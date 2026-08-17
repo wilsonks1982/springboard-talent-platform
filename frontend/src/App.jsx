@@ -14,6 +14,7 @@ export default function App() {
 
     async function bootstrap() {
       if (!accessToken) {
+        console.log("No access token found, clearing auth state.");
         dispatch(setAuthReady(true));
         return;
       }

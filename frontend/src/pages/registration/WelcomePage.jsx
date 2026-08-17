@@ -10,19 +10,24 @@ export default function WelcomePage() {
   const navigate = useNavigate();
 
   const begin = () => {
-    dispatch(setStep("NDA"));
-    navigate("/register/nda");
+    dispatch(setStep("ONBOARDING"));
+    navigate("/register/onboarding");
   };
 
   return (
     <RegistrationLayout>
       <VStack align="stretch" spacing={6}>
-        <Text fontWeight="700" color="blue.600">SPRINGBOARD TALENT</Text>
+        <Text fontWeight="700" color="blue.600">
+          SPRINGBOARD TALENT
+        </Text>
         <Heading>Welcome</Heading>
         <Text color="gray.600">
-          Create your candidate account and take the first step with Springboard Talent.
+          Create your candidate account and take the first step with Springboard
+          Talent.
         </Text>
-        <Button colorScheme="blue" size="lg" onClick={begin}>Begin</Button>
+        <Button colorScheme="blue" size="lg" onClick={begin}>
+          Begin
+        </Button>
       </VStack>
     </RegistrationLayout>
   );

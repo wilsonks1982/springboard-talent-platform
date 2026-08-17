@@ -2,6 +2,7 @@ package org.wilsonks.backend.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
     private final AuthService auth;
     private final VerificationService verification;
@@ -24,6 +26,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public RegisterResponse register(@Valid @RequestBody RegisterRequest registerRequest){
+        log.info("Registering user with email: {}", registerRequest.email());
         return auth.register(registerRequest);
     }
 

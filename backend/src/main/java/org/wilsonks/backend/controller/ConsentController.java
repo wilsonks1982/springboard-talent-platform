@@ -24,12 +24,9 @@ public class ConsentController {
         return service.current();
     }
 
-    @PostMapping public Map<String,Object> accept(Authentication a, @Valid @RequestBody ConsentRequest r, HttpServletRequest req){
-        service.accept(
-                (UUID)a.getPrincipal(),
-                r,
-                clientIp(req)
-        );
+    @PostMapping
+    public Map<String,Object> accept(Authentication a, @Valid @RequestBody ConsentRequest r, HttpServletRequest req){
+        service.accept((UUID)a.getPrincipal(), r, clientIp(req));
 
         return Map.of("accepted",true);
     }

@@ -3,12 +3,11 @@ import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 
 const steps = [
   ["WELCOME", "Welcome"],
+  ["ONBOARDING", "Get Started"],
   ["NDA", "NDA"],
   ["PRIVACY", "Privacy"],
-  ["ACCOUNT", "Account"],
-  ["SITUATION", "Situation"],
   ["VERIFICATION", "Verification"],
-  ["CONFIRMATION", "Done"]
+  ["CONFIRMATION", "Done"],
 ];
 
 export default function Progress({ current }) {

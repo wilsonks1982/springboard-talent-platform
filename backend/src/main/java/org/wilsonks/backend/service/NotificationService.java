@@ -1,5 +1,6 @@
 package org.wilsonks.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 public final class NotificationService {
@@ -14,16 +15,18 @@ public final class NotificationService {
     }
 
     @Component
+    @Slf4j
     static class ConsoleEmail implements Email{
         public void send(String to, String code){
-            System.out.println("[DEV EMAIL] "+to+" code="+code);
+            log.info("[DEV EMAIL] {} otp={}",to,code);
         }
     }
 
     @Component
+    @Slf4j
     static class ConsoleSms implements Sms{
         public void send(String to, String code){
-            System.out.println("[DEV SMS] "+to+" otp="+code);
+            log.info("[DEV SMS] {} otp={}",to,code);
         }
     }
 }

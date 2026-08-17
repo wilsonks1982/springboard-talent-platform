@@ -13,13 +13,13 @@ const initialState = {
     phone: "",
     city: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   },
   employmentSituation: "",
   userId: null,
   emailVerified: false,
   phoneVerified: false,
-  error: null
+  error: null,
 };
 
 const slice = createSlice({
@@ -34,31 +34,62 @@ const slice = createSlice({
       state.privacyAccepted = !!p.privacyAccepted;
       state.emailVerified = !!p.emailVerified;
       state.phoneVerified = !!p.phoneVerified;
-      state.employmentSituation = p.employmentSituation ?? state.employmentSituation;
+      state.employmentSituation =
+        p.employmentSituation ?? state.employmentSituation;
       state.step = p.currentStep ?? state.step;
       state.error = null;
     },
-    setStep(state, action) { state.step = action.payload; state.error = null; },
-    setNdaScrolledToEnd(state, action) { state.ndaScrolledToEnd = action.payload; },
-    acceptNda(state) { if (state.ndaScrolledToEnd) state.ndaAccepted = true; },
-    setPrivacyScrolledToEnd(state, action) { state.privacyScrolledToEnd = action.payload; },
-    acceptPrivacy(state) { if (state.privacyScrolledToEnd) state.privacyAccepted = true; },
-    updateAccount(state, action) { state.account = { ...state.account, ...action.payload }; },
-    setSituation(state, action) { state.employmentSituation = action.payload; },
-    setUserId(state, action) { state.userId = action.payload; },
+    setStep(state, action) {
+      state.step = action.payload;
+      state.error = null;
+    },
+    setNdaScrolledToEnd(state, action) {
+      state.ndaScrolledToEnd = action.payload;
+    },
+    acceptNda(state) {
+      if (state.ndaScrolledToEnd) state.ndaAccepted = true;
+    },
+    setPrivacyScrolledToEnd(state, action) {
+      state.privacyScrolledToEnd = action.payload;
+    },
+    acceptPrivacy(state) {
+      if (state.privacyScrolledToEnd) state.privacyAccepted = true;
+    },
+    updateAccount(state, action) {
+      state.account = { ...state.account, ...action.payload };
+    },
+    setSituation(state, action) {
+      state.employmentSituation = action.payload;
+    },
+    setUserId(state, action) {
+      state.userId = action.payload;
+    },
     setVerification(state, action) {
       state.emailVerified = action.payload.emailVerified ?? state.emailVerified;
       state.phoneVerified = action.payload.phoneVerified ?? state.phoneVerified;
     },
-    setError(state, action) { state.error = action.payload; },
-    reset() { return initialState; }
-  }
+    setError(state, action) {
+      state.error = action.payload;
+    },
+    reset() {
+      return initialState;
+    },
+  },
 });
 
 export const {
-  hydrateStatus, setStep, setNdaScrolledToEnd, acceptNda,
-  setPrivacyScrolledToEnd, acceptPrivacy, updateAccount,
-  setSituation, setUserId, setVerification, setError, reset
+  hydrateStatus,
+  setStep,
+  setNdaScrolledToEnd,
+  acceptNda,
+  setPrivacyScrolledToEnd,
+  acceptPrivacy,
+  updateAccount,
+  setSituation,
+  setUserId,
+  setVerification,
+  setError,
+  reset,
 } = slice.actions;
 
 export default slice.reducer;

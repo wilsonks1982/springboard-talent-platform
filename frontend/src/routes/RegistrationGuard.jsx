@@ -7,28 +7,31 @@ import { hydrateStatus, setStep } from "../store/registrationSlice";
 
 const routeStep = {
   "/register/welcome": "WELCOME",
+  "/register/onboarding": "ONBOARDING",
   "/register/nda": "NDA",
   "/register/privacy": "PRIVACY",
-  "/register/account": "ACCOUNT",
-  "/register/situation": "SITUATION",
   "/register/verification": "VERIFICATION",
-  "/register/confirmation": "CONFIRMATION"
+  "/register/confirmation": "CONFIRMATION",
 };
 
 const order = [
-  "WELCOME", "NDA", "PRIVACY", "ACCOUNT",
-  "SITUATION", "VERIFICATION", "CONFIRMATION"
+  "WELCOME",
+  "ONBOARDING",
+  "NDA",
+  "PRIVACY",
+  "VERIFICATION",
+  "CONFIRMATION",
 ];
 
-const pathFor = (step) => ({
-  WELCOME: "/register/welcome",
-  NDA: "/register/nda",
-  PRIVACY: "/register/privacy",
-  ACCOUNT: "/register/account",
-  SITUATION: "/register/situation",
-  VERIFICATION: "/register/verification",
-  CONFIRMATION: "/register/confirmation"
-}[step] || "/register/welcome");
+const pathFor = (step) =>
+  ({
+    WELCOME: "/register/welcome",
+    ONBOARDING: "/register/onboarding",
+    NDA: "/register/nda",
+    PRIVACY: "/register/privacy",
+    VERIFICATION: "/register/verification",
+    CONFIRMATION: "/register/confirmation",
+  })[step] || "/register/welcome";
 
 export default function RegistrationGuard() {
   const dispatch = useDispatch();
@@ -58,7 +61,9 @@ export default function RegistrationGuard() {
     }
 
     load();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [accessToken, dispatch]);
 
   const requested = routeStep[location.pathname] || "WELCOME";
@@ -71,11 +76,18 @@ export default function RegistrationGuard() {
   }, [requestedIndex, currentIndex, registration.step]);
 
   if (checking) {
-    return <Center minH="100vh"><Spinner size="xl" /></Center>;
+    return (
+      <Center minH="100vh">
+        <Spinner size="xl" />
+      </Center>
+    );
   }
 
   // Once registration is complete, don't allow the registration wizard to be reopened.
-  if (registration.step === "CONFIRMATION" && location.pathname !== "/register/confirmation") {
+  if (
+    registration.step === "CONFIRMATION" &&
+    location.pathname !== "/register/confirmation"
+  ) {
     return <Navigate to="/candidate" replace />;
   }
 

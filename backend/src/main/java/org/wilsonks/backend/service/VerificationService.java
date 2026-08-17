@@ -1,5 +1,6 @@
 package org.wilsonks.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.time.*;
 import java.util.*;
 
 @Service
+@Slf4j
 public class VerificationService {
     private final CodesRepository codes;
     private final UsersRepository users;
@@ -70,6 +72,7 @@ public class VerificationService {
 
         if(provider instanceof NotificationService.Email e) e.send(u.getEmail(),code);
         else ((NotificationService.Sms)provider).send(u.getPhone(),code);
+        log.info("Sent verification code to user {} via {} for purpose {}",u.getUserId(),ch,purpose);
     }
 
     @Transactional
