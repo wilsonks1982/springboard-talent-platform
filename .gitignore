@@ -1,0 +1,37 @@
+# IDEs
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production.local
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+
+# Backend
+backend/target/
+backend/.m2/
+backend/db/
+backend/*.log
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

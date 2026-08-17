@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: springboard-talent-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+server:
+  port: ${SERVER_PORT:8080}
+
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
+  jwt:
+    secret: ${JWT_SECRET:VGhpc0lzQURldmVsb3BtZW50S2V5Rm9yU2JUb25seV9DaGFuZ2VNZQ==}
+    access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
+    issuer: ${JWT_ISSUER:springboard-talent}
+  verification:
+    expiry-minutes: ${VERIFICATION_EXPIRY_MINUTES:10}
+    max-attempts: ${VERIFICATION_MAX_ATTEMPTS:5}
