@@ -14,36 +14,65 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.*;
 
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
-    protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain filterChain)throws ServletException,IOException{
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
+        // Handle CORS preflight requests
         if (CorsUtils.isPreFlightRequest(request)) {
-            log.info("Preflight request detected, skipping JWT filter");
+            log.debug("CORS preflight request detected: {} {}", request.getMethod(), request.getRequestURI());
+            // Don't process JWT for preflight, just continue the chain
+            // CORS headers will be added by CorsFilter
             filterChain.doFilter(request, response);
             return;
         }
 
-        String header=request.getHeader("Authorization");
-        if(header!=null&&header.startsWith("Bearer "))
-            try{
-                var claims= jwtService.parse(header.substring(7));
-                UUID id=UUID.fromString(claims.getSubject());
-                String role=claims.get("role",String.class);
-                var a=role==null?List.<SimpleGrantedAuthority>of():List.of(new SimpleGrantedAuthority("ROLE_"+role));
+        // Process JWT for actual requests
+        String authHeader = request.getHeader("Authorization");
 
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(new UsernamePasswordAuthenticationToken(id,null,a));
-            }catch(Exception e){
-                log.warn("JWT parsing failed: "+e.getMessage());
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
+                var claims = jwtService.parse(token);
+                UUID id = UUID.fromString(claims.getSubject());
+                String role = claims.get("role", String.class);
+
+                var authorities = role == null
+                        ? List.<SimpleGrantedAuthority>of()
+                        : List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+                var authentication = new UsernamePasswordAuthenticationToken(id, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.debug("JWT validated for user: {}", id);
+            } catch (Exception e) {
+                log.warn("JWT parsing failed: {}", e.getMessage());
                 SecurityContextHolder.clearContext();
             }
-        filterChain.doFilter(request,response);
+        } else {
+            log.debug("No Bearer token found in request");
+        }
+
+        // Continue the filter chain
+        filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+
+        // Skip JWT filter for these paths
+        return path.startsWith("/api/v1/auth/register") ||
+                path.startsWith("/api/v1/auth/login") ||
+                path.startsWith("/api/v1/auth/status") ||
+                path.startsWith("/api/v1/consents/current") ||
+                path.startsWith("/actuator/health") ||
+                path.startsWith("/h2-console");
     }
 }

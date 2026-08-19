@@ -22,3 +22,11 @@ app:
   verification:
     expiry-minutes: ${VERIFICATION_EXPIRY_MINUTES:10}
     max-attempts: ${VERIFICATION_MAX_ATTEMPTS:5}
+
+
+logging:
+  level:
+    root: WARN
+    org.wilsonks: DEBUG
+    org.springframework.security.web: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

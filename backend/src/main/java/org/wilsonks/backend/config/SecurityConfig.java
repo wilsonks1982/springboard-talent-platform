@@ -1,65 +1,61 @@
 package org.wilsonks.backend.config;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import org.wilsonks.backend.service.JwtFilter;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Configuration
+@EnableWebSecurity
+@Slf4j
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOrigins;
-
-    @Value("${app.cors.allowed-methods}")
-    private String allowedMethods;
-
-    @Value("${app.cors.allowed-headers}")
-    private String allowedHeaders;
-
-    @Value("${app.cors.allow-credentials:true}")
-    private boolean allowCredentials;
-
-    @Value("${app.cors.max-age:3600}")
-    private long maxAge;
+    private final CorsConfigurationSource corsConfigurationSource;
+    private final JwtFilter jwtFilter;
 
     @Bean
-    SecurityFilterChain filter(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        // CORS preflight
-                        .requestMatchers(
-                                HttpMethod.OPTIONS,
-                                "/**"
-                        ).permitAll()
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        log.info("Configuring Security Filter Chain");
 
+        http
+                // Enable CORS FIRST
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+
+                // Then disable CSRF
+                .csrf(csrf -> csrf.disable())
+
+                // Set session policy to stateless
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // Authorization
+                .authorizeHttpRequests(auth -> auth
+                        // Allow OPTIONS requests (CORS preflight)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Public endpoints
                         .requestMatchers(
                                 "/h2-console/**",
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/status",
                                 "/api/v1/consents/current",
                                 "/actuator/health"
                         ).permitAll()
 
+                        // Authenticated endpoints
                         .requestMatchers(
                                 "/api/v1/auth/email/**",
                                 "/api/v1/auth/phone/**",
@@ -69,47 +65,22 @@ public class SecurityConfig {
                                 "/api/v1/consents"
                         ).authenticated()
 
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
                 )
 
+                // Disable form login
                 .formLogin(form -> form.disable())
+
+                // Allow H2 console frames
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+
+                // Add JWT filter AFTER security filters
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
+        log.info("✓ Security Filter Chain configured successfully");
         return http.build();
     }
-
-
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        // Parse comma-separated origins
-        List<String> origins = Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .toList();
-
-        // Parse comma-separated methods
-        List<String> methods = Arrays.stream(allowedMethods.split(","))
-                .map(String::trim)
-                .toList();
-
-        // Parse comma-separated headers
-        List<String> headers = Arrays.stream(allowedHeaders.split(","))
-                .map(String::trim)
-                .toList();
-
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(origins);
-        configuration.setAllowedMethods(methods);
-        configuration.setAllowedHeaders(headers);
-        configuration.setAllowCredentials(allowCredentials);
-        configuration.setMaxAge(maxAge); //Set max age for preflight requests 3600 seconds (1 hour) means the browser will cache the preflight response for 1 hour
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-
-        return source;
-    }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
