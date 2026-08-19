@@ -1,6 +1,6 @@
 app:
   cors:
-    allowed-origins: http://springboard-talent-alb-dev.cloudfront.net,http://localhost:3000
+    allowed-origins: https://springboard-talent.com,https://www.springboard-talent.com
 
 spring:
   datasource:

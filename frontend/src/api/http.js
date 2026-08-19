@@ -1,10 +1,17 @@
 import axios from "axios";
 import { store } from "../store";
 import { clearAuth } from "../store/authSlice";
+import { getApiConfig } from "./apiConfig";
+
+const apiConfig = getApiConfig();
 
 export const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api/v1",
-  headers: { "Content-Type": "application/json" }
+  baseURL: apiConfig.baseURL,
+  timeout: apiConfig.timeout,
+  withCredentials: apiConfig.withCredentials,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use((config) => {
@@ -20,5 +27,5 @@ api.interceptors.response.use(
       store.dispatch(clearAuth());
     }
     return Promise.reject(error);
-  }
+  },
 );

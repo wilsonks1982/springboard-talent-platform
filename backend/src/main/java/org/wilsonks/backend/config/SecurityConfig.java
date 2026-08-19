@@ -1,6 +1,7 @@
 package org.wilsonks.backend.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,31 +18,34 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import org.wilsonks.backend.service.JwtFilter;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    SecurityFilterChain filter(
-            HttpSecurity http,
-            JwtFilter jwtFilter) throws Exception {
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
+    @Value("${app.cors.allowed-methods}")
+    private String allowedMethods;
+
+    @Value("${app.cors.allowed-headers}")
+    private String allowedHeaders;
+
+    @Value("${app.cors.allow-credentials:true}")
+    private boolean allowCredentials;
+
+    @Value("${app.cors.max-age:3600}")
+    private long maxAge;
+
+    @Bean
+    SecurityFilterChain filter(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
-                .cors(cors -> cors.configurationSource(
-                        corsConfigurationSource()
-                ))
-
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
-                        )
-                )
-
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-
                         // CORS preflight
                         .requestMatchers(
                                 HttpMethod.OPTIONS,
@@ -69,17 +73,8 @@ public class SecurityConfig {
                 )
 
                 .formLogin(form -> form.disable())
-
-                .headers(headers ->
-                        headers.frameOptions(frame ->
-                                frame.sameOrigin()
-                        )
-                )
-
-                .addFilterBefore(
-                        jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -87,43 +82,30 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
+        // Parse comma-separated origins
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .toList();
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        // Parse comma-separated methods
+        List<String> methods = Arrays.stream(allowedMethods.split(","))
+                .map(String::trim)
+                .toList();
 
-        configuration.setAllowedOrigins(
-                List.of("http://localhost:3000")
-        );
+        // Parse comma-separated headers
+        List<String> headers = Arrays.stream(allowedHeaders.split(","))
+                .map(String::trim)
+                .toList();
 
-        configuration.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "PATCH",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(origins);
+        configuration.setAllowedMethods(methods);
+        configuration.setAllowedHeaders(headers);
+        configuration.setAllowCredentials(allowCredentials);
+        configuration.setMaxAge(maxAge); //Set max age for preflight requests 3600 seconds (1 hour) means the browser will cache the preflight response for 1 hour
 
-        configuration.setAllowedHeaders(
-                List.of(
-                        "Authorization",
-                        "Content-Type",
-                        "Accept",
-                        "Origin"
-                )
-        );
-
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration(
-                "/**",
-                configuration
-        );
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
         return source;
     }
