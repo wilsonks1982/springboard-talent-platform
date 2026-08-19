@@ -1,0 +1,11 @@
+aws_region                = "us-east-1"
+environment               = "dev"
+app_name                  = "springboard-talent"
+vpc_cidr                  = "10.0.0.0/16"
+public_subnet_cidr        = "10.0.1.0/24"
+ec2_instance_type         = "t3.micro"
+ec2_root_volume_size      = 20
+backend_port              = 8080
+spring_profiles_active    = "dev"
+cors_allowed_origins      = "http://localhost:3000"
+enable_detailed_monitoring = false
