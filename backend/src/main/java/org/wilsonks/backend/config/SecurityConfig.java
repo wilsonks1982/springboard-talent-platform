@@ -40,10 +40,26 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                // Exception handling - FIX THIS
+                .exceptionHandling(exceptions ->
+                        exceptions.authenticationEntryPoint((request, response, authException) -> {
+                            log.warn("Authentication failed for {}: {}", request.getRequestURI(), authException.getMessage());
+                            response.sendError(401, "Unauthorized");
+                        })
+                )
                 // Authorization
                 .authorizeHttpRequests(auth -> auth
                         // Allow OPTIONS requests (CORS preflight)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Static resources
+                        .requestMatchers(
+                                "/favicon.ico",
+                                "/robots.txt",
+                                "/*.js",
+                                "/*.css",
+                                "/*.map"
+                        ).permitAll()
 
                         // Public endpoints
                         .requestMatchers(
@@ -75,7 +91,7 @@ public class SecurityConfig {
                 // Allow H2 console frames
                 .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
-                // Add JWT filter AFTER security filters
+                // Add JWT filter BEFORE security filters
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         log.info("✓ Security Filter Chain configured successfully");

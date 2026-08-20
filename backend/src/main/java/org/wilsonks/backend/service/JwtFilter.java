@@ -24,11 +24,12 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Handle CORS preflight requests
-        if (CorsUtils.isPreFlightRequest(request)) {
-            log.debug("CORS preflight request detected: {} {}", request.getMethod(), request.getRequestURI());
-            // Don't process JWT for preflight, just continue the chain
-            // CORS headers will be added by CorsFilter
+        String uri = request.getRequestURI(); // Log the request URI for debugging
+        String method = request.getMethod(); // Log the request method for debugging
+        log.debug("Processing request URI: {}, method: {} ", uri, method);
+
+        if("OPTIONS".equalsIgnoreCase(method) || isPublicEndpoint(uri) || CorsUtils.isPreFlightRequest(request)) {
+            log.info("Skipping JWT validation for public endpoint or OPTIONS request: {} {}", method, uri);
             filterChain.doFilter(request, response);
             return;
         }
@@ -63,16 +64,17 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-
-        // Skip JWT filter for these paths
-        return path.startsWith("/api/v1/auth/register") ||
-                path.startsWith("/api/v1/auth/login") ||
-                path.startsWith("/api/v1/auth/status") ||
-                path.startsWith("/api/v1/consents/current") ||
-                path.startsWith("/actuator/health") ||
-                path.startsWith("/h2-console");
+    private boolean isPublicEndpoint(String uri) {
+        return uri.contains("/auth/register") ||
+                uri.contains("/auth/login") ||
+                uri.contains("/auth/status") ||
+                uri.contains("/consents/current") ||
+                uri.contains("/actuator/health") ||
+                uri.contains("/h2-console") ||
+                uri.equals("/favicon.ico") ||
+                uri.equals("/robots.txt") ||
+                uri.endsWith(".js") ||
+                uri.endsWith(".css") ||
+                uri.endsWith(".map");
     }
 }

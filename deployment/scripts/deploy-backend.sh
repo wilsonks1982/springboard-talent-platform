@@ -2,16 +2,14 @@
 set -e
 
 EC2_IP=${1:-}
-ENV=${2:-dev}
 
 if [ -z "$EC2_IP" ]; then
-  echo "Usage: ./deploy-backend.sh <ec2-ip> [environment]"
+  echo "Usage: ./deploy-backend.sh <ec2-ip>"
   exit 1
 fi
 
 echo "=== Deploying Backend to EC2 ==="
 echo "EC2 IP: $EC2_IP"
-echo "Environment: $ENV"
 echo ""
 
 # Get the SSH key
@@ -34,24 +32,32 @@ for i in {1..30}; do
   sleep 5
 done
 
-# Copy repository to EC2
-echo "Copying repository to EC2..."
-ssh -i $SSH_KEY ubuntu@$EC2_IP "rm -rf /home/ubuntu/springboard-talent"
-scp -i $SSH_KEY -r . ubuntu@$EC2_IP:/home/ubuntu/springboard-talent/
 
-# Build and start containers
-echo "Building and starting Docker containers..."
 ssh -i $SSH_KEY ubuntu@$EC2_IP << EOSSH
+    # Clean up
+  rm -rf /home/ubuntu/springboard-talent
+  mkdir -p /home/ubuntu/springboard-talent
   cd /home/ubuntu/springboard-talent
-  export SPRING_PROFILES_ACTIVE=$ENV
-  export CORS_ALLOWED_ORIGINS="*"  # Update this with your S3 URL
   
-  docker-compose -f deployment/docker/docker-compose.yml up -d --build
+  # Clone repository (use correct URL)
+  echo "Cloning repository..."
+  
+  git clone https://github.com/wilsonks1982/springboard-talent-platform.git .
+
+  sleep 5
+
+  cd backend
+
+  docker compose down || true
+
+  docker pull public.ecr.aws/l1s7l1v5/springboard-talent-backend:latest
+
+  docker compose up -d
   
   echo "Waiting for containers to start..."
   sleep 5
   
-  docker-compose -f deployment/docker/docker-compose.yml ps
+  docker compose logs -f
 EOSSH
 
 echo ""

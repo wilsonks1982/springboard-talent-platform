@@ -16,6 +16,5 @@ fi
 
 echo "=== Docker Compose Logs (Live) ==="
 echo "Press Ctrl+C to exit"
-echo ""
 
-ssh -i $SSH_KEY ubuntu@$EC2_IP "cd /home/ubuntu/springboard-talent && docker-compose logs -f"
+ssh -i $SSH_KEY ubuntu@$EC2_IP "cd /home/ubuntu/springboard-talent/backend && docker-compose logs -f"

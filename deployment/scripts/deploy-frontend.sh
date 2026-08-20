@@ -22,20 +22,20 @@ fi
 
 # Build frontend
 echo "Building frontend..."
-cd springboard-talent-frontend
+cd frontend
 NODE_ENV=$ENV npm run build
 cd - > /dev/null
 
 # Deploy to S3
 echo "Syncing to S3..."
-aws s3 sync springboard-talent-frontend/dist/ s3://$BUCKET_NAME \
+aws s3 sync frontend/dist/ s3://$BUCKET_NAME \
   --delete \
   --cache-control "max-age=31536000,public" \
   --exclude "index.html" \
   --exclude "*.map"
 
 # Upload index.html with no cache
-aws s3 cp springboard-talent-frontend/dist/index.html s3://$BUCKET_NAME/index.html \
+aws s3 cp frontend/dist/index.html s3://$BUCKET_NAME/index.html \
   --cache-control "no-cache,no-store,must-revalidate" \
   --content-type "text/html"
 
