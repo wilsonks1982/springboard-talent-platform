@@ -63,6 +63,9 @@ resource "aws_instance" "backend" {
   vpc_security_group_ids = [aws_security_group.ec2.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
+  # ✅ ADD THIS LINE - Connect your SSH key
+  key_name = aws_key_pair.ec2_key.key_name
+
   root_block_device {
     volume_type           = "gp3"
     volume_size           = var.ec2_root_volume_size
@@ -79,7 +82,7 @@ resource "aws_instance" "backend" {
     Name = "${var.app_name}-backend-${var.environment}"
   }
 
-  depends_on = [aws_internet_gateway.main]
+  depends_on = [aws_internet_gateway.main, aws_key_pair.ec2_key]
 }
 
 # Elastic IP for EC2 (optional but useful)

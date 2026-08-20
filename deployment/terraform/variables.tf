@@ -1,7 +1,14 @@
+variable "aws_profile" {
+  description = "AWS CLI profile name for deployment"
+  type    = string
+  default = "wilson-admin"
+}
+
+
 variable "aws_region" {
   description = "AWS region for deployment"
   type        = string
-  default     = "us-east-1"
+  default     = "ap-south-1"
 }
 
 variable "environment" {
@@ -60,7 +67,7 @@ variable "spring_profiles_active" {
 variable "cors_allowed_origins" {
   description = "CORS allowed origins (comma-separated)"
   type        = string
-  default     = "http://localhost:3000"
+  default     = "*"
 }
 
 variable "enable_detailed_monitoring" {

@@ -8,7 +8,6 @@ const apiConfig = getApiConfig();
 export const api = axios.create({
   baseURL: apiConfig.baseURL,
   timeout: apiConfig.timeout,
-  withCredentials: apiConfig.withCredentials,
   headers: {
     "Content-Type": "application/json",
   },

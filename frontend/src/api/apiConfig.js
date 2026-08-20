@@ -12,20 +12,14 @@ export const getApiConfig = () => {
     development: {
       baseURL,
       timeout: 10000,
-      withCredentials: false,
-      debug: true,
     },
     dev: {
       baseURL,
       timeout: 10000,
-      withCredentials: true,
-      debug: true,
     },
     production: {
       baseURL,
       timeout: 15000,
-      withCredentials: true,
-      debug: true,
     },
   };
 

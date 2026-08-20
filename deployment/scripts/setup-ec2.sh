@@ -38,28 +38,12 @@ apt-get install -y git curl wget htop
 mkdir -p /home/ubuntu/springboard-talent
 chown -R ubuntu:ubuntu /home/ubuntu/springboard-talent
 
-# Create systemd service for docker-compose
-cat > /etc/systemd/system/springboard-talent.service << 'EOF'
-[Unit]
-Description=Springboard Talent Docker Compose
-Requires=docker.service
-After=docker.service
-
-[Service]
-Type=oneshot
-User=ubuntu
-WorkingDirectory=/home/ubuntu/springboard-talent
-ExecStart=/usr/local/bin/docker-compose up -d
-ExecStop=/usr/local/bin/docker-compose down
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-systemctl daemon-reload
-
 # Log completion
 echo "=== EC2 Setup Complete ===" > /var/log/springboard-setup.log
 echo "Docker version: $(docker --version)" >> /var/log/springboard-setup.log
 echo "Docker Compose version: $(/usr/local/bin/docker-compose --version)" >> /var/log/springboard-setup.log
+echo "" >> /var/log/springboard-setup.log
+echo "Next steps:" >> /var/log/springboard-setup.log
+echo "1. SSH into EC2: ssh -i ~/.ssh/springboard-talent ubuntu@<IP>" >> /var/log/springboard-setup.log
+echo "2. Clone your repo: git clone https://github.com/wilsonks1982/springboard-talent-platform.git /home/ubuntu/springboard-talent" >> /var/log/springboard-setup.log
+echo "3. Run docker-compose: cd /home/ubuntu/springboard-talent && docker-compose up -d" >> /var/log/springboard-setup.log
