@@ -6,9 +6,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.wilsonks.backend.domain.Candidate;
 import org.wilsonks.backend.domain.User;
 import org.wilsonks.backend.dto.*;
+import org.wilsonks.backend.repository.CandidateRepository;
 import org.wilsonks.backend.repository.UsersRepository;
+import org.wilsonks.backend.security.JwtService;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -22,9 +25,13 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwt;
     private final VerificationService verification;
+    private final CandidateRepository candidatesRepo;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest){
+
+        // 1. Validate input
+        // 2. Check duplicate email/phone
         String email=registerRequest.email().trim().toLowerCase(Locale.ROOT);
         String phone=normalize(registerRequest.phone());
 
@@ -47,6 +54,8 @@ public class AuthService {
             throw new IllegalArgumentException("An account with this phone number already exists.");
         }
 
+        // 3. Create User
+
         User user=new User();
         user.setFullName(registerRequest.fullName().trim());
         user.setEmail(email);
@@ -59,7 +68,15 @@ public class AuthService {
 
         user= usersRepo.save(user);
 
+        // 4. Create Candidate
+
+        Candidate candidate=new Candidate();
+        candidate.setUser(user); // Set the user for the candidate
+        candidatesRepo.save(candidate);
+
         log.info("User registered successfully with ID: {}", user.getUserId());
+
+        // 5. Continue existing registration flow
 
         verification.createEmail(user);
 
@@ -69,7 +86,6 @@ public class AuthService {
         return RegisterResponse.of(user, token, jwt.expires(), "VERIFICATION_PENDING");
 
     }
-
 
     public LoginResponse login(LoginRequest loginRequest){
         User user= usersRepo.findByEmailIgnoreCase(loginRequest.email().trim().toLowerCase()).orElseThrow(()->new BadCredentialsException("Invalid email or password."));

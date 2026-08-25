@@ -57,6 +57,14 @@ public class User {
     @Column(name="updated_at",nullable=false)
     private OffsetDateTime updatedAt;
 
+    @OneToOne(
+            mappedBy = "user",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Candidate candidate;
+
     @PrePersist
     void create() {
         if (userId == null) userId = UUID.randomUUID();

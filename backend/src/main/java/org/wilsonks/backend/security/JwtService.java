@@ -1,4 +1,4 @@
-package org.wilsonks.backend.service;
+package org.wilsonks.backend.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;

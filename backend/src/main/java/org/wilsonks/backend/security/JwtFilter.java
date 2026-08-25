@@ -1,4 +1,4 @@
-package org.wilsonks.backend.service;
+package org.wilsonks.backend.security;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
