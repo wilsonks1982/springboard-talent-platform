@@ -5,7 +5,7 @@ import org.wilsonks.backend.domain.Candidate;
 
 import java.util.UUID;
 
-public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
+public interface CandidatesRepository extends JpaRepository<Candidate, UUID> {
     boolean existsByUserUserId(UUID id);
     Candidate findByUserUserId(UUID id);
 }

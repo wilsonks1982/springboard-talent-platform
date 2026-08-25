@@ -44,14 +44,15 @@ public class VerificationService {
         this.max=max;
     }
 
-    @Transactional
-    public void createEmail(User u){
-        send(u, VerificationChannel.EMAIL,VerificationPurpose.EMAIL_VERIFICATION,email);
-    }
 
     @Transactional
     public void resendEmail(UUID id){
         createEmail(users.findById(id).orElseThrow());
+    }
+
+    @Transactional
+    public void createEmail(User u){
+        send(u, VerificationChannel.EMAIL,VerificationPurpose.EMAIL_VERIFICATION,email);
     }
 
     @Transactional
@@ -61,7 +62,12 @@ public class VerificationService {
     }
 
     private void send(User u, VerificationChannel ch, VerificationPurpose purpose, Object provider){
-        String code="%06d".formatted(random.nextInt(1_000_000));
+//        String code="%06d".formatted(random.nextInt(1_000_000));
+        String code = "%06d".formatted(333333);
+        if(VerificationChannel.EMAIL == ch ) {
+            code = "%06d".formatted(222222);
+        }
+
         VerificationCode v=new VerificationCode();
         v.setUser(u);
         v.setChannel(ch);

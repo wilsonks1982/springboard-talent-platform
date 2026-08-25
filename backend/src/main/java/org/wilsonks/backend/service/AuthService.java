@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wilsonks.backend.domain.Candidate;
 import org.wilsonks.backend.domain.User;
 import org.wilsonks.backend.dto.*;
-import org.wilsonks.backend.repository.CandidateRepository;
+import org.wilsonks.backend.repository.CandidatesRepository;
 import org.wilsonks.backend.repository.UsersRepository;
 import org.wilsonks.backend.security.JwtService;
 
@@ -25,7 +25,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwt;
     private final VerificationService verification;
-    private final CandidateRepository candidatesRepo;
+    private final CandidatesRepository candidatesRepo;
 
     @Transactional
     public RegisterResponse register(RegisterRequest registerRequest){
