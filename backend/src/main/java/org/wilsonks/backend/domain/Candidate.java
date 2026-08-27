@@ -47,6 +47,14 @@ public class Candidate implements Persistable<UUID> {
     @OrderBy("displayOrder ASC")
     private List<CandidateCertification> certifications = new ArrayList<>();
 
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CandidateAchievement> achievements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CandidateReference> references = new ArrayList<>();
+
     @Column(name = "current_challenge")
     private String currentChallenge;
 

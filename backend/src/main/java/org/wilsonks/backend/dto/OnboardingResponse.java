@@ -20,6 +20,8 @@ public record OnboardingResponse(
         List<ExperienceResponse> experiences,
         List<EducationResponse> education,
         List<CertificationResponse> certifications,
+        List<AchievementResponse> achievements,
+        List<ReferenceResponse> references,
 
         String currentChallenge,
         String growthAspiration,
@@ -68,6 +70,21 @@ public record OnboardingResponse(
             LocalDate issueDate,
             LocalDate expiryDate,
             String description,
+            int displayOrder
+    ) {}
+
+    public record AchievementResponse(
+            UUID id,
+            String title,
+            String description,
+            int displayOrder
+    ) {}
+
+    public record ReferenceResponse(
+            UUID id,
+            String name,
+            String relationship,
+            String contact,
             int displayOrder
     ) {}
 }

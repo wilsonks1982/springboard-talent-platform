@@ -71,6 +71,31 @@ public class OnboardingService {
                         )
                         .toList();
 
+        List<OnboardingResponse.AchievementResponse> achievements = candidate.getAchievements()
+                        .stream()
+                        .map(item ->
+                                new OnboardingResponse.AchievementResponse(
+                                        item.getId(),
+                                        item.getTitle(),
+                                        item.getDescription(),
+                                        item.getDisplayOrder()
+                                )
+                        )
+                        .toList();
+
+        List<OnboardingResponse.ReferenceResponse> references = candidate.getReferences()
+                        .stream()
+                        .map(item ->
+                                new OnboardingResponse.ReferenceResponse(
+                                        item.getId(),
+                                        item.getName(),
+                                        item.getRelationship(),
+                                        item.getContact(),
+                                        item.getDisplayOrder()
+                                )
+                        )
+                        .toList();
+
         return new OnboardingResponse(
                 user.getUserId(),
                 user.getFullName(),
@@ -80,6 +105,8 @@ public class OnboardingService {
                 experiences,
                 education,
                 certifications,
+                achievements,
+                references,
 
                 candidate.getCurrentChallenge(),
                 candidate.getGrowthAspiration(),
