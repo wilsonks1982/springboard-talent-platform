@@ -9,6 +9,7 @@ import org.wilsonks.backend.dto.OnboardingResponse;
 import org.wilsonks.backend.repository.CandidatesRepository;
 import org.wilsonks.backend.repository.UsersRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,15 +22,54 @@ public class OnboardingService {
     @Transactional(readOnly = true)
     public OnboardingResponse getOnboarding(UUID userId) {
 
-        User user = usersRepo.findById(userId)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found."));
+        User user = usersRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found."));
+        Candidate candidate = candidatesRepo.findById(userId).orElseThrow(() -> new IllegalStateException("Candidate profile not found."));
 
-        Candidate candidate = candidatesRepo.findById(userId)
-                .orElseThrow(() ->
-                        new IllegalStateException(
-                                "Candidate profile not found."
-                        ));
+        List<OnboardingResponse.ExperienceResponse> experiences = candidate.getExperiences()
+                        .stream()
+                        .map(experience ->
+                                new OnboardingResponse.ExperienceResponse(
+                                        experience.getId(),
+                                        experience.getCompanyName(),
+                                        experience.getJobTitle(),
+                                        experience.getStartDate(),
+                                        experience.getEndDate(),
+                                        experience.isCurrent(),
+                                        experience.getDescription(),
+                                        experience.getDisplayOrder()
+                                )
+                        )
+                        .toList();
+
+        List<OnboardingResponse.EducationResponse> education = candidate.getEducation()
+                        .stream()
+                        .map(item ->
+                                new OnboardingResponse.EducationResponse(
+                                        item.getId(),
+                                        item.getDegree(),
+                                        item.getInstitution(),
+                                        item.getFieldOfStudy(),
+                                        item.getYearOfPassing(),
+                                        item.getEducationLevel(),
+                                        item.getDisplayOrder()
+                                )
+                        )
+                        .toList();
+
+        List<OnboardingResponse.CertificationResponse> certifications = candidate.getCertifications()
+                        .stream()
+                        .map(item ->
+                                new OnboardingResponse.CertificationResponse(
+                                        item.getId(),
+                                        item.getName(),
+                                        item.getIssuingOrganization(),
+                                        item.getIssueDate(),
+                                        item.getExpiryDate(),
+                                        item.getDescription(),
+                                        item.getDisplayOrder()
+                                )
+                        )
+                        .toList();
 
         return new OnboardingResponse(
                 user.getUserId(),
@@ -37,9 +77,9 @@ public class OnboardingService {
                 user.getEmail(),
                 user.getEmploymentSituation(),
 
-                candidate.getCurrentCompany(),
-                candidate.getCurrentRole(),
-                candidate.getYearsExperience(),
+                experiences,
+                education,
+                certifications,
 
                 candidate.getCurrentChallenge(),
                 candidate.getGrowthAspiration(),

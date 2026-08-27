@@ -6,19 +6,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 import org.wilsonks.backend.domain.enums.RelocationPreference;
 import org.wilsonks.backend.domain.enums.WorkModePreference;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+/*
+For a shared-primary-key entity like Candidate, making Candidate implement Persistable<UUID> so Spring Data knows that
+a newly-created Candidate is new even though its ID is already assigned.
+ */
 @Entity
 @Table(name = "candidates")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class Candidate {
+public class Candidate implements Persistable<UUID> {
 
     @Id
     @Column(name = "user_id")
@@ -29,14 +35,17 @@ public class Candidate {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "current_company")
-    private String currentCompany;
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CandidateExperience> experiences = new ArrayList<>();
 
-    @Column(name = "current_job_role")
-    private String currentRole;
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CandidateEducation> education = new ArrayList<>();
 
-    @Column(name = "years_experience")
-    private String yearsExperience;
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("displayOrder ASC")
+    private List<CandidateCertification> certifications = new ArrayList<>();
 
     @Column(name = "current_challenge")
     private String currentChallenge;
@@ -73,4 +82,22 @@ public class Candidate {
     @Column(name = "onboarding_completed_at")
     private OffsetDateTime onboardingCompletedAt;
 
+    @Transient
+    private boolean newEntity = true;
+
+    @Override
+    public UUID getId() {
+        return userId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return newEntity;
+    }
+
+    @PostPersist
+    @PostLoad
+    private void markNotNew() {
+        this.newEntity = false;
+    }
 }

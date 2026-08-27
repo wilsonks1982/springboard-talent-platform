@@ -69,12 +69,12 @@ public class AuthService {
         user= usersRepo.save(user);
 
         // 4. Create Candidate
-
         Candidate candidate=new Candidate();
+        candidate.setUserId(user.getUserId()); // Set the user ID for the candidate
         candidate.setUser(user); // Set the user for the candidate
         candidatesRepo.save(candidate);
 
-        log.info("User registered successfully with ID: {}", user.getUserId());
+        log.info("User and candidate registered successfully with ID: {}", user.getUserId());
 
         // 5. Continue existing registration flow
 
