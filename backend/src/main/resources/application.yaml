@@ -9,6 +9,9 @@ server:
 
 
 app:
+  storage:
+    upload-dir: ${STORAGE_UPLOAD_DIR:${user.home}/springboard-uploads}
+    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880} # 5MB
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
     allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
