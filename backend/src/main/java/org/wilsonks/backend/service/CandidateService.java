@@ -17,9 +17,12 @@ public class CandidateService {
 
     @Transactional(readOnly = true)
     public CandidateResponse getMyProfile(UUID userId) {
-
         Candidate candidate = candidatesRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("Candidate profile not found."));
-
         return CandidateResponse.of(candidate);
+    }
+
+    @Transactional(readOnly = true)
+    public Candidate getCandidateByUserId(UUID userId) {
+        return candidatesRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("Candidate profile not found."));
     }
 }

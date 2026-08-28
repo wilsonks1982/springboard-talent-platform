@@ -41,6 +41,11 @@ import { authApi } from "../../api/authApi";
 import { candidateApi } from "../../api/candidateApi";
 import { clearAuth } from "../../store/authSlice";
 import CandidateHeader from "../../components/candidate/candidateHeader";
+import ExperienceSection from "../../components/candidate/sections/ExperienceSection";
+
+import ExperienceDrawer from "../../components/candidate/drawers/ExperienceDrawer";
+
+import { candidateExperienceApi } from "../../api/candidateExperienceApi";
 
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
@@ -49,6 +54,12 @@ export default function CandidateLandingPage() {
   const [candidate, setCandidate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [experiences, setExperiences] = useState(candidate?.experiences || []);
+
+  const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
+
+  const [editingExperience, setEditingExperience] = useState(null);
 
   useEffect(() => {
     loadCandidate();
@@ -109,6 +120,51 @@ export default function CandidateLandingPage() {
   const completion = calculateProfileCompletion(candidate);
 
   const firstName = candidate.user?.fullName?.split(" ")[0] || "there";
+
+  function handleAddExperience() {
+    setEditingExperience(null);
+    setExperienceDrawerOpen(true);
+  }
+
+  function handleEditExperience(experience) {
+    setEditingExperience(experience);
+    setExperienceDrawerOpen(true);
+  }
+
+  async function handleSaveExperience(payload, experienceId) {
+    if (experienceId) {
+      const updated = await candidateExperienceApi.update(
+        experienceId,
+        payload,
+      );
+
+      setExperiences((current) =>
+        current.map((experience) =>
+          experience.id === experienceId ? updated : experience,
+        ),
+      );
+    } else {
+      const created = await candidateExperienceApi.create(payload);
+
+      setExperiences((current) => [...current, created]);
+    }
+  }
+
+  async function handleDeleteExperience(experience) {
+    const confirmed = window.confirm(
+      `Delete your experience at ${experience.companyName}?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await candidateExperienceApi.remove(experience.id);
+
+    setExperiences((current) =>
+      current.filter((item) => item.id !== experience.id),
+    );
+  }
 
   return (
     <Flex minH="100vh" bg="#F7F8FC">
@@ -182,9 +238,11 @@ export default function CandidateLandingPage() {
           >
             <GridItem>
               <Stack spacing={5}>
-                <ExperienceCard
-                  experiences={candidate.experiences}
-                  navigate={navigate}
+                <ExperienceSection
+                  experiences={experiences}
+                  onAdd={handleAddExperience}
+                  onEdit={handleEditExperience}
+                  onDelete={handleDeleteExperience}
                 />
 
                 <EducationCard
@@ -213,6 +271,15 @@ export default function CandidateLandingPage() {
             </GridItem>
           </Grid>
         </Box>
+        <ExperienceDrawer
+          isOpen={experienceDrawerOpen}
+          onClose={() => {
+            setExperienceDrawerOpen(false);
+            setEditingExperience(null);
+          }}
+          experience={editingExperience}
+          onSave={handleSaveExperience}
+        />
       </Box>
     </Flex>
   );
