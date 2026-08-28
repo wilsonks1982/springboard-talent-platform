@@ -21,8 +21,8 @@ public class CandidateDocument {
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "candidate_user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidate_user_id", nullable = false, unique = true)
     private Candidate candidate;
 
     @Enumerated(EnumType.STRING)
@@ -51,6 +51,4 @@ public class CandidateDocument {
     @Column(name = "parsing_error", columnDefinition = "TEXT")
     private String parsingError;
 
-    @Column(name = "is_primary", nullable = false)
-    private boolean primary;
 }

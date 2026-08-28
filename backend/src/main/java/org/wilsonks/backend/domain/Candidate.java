@@ -55,9 +55,9 @@ public class Candidate implements Persistable<UUID> {
     @OrderBy("displayOrder ASC")
     private List<CandidateReference> references = new ArrayList<>();
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("uploadedAt DESC")
-    private List<CandidateDocument> documents = new ArrayList<>();
+    private CandidateDocument resume;
 
     @Column(name = "current_challenge")
     private String currentChallenge;

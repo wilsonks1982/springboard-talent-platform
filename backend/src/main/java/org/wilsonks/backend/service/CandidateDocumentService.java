@@ -30,28 +30,50 @@ public class CandidateDocumentService {
 
         Candidate candidate = candidatesRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("Candidate profile not found."));
 
-        // 1. Create document metadata
-        CandidateDocument document = new CandidateDocument();
+        CandidateDocument document = documentsRepo.findByCandidateUserId(userId).orElse(null);
 
-        document.setCandidate(candidate);
-        document.setDocumentType(DocumentType.RESUME);
+        if (document == null) {
+
+            document = new CandidateDocument();
+
+            document.setCandidate(candidate);
+            document.setDocumentType(DocumentType.RESUME);
+            document.setParsingStatus(ParsingStatus.NOT_STARTED);
+        }
+
+        String storageKey = storageService.store(candidate.getUser().getEmail(), file);
+
         document.setOriginalFileName(file.getOriginalFilename());
-        document.setContentType(file.getContentType());
-        document.setFileSize(file.getSize());
-        document.setUploadedAt(OffsetDateTime.now());
-        document.setParsingStatus(ParsingStatus.NOT_STARTED);
-        document.setPrimary(false);
 
-        // 2. Persist so UUID is generated
-        document = documentsRepo.saveAndFlush(document);
-
-        // 3. Store physical file
-        String storageKey = storageService.store(candidate.getUser().getEmail(), document.getId(), file);
-
-        // 4. Update metadata with storage location
         document.setStorageKey(storageKey);
 
+        document.setContentType(file.getContentType());
+
+        document.setFileSize(file.getSize());
+
+        document.setUploadedAt(OffsetDateTime.now());
+
+        document.setParsingStatus(ParsingStatus.NOT_STARTED);
+
+        document.setParsingError(null);
+
         return documentsRepo.save(document);
+    }
+
+    @Transactional(readOnly = true)
+    public CandidateDocument getResume(UUID userId) {
+
+        return documentsRepo.findByCandidateUserId(userId).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
+    }
+
+    @Transactional
+    public void deleteResume(UUID userId) throws IOException {
+
+        CandidateDocument document = documentsRepo.findByCandidateUserId(userId).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
+
+        storageService.delete(document.getStorageKey());
+
+        documentsRepo.delete(document);
     }
 
     private void validate(MultipartFile file) {

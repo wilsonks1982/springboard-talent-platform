@@ -5,11 +5,19 @@ import org.wilsonks.backend.domain.CandidateDocument;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record CandidateDocumentResponse(UUID id, String documentType, String originalFileName, String contentType,
-                                        Long fileSize, OffsetDateTime uploadedAt, String parsingStatus,
-                                        boolean primary) {
+public record CandidateDocumentResponse(
+        UUID id,
+        String documentType,
+        String originalFileName,
+        String contentType,
+        Long fileSize,
+        OffsetDateTime uploadedAt,
+        String parsingStatus
+) {
 
-    public static CandidateDocumentResponse of(CandidateDocument document) {
+    public static CandidateDocumentResponse of(
+            CandidateDocument document
+    ) {
         return new CandidateDocumentResponse(
                 document.getId(),
                 document.getDocumentType().name(),
@@ -17,7 +25,7 @@ public record CandidateDocumentResponse(UUID id, String documentType, String ori
                 document.getContentType(),
                 document.getFileSize(),
                 document.getUploadedAt(),
-                document.getParsingStatus().name(),
-                document.isPrimary());
+                document.getParsingStatus().name()
+        );
     }
 }
