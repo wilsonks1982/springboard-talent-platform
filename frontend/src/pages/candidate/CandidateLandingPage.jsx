@@ -54,6 +54,10 @@ import { candidateEducationApi } from "../../api/candidateEducationApi";
 
 import ProfileStrengthCard from "../../components/candidate/sections/ProfileStrengthCard";
 
+import ResumeSection from "../../components/candidate/sections/ResumeSection";
+import ResumeUploadDrawer from "../../components/candidate/drawers/ResumeUploadDrawer";
+import { candidateResumeApi } from "../../api/candidateResumeApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -71,6 +75,9 @@ export default function CandidateLandingPage() {
   const [editingEducation, setEditingEducation] = useState(null);
 
   const [profileStrength, setProfileStrength] = useState(null);
+
+  const [resume, setResume] = useState(null);
+  const [resumeDrawerOpen, setResumeDrawerOpen] = useState(false);
 
   useEffect(() => {
     loadCandidate();
@@ -90,6 +97,7 @@ export default function CandidateLandingPage() {
       setExperiences(candidateData.experiences || []);
       setEducation(candidateData.education || []);
       setProfileStrength(profileStrengthData);
+      setResume(candidateData.resume || null);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -241,6 +249,45 @@ export default function CandidateLandingPage() {
     }
   }
 
+  function handleUploadResume() {
+    setResumeDrawerOpen(true);
+  }
+
+  async function handleSaveResume(file) {
+    const uploaded = await candidateResumeApi.upload(file);
+
+    setResume(uploaded);
+
+    await refreshProfileStrength();
+  }
+
+  async function handleDownloadResume() {
+    const blob = await candidateResumeApi.download();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const anchor = document.createElement("a");
+
+    anchor.href = url;
+    anchor.download = "Resume.pdf";
+
+    document.body.appendChild(anchor);
+
+    anchor.click();
+
+    anchor.remove();
+
+    window.URL.revokeObjectURL(url);
+  }
+
+  async function handleDeleteResume() {
+    await candidateResumeApi.delete();
+
+    setResume(null);
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -281,14 +328,14 @@ export default function CandidateLandingPage() {
           </Box>
 
           {/* Top cards */}
-          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
+          {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
             <ResumeCard
               resume={candidate.resume}
               onUpload={() => navigate("/candidate/profile")}
             />
 
             <QuickActions candidate={candidate} navigate={navigate} />
-          </SimpleGrid>
+          </SimpleGrid> */}
 
           {/* Completion */}
           <CompletionCard
@@ -325,6 +372,13 @@ export default function CandidateLandingPage() {
                   onAdd={handleAddEducation}
                   onEdit={handleEditEducation}
                   onDelete={handleDeleteEducation}
+                />
+
+                <ResumeSection
+                  resume={resume}
+                  onUpload={handleUploadResume}
+                  onDownload={handleDownloadResume}
+                  onDelete={handleDeleteResume}
                 />
 
                 <CertificationCard
@@ -365,6 +419,12 @@ export default function CandidateLandingPage() {
           }}
           education={editingEducation}
           onSave={handleSaveEducation}
+        />
+
+        <ResumeUploadDrawer
+          isOpen={resumeDrawerOpen}
+          onClose={() => setResumeDrawerOpen(false)}
+          onSave={handleSaveResume}
         />
       </Box>
     </Flex>

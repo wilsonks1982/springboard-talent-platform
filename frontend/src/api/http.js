@@ -8,9 +8,6 @@ const apiConfig = getApiConfig();
 export const api = axios.create({
   baseURL: apiConfig.baseURL,
   timeout: apiConfig.timeout,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 api.interceptors.request.use((config) => {
