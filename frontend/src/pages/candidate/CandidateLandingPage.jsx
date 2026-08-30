@@ -55,7 +55,7 @@ export default function CandidateLandingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [experiences, setExperiences] = useState(candidate?.experiences || []);
+  const [experiences, setExperiences] = useState([]);
 
   const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
 
@@ -72,6 +72,7 @@ export default function CandidateLandingPage() {
 
       const data = await candidateApi.getMe();
       setCandidate(data);
+      setExperiences(data.experiences || []);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -151,14 +152,6 @@ export default function CandidateLandingPage() {
   }
 
   async function handleDeleteExperience(experience) {
-    const confirmed = window.confirm(
-      `Delete your experience at ${experience.companyName}?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
     await candidateExperienceApi.remove(experience.id);
 
     setExperiences((current) =>
@@ -801,78 +794,6 @@ function SectionHeader({ title, action, onAction }) {
         + {action}
       </Button>
     </Flex>
-  );
-}
-
-function ExperienceCard({ experiences, navigate }) {
-  return (
-    <Card>
-      <SectionHeader
-        title="Experience"
-        action="Add Experience"
-        onAction={() => navigate("/candidate/profile")}
-      />
-
-      {experiences.length === 0 ? (
-        <EmptyState
-          icon={FiBriefcase}
-          title="Your professional journey starts here."
-          text="Add your work experience to build your career story."
-          action="Add Experience"
-          onClick={() => navigate("/candidate/profile")}
-        />
-      ) : (
-        <Stack spacing={0}>
-          {experiences.slice(0, 3).map((experience, index) => (
-            <Box key={experience.id}>
-              {index > 0 && <Divider my={5} />}
-
-              <Flex justify="space-between" gap={4}>
-                <HStack align="flex-start" spacing={4}>
-                  <Box
-                    w="42px"
-                    h="42px"
-                    borderRadius="lg"
-                    bg="purple.50"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontWeight="800"
-                    color="purple.600"
-                  >
-                    {experience.companyName?.[0] || "C"}
-                  </Box>
-
-                  <Box>
-                    <Text fontWeight="700">{experience.jobTitle}</Text>
-
-                    <Text mt={1} fontSize="sm" color="gray.600">
-                      {experience.companyName}
-                    </Text>
-
-                    <Text mt={1} fontSize="xs" color="gray.500">
-                      {formatDate(experience.startDate)} —{" "}
-                      {experience.current
-                        ? "Present"
-                        : formatDate(experience.endDate)}
-                    </Text>
-                  </Box>
-                </HStack>
-
-                <Text
-                  fontSize="sm"
-                  color="purple.600"
-                  cursor="pointer"
-                  onClick={() => navigate("/candidate/profile")}
-                >
-                  Edit
-                </Text>
-              </Flex>
-            </Box>
-          ))}
-        </Stack>
-      )}
-    </Card>
   );
 }
 

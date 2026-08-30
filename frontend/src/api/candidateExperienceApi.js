@@ -1,6 +1,6 @@
 import { api } from "./http";
 
-const BASE_URL = "/api/v1/candidates/me/experiences";
+const BASE_URL = "/candidates/me/experiences";
 
 export const candidateExperienceApi = {
   async getAll() {

@@ -1,5 +1,12 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Badge,
   Box,
   Button,
   Flex,
@@ -40,6 +47,14 @@ export default function ExperienceSection({
   onEdit,
   onDelete,
 }) {
+  const [experienceToDelete, setExperienceToDelete] = useState(null);
+
+  const cancelRef = useRef();
+
+  function requestDelete(experience) {
+    setExperienceToDelete(experience);
+  }
+
   return (
     <Box
       bg="white"
@@ -158,9 +173,24 @@ export default function ExperienceSection({
                       {experience.companyName}
                     </Text>
 
-                    <Text fontSize="xs" color="gray.400" mt={1}>
-                      {getDateRange(experience)}
-                    </Text>
+                    <HStack spacing={2} mt={1} flexWrap="wrap">
+                      <Text fontSize="xs" color="gray.400">
+                        {getDateRange(experience)}
+                      </Text>
+
+                      {experience.current && (
+                        <Badge
+                          colorScheme="green"
+                          variant="subtle"
+                          borderRadius="full"
+                          px={2}
+                          fontSize="10px"
+                          textTransform="none"
+                        >
+                          Current
+                        </Badge>
+                      )}
+                    </HStack>
                   </Box>
 
                   <HStack spacing={1}>
@@ -178,7 +208,7 @@ export default function ExperienceSection({
                       size="sm"
                       variant="ghost"
                       colorScheme="red"
-                      onClick={() => onDelete(experience)}
+                      onClick={() => requestDelete(experience)}
                     />
                   </HStack>
                 </Flex>
@@ -193,6 +223,56 @@ export default function ExperienceSection({
           ))}
         </VStack>
       )}
+      <AlertDialog
+        isOpen={Boolean(experienceToDelete)}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setExperienceToDelete(null)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent borderRadius="2xl">
+            <AlertDialogHeader fontSize="lg" fontWeight="700">
+              Delete experience?
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              <Text color="gray.600">
+                This will permanently remove your experience at{" "}
+                <Text as="span" fontWeight="600" color="gray.800">
+                  {experienceToDelete?.companyName}
+                </Text>
+                .
+              </Text>
+
+              <Text fontSize="sm" color="gray.500" mt={2}>
+                This action cannot be undone.
+              </Text>
+            </AlertDialogBody>
+
+            <AlertDialogFooter gap={3}>
+              <Button
+                ref={cancelRef}
+                variant="ghost"
+                onClick={() => setExperienceToDelete(null)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                colorScheme="red"
+                onClick={async () => {
+                  const experience = experienceToDelete;
+
+                  setExperienceToDelete(null);
+
+                  await onDelete(experience);
+                }}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   );
 }
