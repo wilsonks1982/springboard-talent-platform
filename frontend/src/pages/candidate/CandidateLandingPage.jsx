@@ -41,11 +41,14 @@ import { authApi } from "../../api/authApi";
 import { candidateApi } from "../../api/candidateApi";
 import { clearAuth } from "../../store/authSlice";
 import CandidateHeader from "../../components/candidate/candidateHeader";
+
 import ExperienceSection from "../../components/candidate/sections/ExperienceSection";
-
 import ExperienceDrawer from "../../components/candidate/drawers/ExperienceDrawer";
-
 import { candidateExperienceApi } from "../../api/candidateExperienceApi";
+
+import EducationSection from "../../components/candidate/sections/EducationSection";
+import EducationDrawer from "../../components/candidate/drawers/EducationDrawer";
+import { candidateEducationApi } from "../../api/candidateEducationApi";
 
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
@@ -56,10 +59,12 @@ export default function CandidateLandingPage() {
   const [error, setError] = useState("");
 
   const [experiences, setExperiences] = useState([]);
-
   const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
-
   const [editingExperience, setEditingExperience] = useState(null);
+
+  const [education, setEducation] = useState([]);
+  const [educationDrawerOpen, setEducationDrawerOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState(null);
 
   useEffect(() => {
     loadCandidate();
@@ -73,6 +78,7 @@ export default function CandidateLandingPage() {
       const data = await candidateApi.getMe();
       setCandidate(data);
       setExperiences(data.experiences || []);
+      setEducation(data.education || []);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -159,6 +165,38 @@ export default function CandidateLandingPage() {
     );
   }
 
+  function handleAddEducation() {
+    setEditingEducation(null);
+    setEducationDrawerOpen(true);
+  }
+
+  function handleEditEducation(item) {
+    setEditingEducation(item);
+    setEducationDrawerOpen(true);
+  }
+
+  async function handleSaveEducation(payload, educationId) {
+    if (educationId) {
+      const updated = await candidateEducationApi.update(educationId, payload);
+
+      setEducation((current) =>
+        current.map((item) => (item.id === educationId ? updated : item)),
+      );
+    } else {
+      const created = await candidateEducationApi.create(payload);
+
+      setEducation((current) => [...current, created]);
+    }
+  }
+
+  async function handleDeleteEducation(item) {
+    await candidateEducationApi.remove(item.id);
+
+    setEducation((current) =>
+      current.filter((education) => education.id !== item.id),
+    );
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -238,9 +276,11 @@ export default function CandidateLandingPage() {
                   onDelete={handleDeleteExperience}
                 />
 
-                <EducationCard
-                  education={candidate.education}
-                  navigate={navigate}
+                <EducationSection
+                  education={education}
+                  onAdd={handleAddEducation}
+                  onEdit={handleEditEducation}
+                  onDelete={handleDeleteEducation}
                 />
 
                 <CertificationCard
@@ -272,6 +312,15 @@ export default function CandidateLandingPage() {
           }}
           experience={editingExperience}
           onSave={handleSaveExperience}
+        />
+        <EducationDrawer
+          isOpen={educationDrawerOpen}
+          onClose={() => {
+            setEducationDrawerOpen(false);
+            setEditingEducation(null);
+          }}
+          education={editingEducation}
+          onSave={handleSaveEducation}
         />
       </Box>
     </Flex>
@@ -794,71 +843,6 @@ function SectionHeader({ title, action, onAction }) {
         + {action}
       </Button>
     </Flex>
-  );
-}
-
-function EducationCard({ education, navigate }) {
-  return (
-    <Card>
-      <SectionHeader
-        title="Education"
-        action="Add Education"
-        onAction={() => navigate("/candidate/profile")}
-      />
-
-      {education.length === 0 ? (
-        <EmptyState
-          icon={FiBookOpen}
-          title="Add your educational background."
-          text="Show recruiters where your academic journey began."
-          action="Add Education"
-          onClick={() => navigate("/candidate/profile")}
-        />
-      ) : (
-        <Stack spacing={4}>
-          {education.slice(0, 3).map((item) => (
-            <Flex key={item.id} justify="space-between" align="flex-start">
-              <HStack align="flex-start" spacing={4}>
-                <Box
-                  w="42px"
-                  h="42px"
-                  borderRadius="lg"
-                  bg="green.50"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Icon as={FiBookOpen} color="green.600" />
-                </Box>
-
-                <Box>
-                  <Text fontWeight="700">{item.degree}</Text>
-
-                  <Text mt={1} fontSize="sm" color="gray.600">
-                    {item.institution}
-                  </Text>
-
-                  {item.yearOfPassing && (
-                    <Text mt={1} fontSize="xs" color="gray.500">
-                      {item.yearOfPassing}
-                    </Text>
-                  )}
-                </Box>
-              </HStack>
-
-              <Text
-                fontSize="sm"
-                color="purple.600"
-                cursor="pointer"
-                onClick={() => navigate("/candidate/profile")}
-              >
-                Edit
-              </Text>
-            </Flex>
-          ))}
-        </Stack>
-      )}
-    </Card>
   );
 }
 

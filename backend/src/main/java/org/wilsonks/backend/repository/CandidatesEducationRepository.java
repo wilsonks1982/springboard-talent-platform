@@ -6,6 +6,6 @@ import org.wilsonks.backend.domain.CandidateEducation;
 import java.util.List;
 import java.util.UUID;
 
-public interface CandidateEducationsRepository extends JpaRepository<CandidateEducation, UUID> {
-    List<CandidateEducation> findAllByCandidateUserIdOrderByDisplayOrderAsc(UUID userId);
+public interface CandidatesEducationRepository extends JpaRepository<CandidateEducation, UUID> {
+    List<CandidateEducation> findByCandidateUserIdOrderByDisplayOrderAsc(UUID userId);
 }

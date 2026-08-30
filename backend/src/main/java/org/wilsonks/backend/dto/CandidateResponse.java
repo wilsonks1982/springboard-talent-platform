@@ -1,6 +1,7 @@
 package org.wilsonks.backend.dto;
 
 import org.wilsonks.backend.domain.Candidate;
+import org.wilsonks.backend.dto.responses.CandidateEducationResponse;
 import org.wilsonks.backend.dto.responses.CandidateExperienceResponse;
 
 import java.time.LocalDate;
@@ -92,29 +93,7 @@ public record CandidateResponse(
     }
 
 
-    public record CandidateEducationResponse(
-            UUID id,
-            String degree,
-            String institution,
-            String fieldOfStudy,
-            Integer yearOfPassing,
-            String educationLevel,
-            int displayOrder
-    ) {
-        public static CandidateEducationResponse of(
-                org.wilsonks.backend.domain.CandidateEducation education
-        ) {
-            return new CandidateEducationResponse(
-                    education.getId(),
-                    education.getDegree(),
-                    education.getInstitution(),
-                    education.getFieldOfStudy(),
-                    education.getYearOfPassing(),
-                    education.getEducationLevel(),
-                    education.getDisplayOrder()
-            );
-        }
-    }
+
 
     public record CandidateCertificationResponse(
             UUID id,
