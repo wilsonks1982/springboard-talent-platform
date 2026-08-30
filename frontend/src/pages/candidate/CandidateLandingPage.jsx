@@ -40,6 +40,8 @@ import { useNavigate } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 import { candidateApi } from "../../api/candidateApi";
 import { clearAuth } from "../../store/authSlice";
+import { profileStrengthApi } from "../../api/candidateProfileStrengthApi";
+
 import CandidateHeader from "../../components/candidate/candidateHeader";
 
 import ExperienceSection from "../../components/candidate/sections/ExperienceSection";
@@ -49,6 +51,8 @@ import { candidateExperienceApi } from "../../api/candidateExperienceApi";
 import EducationSection from "../../components/candidate/sections/EducationSection";
 import EducationDrawer from "../../components/candidate/drawers/EducationDrawer";
 import { candidateEducationApi } from "../../api/candidateEducationApi";
+
+import ProfileStrengthCard from "../../components/candidate/sections/ProfileStrengthCard";
 
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
@@ -66,6 +70,8 @@ export default function CandidateLandingPage() {
   const [educationDrawerOpen, setEducationDrawerOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState(null);
 
+  const [profileStrength, setProfileStrength] = useState(null);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -75,10 +81,15 @@ export default function CandidateLandingPage() {
       setLoading(true);
       setError("");
 
-      const data = await candidateApi.getMe();
-      setCandidate(data);
-      setExperiences(data.experiences || []);
-      setEducation(data.education || []);
+      const [candidateData, profileStrengthData] = await Promise.all([
+        candidateApi.getMe(),
+        profileStrengthApi.get(),
+      ]);
+
+      setCandidate(candidateData);
+      setExperiences(candidateData.experiences || []);
+      setEducation(candidateData.education || []);
+      setProfileStrength(profileStrengthData);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -154,6 +165,8 @@ export default function CandidateLandingPage() {
       const created = await candidateExperienceApi.create(payload);
 
       setExperiences((current) => [...current, created]);
+
+      await refreshProfileStrength();
     }
   }
 
@@ -163,6 +176,8 @@ export default function CandidateLandingPage() {
     setExperiences((current) =>
       current.filter((item) => item.id !== experience.id),
     );
+
+    await refreshProfileStrength();
   }
 
   function handleAddEducation() {
@@ -186,6 +201,8 @@ export default function CandidateLandingPage() {
       const created = await candidateEducationApi.create(payload);
 
       setEducation((current) => [...current, created]);
+
+      await refreshProfileStrength();
     }
   }
 
@@ -195,6 +212,33 @@ export default function CandidateLandingPage() {
     setEducation((current) =>
       current.filter((education) => education.id !== item.id),
     );
+
+    await refreshProfileStrength();
+  }
+
+  function handleProfileSectionAction(sectionKey) {
+    switch (sectionKey) {
+      case "EXPERIENCE":
+        handleAddExperience();
+        break;
+
+      case "EDUCATION":
+        handleAddEducation();
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  async function refreshProfileStrength() {
+    try {
+      const data = await profileStrengthApi.get();
+
+      setProfileStrength(data);
+    } catch (err) {
+      console.error("Failed to refresh profile strength", err);
+    }
   }
 
   return (
@@ -238,11 +282,6 @@ export default function CandidateLandingPage() {
 
           {/* Top cards */}
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
-            <ProfileStrengthCard
-              completion={completion}
-              onComplete={() => navigate("/candidate/profile")}
-            />
-
             <ResumeCard
               resume={candidate.resume}
               onUpload={() => navigate("/candidate/profile")}
@@ -269,6 +308,11 @@ export default function CandidateLandingPage() {
           >
             <GridItem>
               <Stack spacing={5}>
+                <ProfileStrengthCard
+                  profileStrength={profileStrength}
+                  onSectionAction={handleProfileSectionAction}
+                />
+
                 <ExperienceSection
                   experiences={experiences}
                   onAdd={handleAddExperience}
@@ -506,73 +550,6 @@ function Card({ children, ...props }) {
     >
       {children}
     </Box>
-  );
-}
-
-function ProfileStrengthCard({ completion, onComplete }) {
-  return (
-    <Card>
-      <HStack justify="space-between">
-        <Text
-          fontSize="xs"
-          fontWeight="700"
-          color="gray.500"
-          letterSpacing="0.04em"
-        >
-          PROFILE STRENGTH
-        </Text>
-
-        <Badge borderRadius="full" colorScheme="purple" px={2}>
-          {completion}%
-        </Badge>
-      </HStack>
-
-      <Flex mt={5} align="center" gap={5}>
-        <Box
-          position="relative"
-          w="92px"
-          h="92px"
-          borderRadius="full"
-          bg="purple.50"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box
-            position="absolute"
-            inset="8px"
-            border="7px solid"
-            borderColor="purple.500"
-            borderRadius="full"
-            borderLeftColor="purple.100"
-            transform={`rotate(${completion * 2.7}deg)`}
-          />
-
-          <Text fontSize="xl" fontWeight="800" color="gray.800">
-            {completion}%
-          </Text>
-        </Box>
-
-        <Box>
-          <Text fontWeight="700">You're off to a good start.</Text>
-
-          <Text mt={1} fontSize="sm" color="gray.500">
-            Complete a few more sections to strengthen your profile.
-          </Text>
-        </Box>
-      </Flex>
-
-      <Button
-        mt={6}
-        w="full"
-        colorScheme="purple"
-        borderRadius="lg"
-        onClick={onComplete}
-      >
-        Complete Profile
-        <Icon as={FiChevronRight} ml={2} />
-      </Button>
-    </Card>
   );
 }
 
