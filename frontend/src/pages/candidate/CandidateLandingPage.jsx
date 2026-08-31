@@ -66,6 +66,10 @@ import AchievementsSection from "../../components/candidate/sections/Achievement
 import AchievementDrawer from "../../components/candidate/drawers/AchievementDrawer";
 import { candidateAchievementApi } from "../../api/candidateAchievementApi";
 
+import ReferencesSection from "../../components/candidate/sections/ReferencesSection";
+import ReferenceDrawer from "../../components/candidate/drawers/ReferenceDrawer";
+import { candidateReferenceApi } from "../../api/candidateReferenceApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -95,6 +99,10 @@ export default function CandidateLandingPage() {
   const [achievementDrawerOpen, setAchievementDrawerOpen] = useState(false);
   const [editingAchievement, setEditingAchievement] = useState(null);
 
+  const [references, setReferences] = useState([]);
+  const [referenceDrawerOpen, setReferenceDrawerOpen] = useState(false);
+  const [editingReference, setEditingReference] = useState(null);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -114,9 +122,10 @@ export default function CandidateLandingPage() {
       setEducation(candidateData.education || []);
       setCertifications(candidateData.certifications || []);
       setAchievements(candidateData.achievements || []);
+      setReferences(candidateData.references || []);
+      setResume(candidateData.resume || null);
 
       setProfileStrength(profileStrengthData);
-      setResume(candidateData.resume || null);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -394,6 +403,50 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  function handleAddReference() {
+    setEditingReference(null);
+    setReferenceDrawerOpen(true);
+  }
+
+  function handleEditReference(reference) {
+    setEditingReference(reference);
+    setReferenceDrawerOpen(true);
+  }
+
+  async function handleSaveReference(data) {
+    let saved;
+
+    if (editingReference) {
+      saved = await candidateReferenceApi.update(editingReference.id, data);
+    } else {
+      saved = await candidateReferenceApi.create(data);
+    }
+
+    setCandidate((current) => ({
+      ...current,
+
+      references: editingReference
+        ? current.references.map((item) =>
+            item.id === saved.id ? saved : item,
+          )
+        : [...current.references, saved],
+    }));
+
+    await refreshProfileStrength();
+  }
+
+  async function handleDeleteReference(id) {
+    await candidateReferenceApi.delete(id);
+
+    setCandidate((current) => ({
+      ...current,
+
+      references: current.references.filter((item) => item.id !== id),
+    }));
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -500,6 +553,13 @@ export default function CandidateLandingPage() {
                   onEdit={handleEditAchievement}
                   onDelete={handleDeleteAchievement}
                 />
+
+                <ReferencesSection
+                  references={candidate.references || []}
+                  onAdd={handleAddReference}
+                  onEdit={handleEditReference}
+                  onDelete={handleDeleteReference}
+                />
               </Stack>
             </GridItem>
 
@@ -554,6 +614,13 @@ export default function CandidateLandingPage() {
           onClose={() => setAchievementDrawerOpen(false)}
           achievement={editingAchievement}
           onSave={handleSaveAchievement}
+        />
+
+        <ReferenceDrawer
+          isOpen={referenceDrawerOpen}
+          onClose={() => setReferenceDrawerOpen(false)}
+          reference={editingReference}
+          onSave={handleSaveReference}
         />
       </Box>
     </Flex>

@@ -1,15 +1,11 @@
 package org.wilsonks.backend.dto;
 
 import org.wilsonks.backend.domain.Candidate;
-import org.wilsonks.backend.dto.responses.CandidateAchievementResponse;
-import org.wilsonks.backend.dto.responses.CandidateCertificationResponse;
-import org.wilsonks.backend.dto.responses.CandidateEducationResponse;
-import org.wilsonks.backend.dto.responses.CandidateExperienceResponse;
+import org.wilsonks.backend.dto.responses.*;
 
-import java.time.LocalDate;
+
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public record CandidateResponse(
         UserProfileResponse user,
@@ -97,27 +93,5 @@ public record CandidateResponse(
 
 
 
-
-
-
-    public record CandidateReferenceResponse(
-            UUID id,
-            String name,
-            String relationship,
-            String contact,
-            int displayOrder
-    ) {
-        public static CandidateReferenceResponse of(
-                org.wilsonks.backend.domain.CandidateReference reference
-        ) {
-            return new CandidateReferenceResponse(
-                    reference.getId(),
-                    reference.getName(),
-                    reference.getRelationship(),
-                    reference.getContact(),
-                    reference.getDisplayOrder()
-            );
-        }
-    }
 
 }
