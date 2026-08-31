@@ -58,6 +58,10 @@ import ResumeSection from "../../components/candidate/sections/ResumeSection";
 import ResumeUploadDrawer from "../../components/candidate/drawers/ResumeUploadDrawer";
 import { candidateResumeApi } from "../../api/candidateResumeApi";
 
+import CertificationsSection from "../../components/candidate/sections/CertificationsSection";
+import CertificationDrawer from "../../components/candidate/drawers/CertificationDrawer";
+import { candidateCertificationApi } from "../../api/candidateCertificationApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,6 +83,10 @@ export default function CandidateLandingPage() {
   const [resume, setResume] = useState(null);
   const [resumeDrawerOpen, setResumeDrawerOpen] = useState(false);
 
+  const [certifications, setCertifications] = useState([]);
+  const [certificationDrawerOpen, setCertificationDrawerOpen] = useState(false);
+  const [editingCertification, setEditingCertification] = useState(null);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -96,6 +104,8 @@ export default function CandidateLandingPage() {
       setCandidate(candidateData);
       setExperiences(candidateData.experiences || []);
       setEducation(candidateData.education || []);
+      setCertifications(candidateData.certifications || []);
+
       setProfileStrength(profileStrengthData);
       setResume(candidateData.resume || null);
     } catch (err) {
@@ -288,6 +298,51 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  function handleAddCertification() {
+    setEditingCertification(null);
+    setCertificationDrawerOpen(true);
+  }
+
+  function handleEditCertification(certification) {
+    setEditingCertification(certification);
+    setCertificationDrawerOpen(true);
+  }
+
+  async function handleSaveCertification(data) {
+    let saved;
+
+    if (editingCertification) {
+      saved = await candidateCertificationApi.update(
+        editingCertification.id,
+        data,
+      );
+    } else {
+      saved = await candidateCertificationApi.create(data);
+    }
+
+    setCandidate((current) => ({
+      ...current,
+      certifications: editingCertification
+        ? current.certifications.map((item) =>
+            item.id === saved.id ? saved : item,
+          )
+        : [...current.certifications, saved],
+    }));
+
+    await refreshProfileStrength();
+  }
+
+  async function handleDeleteCertification(id) {
+    await candidateCertificationApi.delete(id);
+
+    setCandidate((current) => ({
+      ...current,
+      certifications: current.certifications.filter((item) => item.id !== id),
+    }));
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -381,9 +436,11 @@ export default function CandidateLandingPage() {
                   onDelete={handleDeleteResume}
                 />
 
-                <CertificationCard
-                  certifications={candidate.certifications}
-                  navigate={navigate}
+                <CertificationsSection
+                  certifications={candidate.certifications || []}
+                  onAdd={handleAddCertification}
+                  onEdit={handleEditCertification}
+                  onDelete={handleDeleteCertification}
                 />
               </Stack>
             </GridItem>
@@ -425,6 +482,13 @@ export default function CandidateLandingPage() {
           isOpen={resumeDrawerOpen}
           onClose={() => setResumeDrawerOpen(false)}
           onSave={handleSaveResume}
+        />
+
+        <CertificationDrawer
+          isOpen={certificationDrawerOpen}
+          onClose={() => setCertificationDrawerOpen(false)}
+          certification={editingCertification}
+          onSave={handleSaveCertification}
         />
       </Box>
     </Flex>
@@ -880,65 +944,6 @@ function SectionHeader({ title, action, onAction }) {
         + {action}
       </Button>
     </Flex>
-  );
-}
-
-function CertificationCard({ certifications, navigate }) {
-  return (
-    <Card>
-      <SectionHeader
-        title="Certifications"
-        action="Add Certification"
-        onAction={() => navigate("/candidate/profile")}
-      />
-
-      {certifications.length === 0 ? (
-        <EmptyState
-          icon={FiAward}
-          title="Showcase your certifications."
-          text="Add certifications and courses that strengthen your profile."
-          action="Add Certification"
-          onClick={() => navigate("/candidate/profile")}
-        />
-      ) : (
-        <Stack spacing={4}>
-          {certifications.slice(0, 3).map((item) => (
-            <Flex key={item.id} justify="space-between">
-              <HStack spacing={4}>
-                <Box
-                  w="42px"
-                  h="42px"
-                  borderRadius="lg"
-                  bg="orange.50"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Icon as={FiAward} color="orange.500" />
-                </Box>
-
-                <Box>
-                  <Text fontWeight="700">{item.name}</Text>
-
-                  <Text mt={1} fontSize="sm" color="gray.600">
-                    {item.issuingOrganization}
-                  </Text>
-                </Box>
-              </HStack>
-
-              <Text
-                fontSize="sm"
-                color="purple.600"
-                cursor="pointer"
-                onClick={() => navigate("/candidate/profile")}
-              >
-                Edit
-              </Text>
-            </Flex>
-          ))}
-        </Stack>
-      )}
-    </Card>
   );
 }
 

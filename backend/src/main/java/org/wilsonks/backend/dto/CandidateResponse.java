@@ -1,6 +1,7 @@
 package org.wilsonks.backend.dto;
 
 import org.wilsonks.backend.domain.Candidate;
+import org.wilsonks.backend.dto.responses.CandidateCertificationResponse;
 import org.wilsonks.backend.dto.responses.CandidateEducationResponse;
 import org.wilsonks.backend.dto.responses.CandidateExperienceResponse;
 
@@ -95,29 +96,6 @@ public record CandidateResponse(
 
 
 
-    public record CandidateCertificationResponse(
-            UUID id,
-            String name,
-            String issuingOrganization,
-            LocalDate issueDate,
-            LocalDate expiryDate,
-            String description,
-            int displayOrder
-    ) {
-        public static CandidateCertificationResponse of(
-                org.wilsonks.backend.domain.CandidateCertification certification
-        ) {
-            return new CandidateCertificationResponse(
-                    certification.getId(),
-                    certification.getName(),
-                    certification.getIssuingOrganization(),
-                    certification.getIssueDate(),
-                    certification.getExpiryDate(),
-                    certification.getDescription(),
-                    certification.getDisplayOrder()
-            );
-        }
-    }
 
     public record CandidateAchievementResponse(
             UUID id,
