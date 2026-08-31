@@ -62,6 +62,10 @@ import CertificationsSection from "../../components/candidate/sections/Certifica
 import CertificationDrawer from "../../components/candidate/drawers/CertificationDrawer";
 import { candidateCertificationApi } from "../../api/candidateCertificationApi";
 
+import AchievementsSection from "../../components/candidate/sections/AchievementsSection";
+import AchievementDrawer from "../../components/candidate/drawers/AchievementDrawer";
+import { candidateAchievementApi } from "../../api/candidateAchievementApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -87,6 +91,10 @@ export default function CandidateLandingPage() {
   const [certificationDrawerOpen, setCertificationDrawerOpen] = useState(false);
   const [editingCertification, setEditingCertification] = useState(null);
 
+  const [achievements, setAchievements] = useState([]);
+  const [achievementDrawerOpen, setAchievementDrawerOpen] = useState(false);
+  const [editingAchievement, setEditingAchievement] = useState(null);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -105,6 +113,7 @@ export default function CandidateLandingPage() {
       setExperiences(candidateData.experiences || []);
       setEducation(candidateData.education || []);
       setCertifications(candidateData.certifications || []);
+      setAchievements(candidateData.achievements || []);
 
       setProfileStrength(profileStrengthData);
       setResume(candidateData.resume || null);
@@ -343,6 +352,48 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  function handleAddAchievement() {
+    setEditingAchievement(null);
+    setAchievementDrawerOpen(true);
+  }
+
+  function handleEditAchievement(achievement) {
+    setEditingAchievement(achievement);
+    setAchievementDrawerOpen(true);
+  }
+
+  async function handleSaveAchievement(data) {
+    let saved;
+
+    if (editingAchievement) {
+      saved = await candidateAchievementApi.update(editingAchievement.id, data);
+    } else {
+      saved = await candidateAchievementApi.create(data);
+    }
+
+    setCandidate((current) => ({
+      ...current,
+      achievements: editingAchievement
+        ? current.achievements.map((item) =>
+            item.id === saved.id ? saved : item,
+          )
+        : [...current.achievements, saved],
+    }));
+
+    await refreshProfileStrength();
+  }
+
+  async function handleDeleteAchievement(id) {
+    await candidateAchievementApi.delete(id);
+
+    setCandidate((current) => ({
+      ...current,
+      achievements: current.achievements.filter((item) => item.id !== id),
+    }));
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -442,6 +493,13 @@ export default function CandidateLandingPage() {
                   onEdit={handleEditCertification}
                   onDelete={handleDeleteCertification}
                 />
+
+                <AchievementsSection
+                  achievements={candidate.achievements || []}
+                  onAdd={handleAddAchievement}
+                  onEdit={handleEditAchievement}
+                  onDelete={handleDeleteAchievement}
+                />
               </Stack>
             </GridItem>
 
@@ -489,6 +547,13 @@ export default function CandidateLandingPage() {
           onClose={() => setCertificationDrawerOpen(false)}
           certification={editingCertification}
           onSave={handleSaveCertification}
+        />
+
+        <AchievementDrawer
+          isOpen={achievementDrawerOpen}
+          onClose={() => setAchievementDrawerOpen(false)}
+          achievement={editingAchievement}
+          onSave={handleSaveAchievement}
         />
       </Box>
     </Flex>

@@ -1,6 +1,7 @@
 package org.wilsonks.backend.dto;
 
 import org.wilsonks.backend.domain.Candidate;
+import org.wilsonks.backend.dto.responses.CandidateAchievementResponse;
 import org.wilsonks.backend.dto.responses.CandidateCertificationResponse;
 import org.wilsonks.backend.dto.responses.CandidateEducationResponse;
 import org.wilsonks.backend.dto.responses.CandidateExperienceResponse;
@@ -97,23 +98,7 @@ public record CandidateResponse(
 
 
 
-    public record CandidateAchievementResponse(
-            UUID id,
-            String title,
-            String description,
-            int displayOrder
-    ) {
-        public static CandidateAchievementResponse of(
-                org.wilsonks.backend.domain.CandidateAchievement achievement
-        ) {
-            return new CandidateAchievementResponse(
-                    achievement.getId(),
-                    achievement.getTitle(),
-                    achievement.getDescription(),
-                    achievement.getDisplayOrder()
-            );
-        }
-    }
+
 
     public record CandidateReferenceResponse(
             UUID id,
