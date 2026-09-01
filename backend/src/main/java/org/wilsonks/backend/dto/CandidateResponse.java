@@ -16,11 +16,12 @@ public record CandidateResponse(
         String functionalArea,
         String workModePreference,
         String relocationPreference,
-        String noticePeriod,
         String compensationRange,
         boolean compensationVisibleToRecruiters,
         String linkedinUrl,
         OffsetDateTime onboardingCompletedAt,
+
+        CandidateCareerPreferencesResponse careerPreferences,
 
         List<CandidateExperienceResponse> experiences,
         List<CandidateEducationResponse> education,
@@ -51,11 +52,13 @@ public record CandidateResponse(
                         ? candidate.getRelocationPreference().name()
                         : null,
 
-                candidate.getNoticePeriod(),
                 candidate.getCompensationRange(),
                 candidate.isCompensationVisibleToRecruiters(),
                 candidate.getLinkedinUrl(),
                 candidate.getOnboardingCompletedAt(),
+
+                CandidateCareerPreferencesResponse.of(candidate),
+
 
                 candidate.getExperiences()
                         .stream()

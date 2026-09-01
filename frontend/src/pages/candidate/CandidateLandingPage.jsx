@@ -17,6 +17,7 @@ import {
   Spinner,
   Stack,
   Text,
+  Tag,
   VStack,
 } from "@chakra-ui/react";
 import {
@@ -70,6 +71,9 @@ import ReferencesSection from "../../components/candidate/sections/ReferencesSec
 import ReferenceDrawer from "../../components/candidate/drawers/ReferenceDrawer";
 import { candidateReferenceApi } from "../../api/candidateReferenceApi";
 
+import CareerPreferencesDrawer from "../../components/candidate/drawers/CareerPreferencesDrawer";
+import { candidateCareerPreferencesApi } from "../../api/candidateCareerPreferencesApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -102,6 +106,9 @@ export default function CandidateLandingPage() {
   const [references, setReferences] = useState([]);
   const [referenceDrawerOpen, setReferenceDrawerOpen] = useState(false);
   const [editingReference, setEditingReference] = useState(null);
+
+  const [careerPreferencesDrawerOpen, setCareerPreferencesDrawerOpen] =
+    useState(false);
 
   useEffect(() => {
     loadCandidate();
@@ -440,8 +447,18 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
-
       references: current.references.filter((item) => item.id !== id),
+    }));
+
+    await refreshProfileStrength();
+  }
+
+  async function handleSaveCareerPreferences(data) {
+    const updated = await candidateCareerPreferencesApi.update(data);
+
+    setCandidate((current) => ({
+      ...current,
+      careerPreferences: updated,
     }));
 
     await refreshProfileStrength();
@@ -565,14 +582,14 @@ export default function CandidateLandingPage() {
 
             <GridItem>
               <Stack spacing={5}>
-                <ProfileSummaryCard candidate={candidate} navigate={navigate} />
+                {/* <ProfileSummaryCard candidate={candidate} navigate={navigate} /> */}
 
                 <CareerPreferencesCard
                   candidate={candidate}
-                  navigate={navigate}
+                  onEdit={() => setCareerPreferencesDrawerOpen(true)}
                 />
 
-                <OpportunityCard navigate={navigate} />
+                {/* <OpportunityCard navigate={navigate} /> */}
               </Stack>
             </GridItem>
           </Grid>
@@ -621,6 +638,13 @@ export default function CandidateLandingPage() {
           onClose={() => setReferenceDrawerOpen(false)}
           reference={editingReference}
           onSave={handleSaveReference}
+        />
+
+        <CareerPreferencesDrawer
+          isOpen={careerPreferencesDrawerOpen}
+          onClose={() => setCareerPreferencesDrawerOpen(false)}
+          preferences={candidate.careerPreferences}
+          onSave={handleSaveCareerPreferences}
         />
       </Box>
     </Flex>
@@ -1119,40 +1143,94 @@ function ProfileSummaryCard({ candidate, navigate }) {
   );
 }
 
-function CareerPreferencesCard({ candidate, navigate }) {
+function CareerPreferencesCard({ candidate, onEdit }) {
+  const preferences = candidate.careerPreferences;
+
+  const industries = preferences?.desiredIndustries || [];
+  const locations = preferences?.desiredLocations || [];
+  const languages = preferences?.languages || [];
+
+  const hasPreferences =
+    Boolean(preferences?.desiredTitle) ||
+    locations.length > 0 ||
+    industries.length > 0 ||
+    languages.length > 0 ||
+    Boolean(preferences?.openToRemote) ||
+    preferences?.noticePeriod != null ||
+    Boolean(preferences?.workAuthorization);
+
   return (
     <Card>
-      <Flex justify="space-between">
-        <Heading size="sm">Career Preferences</Heading>
+      <Flex justify="space-between" align="center">
+        <Box>
+          <Heading size="sm">Career Preferences</Heading>
 
-        <Text
-          fontSize="sm"
-          color="purple.600"
-          cursor="pointer"
-          onClick={() => navigate("/candidate/profile")}
-        >
+          <Text mt={1} fontSize="xs" color="gray.500">
+            What you're looking for next
+          </Text>
+        </Box>
+
+        <Button size="sm" variant="ghost" colorScheme="purple" onClick={onEdit}>
           Edit
-        </Text>
+        </Button>
       </Flex>
 
-      <Stack mt={5} spacing={4}>
-        <Preference
-          label="Work mode"
-          value={formatValue(candidate.workModePreference)}
-        />
+      {!hasPreferences ? (
+        <Box
+          mt={5}
+          p={5}
+          border="1px dashed"
+          borderColor="gray.300"
+          borderRadius="xl"
+        >
+          <Text fontWeight="600" color="gray.700">
+            Tell us what you're looking for next.
+          </Text>
 
-        <Preference
-          label="Relocation"
-          value={formatValue(candidate.relocationPreference)}
-        />
+          <Text mt={1} fontSize="sm" color="gray.500">
+            Add your target role, locations and work preferences.
+          </Text>
 
-        <Preference label="Notice period" value={candidate.noticePeriod} />
+          <Button mt={4} size="sm" colorScheme="purple" onClick={onEdit}>
+            Add preferences
+          </Button>
+        </Box>
+      ) : (
+        <Stack mt={5} spacing={5}>
+          <Preference label="Looking for" value={preferences?.desiredTitle} />
 
-        <Preference
-          label="Expected compensation"
-          value={candidate.compensationRange}
-        />
-      </Stack>
+          {industries.length > 0 && (
+            <PreferenceTags label="Industries" values={industries} />
+          )}
+
+          {locations.length > 0 && (
+            <PreferenceTags label="Locations" values={locations} />
+          )}
+
+          <Preference
+            label="Work preference"
+            value={formatCareerPreference(preferences?.openToRemote)}
+          />
+
+          <Preference
+            label="Notice period"
+            value={
+              preferences?.noticePeriod != null
+                ? `${preferences.noticePeriod} days`
+                : "Not specified"
+            }
+          />
+
+          <Preference
+            label="Work authorization"
+            value={formatCareerPreference(preferences?.workAuthorization)}
+          />
+
+          {languages.length > 0 && (
+            <PreferenceTags label="Languages" values={languages} />
+          )}
+        </Stack>
+      )}
     </Card>
   );
 }
@@ -1254,6 +1332,36 @@ function EmptyState({ icon, title, text, action, onClick }) {
 /* ------------------------------------------------------------------ */
 /* Helpers */
 /* ------------------------------------------------------------------ */
+
+function PreferenceTags({ label, values }) {
+  return (
+    <Box>
+      <Text fontSize="xs" fontWeight="600" color="gray.500" mb={2}>
+        {label}
+      </Text>
+
+      <Flex gap={2} flexWrap="wrap">
+        {values.map((value) => (
+          <Tag key={value} size="sm" borderRadius="full" colorScheme="purple">
+            {value}
+          </Tag>
+        ))}
+      </Flex>
+    </Box>
+  );
+}
+
+function formatCareerPreference(value) {
+  if (!value) {
+    return "Not specified";
+  }
+
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 function calculateProfileCompletion(candidate) {
   const checks = [

@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.Persistable;
+import org.wilsonks.backend.domain.enums.OpenToRemote;
 import org.wilsonks.backend.domain.enums.RelocationPreference;
+import org.wilsonks.backend.domain.enums.WorkAuthorization;
 import org.wilsonks.backend.domain.enums.WorkModePreference;
 
 import java.time.OffsetDateTime;
@@ -59,6 +61,35 @@ public class Candidate implements Persistable<UUID> {
     @OrderBy("uploadedAt DESC")
     private CandidateDocument resume;
 
+    @Column(name = "desired_title")
+    private String desiredTitle;
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_desired_industries", joinColumns = @JoinColumn(name = "candidate_user_id"))
+    @Column(name = "industry")
+    private List<String> desiredIndustries = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_desired_locations", joinColumns = @JoinColumn(name = "candidate_user_id"))
+    @Column(name = "location")
+    private List<String> desiredLocations = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "open_to_remote")
+    private OpenToRemote openToRemote;
+
+    @Column(name = "notice_period")
+    private Integer noticePeriod;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "work_authorization")
+    private WorkAuthorization workAuthorization;
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_languages", joinColumns = @JoinColumn(name = "candidate_user_id"))
+    @Column(name = "language")
+    private List<String> languages = new ArrayList<>();
+
     @Column(name = "current_challenge")
     private String currentChallenge;
 
@@ -78,9 +109,6 @@ public class Candidate implements Persistable<UUID> {
     @Enumerated(EnumType.STRING)
     @Column(name = "relocation_preference")
     private RelocationPreference relocationPreference;
-
-    @Column(name = "notice_period")
-    private String noticePeriod;
 
     @Column(name = "compensation_range")
     private String compensationRange;
