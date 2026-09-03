@@ -74,6 +74,10 @@ import { candidateReferenceApi } from "../../api/candidateReferenceApi";
 import CareerPreferencesDrawer from "../../components/candidate/drawers/CareerPreferencesDrawer";
 import { candidateCareerPreferencesApi } from "../../api/candidateCareerPreferencesApi";
 
+import BasicProfileCard from "../../components/candidate/sections/BasicProfileCard";
+import BasicProfileDrawer from "../../components/candidate/drawers/BasicProfileDrawer";
+import { candidateBasicProfileApi } from "../../api/candidateBasicProfileApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -110,6 +114,9 @@ export default function CandidateLandingPage() {
   const [careerPreferencesDrawerOpen, setCareerPreferencesDrawerOpen] =
     useState(false);
 
+  const [basicProfile, setBasicProfile] = useState(null);
+  const [isBasicProfileOpen, setIsBasicProfileOpen] = useState(false);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -119,10 +126,12 @@ export default function CandidateLandingPage() {
       setLoading(true);
       setError("");
 
-      const [candidateData, profileStrengthData] = await Promise.all([
-        candidateApi.getMe(),
-        profileStrengthApi.get(),
-      ]);
+      const [candidateData, profileStrengthData, basicProfileData] =
+        await Promise.all([
+          candidateApi.getMe(),
+          profileStrengthApi.get(),
+          candidateBasicProfileApi.get(),
+        ]);
 
       setCandidate(candidateData);
       setExperiences(candidateData.experiences || []);
@@ -133,6 +142,7 @@ export default function CandidateLandingPage() {
       setResume(candidateData.resume || null);
 
       setProfileStrength(profileStrengthData);
+      setBasicProfile(basicProfileData);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -464,6 +474,14 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  async function handleSaveBasicProfile(data) {
+    const updated = await candidateBasicProfileApi.update(data);
+
+    setBasicProfile(updated);
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -504,14 +522,26 @@ export default function CandidateLandingPage() {
           </Box>
 
           {/* Top cards */}
-          {/* <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
-            <ResumeCard
-              resume={candidate.resume}
-              onUpload={() => navigate("/candidate/profile")}
+          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
+            <BasicProfileCard
+              profile={basicProfile}
+              onEdit={() => setIsBasicProfileOpen(true)}
             />
 
-            <QuickActions candidate={candidate} navigate={navigate} />
-          </SimpleGrid> */}
+            <ResumeSection
+              resume={resume}
+              onUpload={handleUploadResume}
+              onDownload={handleDownloadResume}
+              onDelete={handleDeleteResume}
+            />
+
+            {/* <ResumeCard
+              resume={candidate.resume}
+              onUpload={() => navigate("/candidate/profile")}
+            /> */}
+
+            {/* <QuickActions candidate={candidate} navigate={navigate} /> */}
+          </SimpleGrid>
 
           {/* Completion */}
           <CompletionCard
@@ -550,12 +580,12 @@ export default function CandidateLandingPage() {
                   onDelete={handleDeleteEducation}
                 />
 
-                <ResumeSection
+                {/* <ResumeSection
                   resume={resume}
                   onUpload={handleUploadResume}
                   onDownload={handleDownloadResume}
                   onDelete={handleDeleteResume}
-                />
+                /> */}
 
                 <CertificationsSection
                   certifications={candidate.certifications || []}
@@ -645,6 +675,12 @@ export default function CandidateLandingPage() {
           onClose={() => setCareerPreferencesDrawerOpen(false)}
           preferences={candidate.careerPreferences}
           onSave={handleSaveCareerPreferences}
+        />
+        <BasicProfileDrawer
+          isOpen={isBasicProfileOpen}
+          onClose={() => setIsBasicProfileOpen(false)}
+          profile={basicProfile}
+          onSave={handleSaveBasicProfile}
         />
       </Box>
     </Flex>

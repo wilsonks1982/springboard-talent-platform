@@ -7,10 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.Persistable;
-import org.wilsonks.backend.domain.enums.OpenToRemote;
-import org.wilsonks.backend.domain.enums.RelocationPreference;
-import org.wilsonks.backend.domain.enums.WorkAuthorization;
-import org.wilsonks.backend.domain.enums.WorkModePreference;
+import org.wilsonks.backend.domain.enums.*;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -36,6 +33,29 @@ public class Candidate implements Persistable<UUID> {
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "city")
+    private String city;
+
+    @Column(name = "state_country")
+    private String stateCountry;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "non_employment_reason")
+    private NonEmploymentReason nonEmploymentReason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_search_status")
+    private JobSearchStatus jobSearchStatus;
+
+    @Column(name = "currently_employed")
+    private Boolean currentlyEmployed;
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("displayOrder ASC")
