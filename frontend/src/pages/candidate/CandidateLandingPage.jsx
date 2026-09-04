@@ -82,6 +82,12 @@ import CandidateCompensationCard from "../../components/candidate/sections/Candi
 import CandidateCompensationDrawer from "../../components/candidate/drawers/CandidateCompensationDrawer";
 import { candidateCompensationApi } from "../../api/candidateCompensationApi";
 
+import EmploymentVerificationCard from "../../components/candidate/sections/EmploymentVerificationCard";
+
+import EmploymentVerificationDrawer from "../../components/candidate/drawers/EmploymentVerificationDrawer";
+
+import { candidateEmploymentVerificationApi } from "../../api/candidateEmploymentVerificationApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -124,6 +130,13 @@ export default function CandidateLandingPage() {
   const [compensation, setCompensation] = useState(null);
   const [isCompensationOpen, setIsCompensationOpen] = useState(false);
 
+  const [employmentVerification, setEmploymentVerification] = useState(null);
+
+  const [
+    employmentVerificationDrawerOpen,
+    setEmploymentVerificationDrawerOpen,
+  ] = useState(false);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -138,11 +151,13 @@ export default function CandidateLandingPage() {
         profileStrengthData,
         basicProfileData,
         compensationData,
+        employmentVerificationData,
       ] = await Promise.all([
         candidateApi.getMe(),
         profileStrengthApi.get(),
         candidateBasicProfileApi.get(),
         candidateCompensationApi.get(),
+        candidateEmploymentVerificationApi.get(),
       ]);
 
       setCandidate(candidateData);
@@ -156,6 +171,7 @@ export default function CandidateLandingPage() {
       setProfileStrength(profileStrengthData);
       setBasicProfile(basicProfileData);
       setCompensation(compensationData);
+      setEmploymentVerification(employmentVerificationData);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -503,6 +519,21 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  async function handleSaveEmploymentVerification(data) {
+    const updated = await candidateEmploymentVerificationApi.update(data);
+
+    setEmploymentVerification(updated);
+
+    await refreshProfileStrength();
+  }
+
+  async function handleTriggerEmploymentVerification() {
+    const updated =
+      await candidateEmploymentVerificationApi.triggerVerification();
+
+    setEmploymentVerification(updated);
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -639,7 +670,10 @@ export default function CandidateLandingPage() {
                   candidate={candidate}
                   onEdit={() => setCareerPreferencesDrawerOpen(true)}
                 />
-
+                <EmploymentVerificationCard
+                  verification={employmentVerification}
+                  onEdit={() => setEmploymentVerificationDrawerOpen(true)}
+                />
                 <CandidateCompensationCard
                   compensation={compensation}
                   onEdit={() => setIsCompensationOpen(true)}
@@ -712,6 +746,15 @@ export default function CandidateLandingPage() {
           onClose={() => setIsCompensationOpen(false)}
           compensation={compensation}
           onSave={handleSaveCompensation}
+        />
+
+        <EmploymentVerificationDrawer
+          isOpen={employmentVerificationDrawerOpen}
+          onClose={() => setEmploymentVerificationDrawerOpen(false)}
+          verification={employmentVerification}
+          currentlyEmployed={basicProfile?.currentlyEmployed}
+          onSave={handleSaveEmploymentVerification}
+          onTriggerVerification={handleTriggerEmploymentVerification}
         />
       </Box>
     </Flex>

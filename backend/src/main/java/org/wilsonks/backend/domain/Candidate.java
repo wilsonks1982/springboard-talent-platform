@@ -148,6 +148,55 @@ public class Candidate implements Persistable<UUID> {
     private CompensationVisibility compensationVisibility =
             CompensationVisibility.HIDDEN;
 
+    // -------------------------------------------------------------------------
+    // Employment Verification — Springboard internal/private
+    // -------------------------------------------------------------------------
+
+    @Column(name = "last_increment_letter_url")
+    private String lastIncrementLetterUrl;
+
+    @Column(name = "variable_pay_letter_url")
+    private String variablePayLetterUrl;
+
+    @Column(name = "relieving_letter_url")
+    private String relievingLetterUrl;
+
+    @Column(name = "other_supporting_document_url")
+    private String otherSupportingDocumentUrl;
+
+    // Verification contacts — private to Springboard
+    @Column(name = "reporting_manager_name")
+    private String reportingManagerName;
+
+    @Column(name = "reporting_manager_phone")
+    private String reportingManagerPhone;
+
+    @Column(name = "reporting_manager_email")
+    private String reportingManagerEmail;
+
+    @Column(name = "hr_contact_name")
+    private String hrContactName;
+
+    @Column(name = "hr_contact_phone")
+    private String hrContactPhone;
+
+    @Column(name = "hr_contact_email")
+    private String hrContactEmail;
+
+    @Column(name = "hr_contact_bd_disclosure_acknowledged")
+    private Boolean hrContactBdDisclosureAcknowledged;
+
+    @Column(name = "hr_contact_bd_disclosure_acknowledged_at")
+    private OffsetDateTime hrContactBdDisclosureAcknowledgedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "employment_verification_status")
+    private EmploymentVerificationStatus employmentVerificationStatus =
+            EmploymentVerificationStatus.NOT_VERIFIED;
+
+    @Column(name = "verification_triggered_at")
+    private OffsetDateTime verificationTriggeredAt;
+
     @Column(name = "linkedin_url")
     private String linkedinUrl;
 
