@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.data.domain.Persistable;
 import org.wilsonks.backend.domain.enums.*;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,11 +131,22 @@ public class Candidate implements Persistable<UUID> {
     @Column(name = "relocation_preference")
     private RelocationPreference relocationPreference;
 
-    @Column(name = "compensation_range")
-    private String compensationRange;
+    @Column(name = "current_ctc", precision = 15, scale = 2)
+    private BigDecimal currentCtc;
 
-    @Column(name = "compensation_visible_to_recruiters")
-    private boolean compensationVisibleToRecruiters = false;
+    @Column(name = "current_ctc_band")
+    private String currentCtcBand;
+
+    @Column(name = "expected_ctc", precision = 15, scale = 2)
+    private BigDecimal expectedCtc;
+
+    @Column(name = "expected_ctc_band")
+    private String expectedCtcBand;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "compensation_visibility")
+    private CompensationVisibility compensationVisibility =
+            CompensationVisibility.HIDDEN;
 
     @Column(name = "linkedin_url")
     private String linkedinUrl;

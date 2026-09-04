@@ -78,6 +78,10 @@ import BasicProfileCard from "../../components/candidate/sections/BasicProfileCa
 import BasicProfileDrawer from "../../components/candidate/drawers/BasicProfileDrawer";
 import { candidateBasicProfileApi } from "../../api/candidateBasicProfileApi";
 
+import CandidateCompensationCard from "../../components/candidate/sections/CandidateCompensationCard";
+import CandidateCompensationDrawer from "../../components/candidate/drawers/CandidateCompensationDrawer";
+import { candidateCompensationApi } from "../../api/candidateCompensationApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -117,6 +121,9 @@ export default function CandidateLandingPage() {
   const [basicProfile, setBasicProfile] = useState(null);
   const [isBasicProfileOpen, setIsBasicProfileOpen] = useState(false);
 
+  const [compensation, setCompensation] = useState(null);
+  const [isCompensationOpen, setIsCompensationOpen] = useState(false);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -126,12 +133,17 @@ export default function CandidateLandingPage() {
       setLoading(true);
       setError("");
 
-      const [candidateData, profileStrengthData, basicProfileData] =
-        await Promise.all([
-          candidateApi.getMe(),
-          profileStrengthApi.get(),
-          candidateBasicProfileApi.get(),
-        ]);
+      const [
+        candidateData,
+        profileStrengthData,
+        basicProfileData,
+        compensationData,
+      ] = await Promise.all([
+        candidateApi.getMe(),
+        profileStrengthApi.get(),
+        candidateBasicProfileApi.get(),
+        candidateCompensationApi.get(),
+      ]);
 
       setCandidate(candidateData);
       setExperiences(candidateData.experiences || []);
@@ -143,6 +155,7 @@ export default function CandidateLandingPage() {
 
       setProfileStrength(profileStrengthData);
       setBasicProfile(basicProfileData);
+      setCompensation(compensationData);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -482,6 +495,14 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
+  async function handleSaveCompensation(data) {
+    const updated = await candidateCompensationApi.update(data);
+
+    setCompensation(updated);
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -619,6 +640,10 @@ export default function CandidateLandingPage() {
                   onEdit={() => setCareerPreferencesDrawerOpen(true)}
                 />
 
+                <CandidateCompensationCard
+                  compensation={compensation}
+                  onEdit={() => setIsCompensationOpen(true)}
+                />
                 {/* <OpportunityCard navigate={navigate} /> */}
               </Stack>
             </GridItem>
@@ -681,6 +706,12 @@ export default function CandidateLandingPage() {
           onClose={() => setIsBasicProfileOpen(false)}
           profile={basicProfile}
           onSave={handleSaveBasicProfile}
+        />
+        <CandidateCompensationDrawer
+          isOpen={isCompensationOpen}
+          onClose={() => setIsCompensationOpen(false)}
+          compensation={compensation}
+          onSave={handleSaveCompensation}
         />
       </Box>
     </Flex>
