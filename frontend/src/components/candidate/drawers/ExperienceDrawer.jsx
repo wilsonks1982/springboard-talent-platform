@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
+  Checkbox,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -10,12 +13,14 @@ import {
   DrawerHeader,
   DrawerOverlay,
   FormControl,
+  FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
-  Switch,
-  Textarea,
-  VStack,
+  Select,
+  Stack,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 
 const EMPTY_FORM = {
@@ -25,48 +30,60 @@ const EMPTY_FORM = {
   endDate: "",
   current: false,
   description: "",
+  reportedToTitle: "",
+  managementType: "",
+  teamSize: "",
+  reasonForLeaving: "",
 };
 
 export default function ExperienceDrawer({
   isOpen,
   onClose,
-  onSave,
   experience,
+  onSave,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
-
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const [error, setError] = useState("");
-
-  const isEdit = Boolean(experience);
+  const isEditing = Boolean(experience);
 
   useEffect(() => {
-    if (experience) {
-      setForm({
-        companyName: experience.companyName || "",
-
-        jobTitle: experience.jobTitle || "",
-
-        startDate: experience.startDate || "",
-
-        endDate: experience.endDate || "",
-
-        current: experience.current || false,
-
-        description: experience.description || "",
-      });
-    } else {
-      setForm(EMPTY_FORM);
+    if (!isOpen) {
+      return;
     }
 
-    setError("");
-  }, [experience, isOpen]);
+    setForm({
+      companyName: experience?.companyName || "",
+      jobTitle: experience?.jobTitle || "",
+      startDate: experience?.startDate
+        ? experience.startDate.substring(0, 7)
+        : "",
+      endDate: experience?.endDate ? experience.endDate.substring(0, 7) : "",
+      current: experience?.current ?? !experience?.endDate,
+      description: experience?.description || "",
+      reportedToTitle: experience?.reportedToTitle || "",
+      managementType: experience?.managementType || "",
+      teamSize: experience?.teamSize != null ? String(experience.teamSize) : "",
+      reasonForLeaving: experience?.reasonForLeaving || "",
+    });
 
-  function updateField(field, value) {
+    setErrors({});
+    setServerError("");
+  }, [isOpen, experience]);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
     setForm((current) => ({
       ...current,
-      [field]: value,
+      [name]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [name]: "",
     }));
   }
 
@@ -78,45 +95,104 @@ export default function ExperienceDrawer({
       current: checked,
       endDate: checked ? "" : current.endDate,
     }));
+
+    setErrors((current) => ({
+      ...current,
+      endDate: "",
+    }));
+  }
+
+  function handleManagementTypeChange(event) {
+    const value = event.target.value;
+
+    setForm((current) => ({
+      ...current,
+      managementType: value,
+      teamSize: value === "PEOPLE_MANAGER" ? current.teamSize : "",
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      managementType: "",
+      teamSize: "",
+    }));
+  }
+
+  function validate() {
+    const nextErrors = {};
+
+    if (!form.companyName.trim()) {
+      nextErrors.companyName = "Company is required.";
+    }
+
+    if (!form.jobTitle.trim()) {
+      nextErrors.jobTitle = "Job title is required.";
+    }
+
+    if (!form.startDate) {
+      nextErrors.startDate = "Start date is required.";
+    }
+
+    if (!form.current && !form.endDate) {
+      nextErrors.endDate = "End date is required for a completed role.";
+    }
+
+    if (form.startDate && form.endDate && form.endDate < form.startDate) {
+      nextErrors.endDate = "End date must be on or after the start date.";
+    }
+
+    if (!form.description.trim()) {
+      nextErrors.description = "Please describe what you did in this role.";
+    } else if (form.description.trim().length < 20) {
+      nextErrors.description =
+        "Role description must be at least 20 characters.";
+    }
+
+    if (!form.managementType) {
+      nextErrors.managementType = "Management type is required.";
+    }
+
+    if (form.managementType === "PEOPLE_MANAGER") {
+      if (!form.teamSize) {
+        nextErrors.teamSize = "Team size is required for People Manager roles.";
+      } else if (Number(form.teamSize) < 1) {
+        nextErrors.teamSize = "Team size must be at least 1.";
+      }
+    }
+
+    setErrors(nextErrors);
+
+    return Object.keys(nextErrors).length === 0;
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
-    setError("");
+    setServerError("");
 
-    if (!form.companyName.trim()) {
-      setError("Company name is required.");
-      return;
-    }
-
-    if (!form.jobTitle.trim()) {
-      setError("Job title is required.");
-      return;
-    }
-
-    if (
-      form.startDate &&
-      form.endDate &&
-      !form.current &&
-      form.endDate < form.startDate
-    ) {
-      setError("End date cannot be before start date.");
+    if (!validate()) {
       return;
     }
 
     const payload = {
       companyName: form.companyName.trim(),
-
       jobTitle: form.jobTitle.trim(),
 
-      startDate: form.startDate || null,
+      // Backend persists LocalDate while UI captures month/year.
+      startDate: `${form.startDate}-01`,
 
-      endDate: form.current ? null : form.endDate || null,
+      endDate: form.current ? null : `${form.endDate}-01`,
 
-      current: form.current,
+      description: form.description.trim(),
 
-      description: form.description.trim() || null,
+      reportedToTitle: form.reportedToTitle.trim() || null,
+
+      managementType: form.managementType,
+
+      teamSize:
+        form.managementType === "PEOPLE_MANAGER" ? Number(form.teamSize) : null,
+
+      reasonForLeaving: form.reasonForLeaving.trim() || null,
     };
 
     try {
@@ -125,154 +201,244 @@ export default function ExperienceDrawer({
       await onSave(payload, experience?.id);
 
       onClose();
-    } catch (err) {
-      setError(err?.response?.data?.message || "Unable to save experience.");
+    } catch (error) {
+      setServerError(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Unable to save employment history.",
+      );
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Drawer
-      isOpen={isOpen}
-      placement="right"
-      onClose={onClose}
-      size={{ base: "full", md: "md" }}
-    >
+    <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
 
       <DrawerContent>
         <DrawerCloseButton />
 
-        <DrawerHeader
-          borderBottom="1px solid"
-          borderColor="gray.100"
-          fontSize="lg"
-          fontWeight="700"
-        >
-          {isEdit ? "Edit experience" : "Add experience"}
+        <DrawerHeader>
+          <Text fontSize="lg" fontWeight="bold">
+            {isEditing ? "Edit Employment" : "Add Employment"}
+          </Text>
+
+          <Text mt={1} fontSize="sm" fontWeight="normal" color="gray.500">
+            Tell us about your role and responsibilities.
+          </Text>
         </DrawerHeader>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-          }}
-        >
-          <DrawerBody>
-            <VStack spacing={5} align="stretch">
-              {error && (
-                <Box
-                  bg="red.50"
-                  border="1px solid"
-                  borderColor="red.100"
-                  borderRadius="lg"
-                  px={4}
-                  py={3}
-                >
-                  <Text fontSize="sm" color="red.600">
-                    {error}
-                  </Text>
-                </Box>
-              )}
+        <DrawerBody overflowY="auto">
+          <Stack
+            as="form"
+            id="employment-history-form"
+            spacing={5}
+            onSubmit={handleSubmit}
+          >
+            {serverError && (
+              <Alert status="error" borderRadius="md">
+                <AlertIcon />
+                {serverError}
+              </Alert>
+            )}
 
-              <FormControl isRequired>
-                <FormLabel>Company</FormLabel>
+            {/* Company */}
+            <FormControl isInvalid={Boolean(errors.companyName)}>
+              <FormLabel>Company</FormLabel>
 
-                <Input
-                  value={form.companyName}
-                  onChange={(e) => updateField("companyName", e.target.value)}
-                  placeholder="e.g. ABC Technologies"
-                />
-              </FormControl>
+              <Input
+                name="companyName"
+                value={form.companyName}
+                onChange={handleChange}
+                placeholder="e.g. ABC Technologies"
+                autoComplete="organization"
+              />
 
-              <FormControl isRequired>
-                <FormLabel>Job title</FormLabel>
+              <FormErrorMessage>{errors.companyName}</FormErrorMessage>
+            </FormControl>
 
-                <Input
-                  value={form.jobTitle}
-                  onChange={(e) => updateField("jobTitle", e.target.value)}
-                  placeholder="e.g. Senior Software Engineer"
-                />
-              </FormControl>
+            {/* Job title */}
+            <FormControl isInvalid={Boolean(errors.jobTitle)}>
+              <FormLabel>Job Title</FormLabel>
 
-              <FormControl>
-                <FormLabel>Start date</FormLabel>
+              <Input
+                name="jobTitle"
+                value={form.jobTitle}
+                onChange={handleChange}
+                placeholder="e.g. Senior Java Developer"
+              />
 
-                <Input
-                  type="date"
-                  value={form.startDate}
-                  onChange={(e) => updateField("startDate", e.target.value)}
-                />
-              </FormControl>
+              <FormErrorMessage>{errors.jobTitle}</FormErrorMessage>
+            </FormControl>
 
-              <FormControl>
-                <FormLabel>End date</FormLabel>
+            {/* Dates */}
+            <Box>
+              <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                <FormControl flex="1" isInvalid={Boolean(errors.startDate)}>
+                  <FormLabel>Start Date</FormLabel>
 
-                <Input
-                  type="date"
-                  value={form.endDate}
-                  isDisabled={form.current}
-                  onChange={(e) => updateField("endDate", e.target.value)}
-                />
-              </FormControl>
-
-              <FormControl>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  py={2}
-                >
-                  <Box>
-                    <FormLabel mb={0} fontSize="sm" fontWeight="600">
-                      I currently work here
-                    </FormLabel>
-
-                    <Text fontSize="xs" color="gray.500" mt={1}>
-                      We'll keep the end date empty.
-                    </Text>
-                  </Box>
-
-                  <Switch
-                    isChecked={form.current}
-                    onChange={handleCurrentChange}
-                    colorScheme="purple"
+                  <Input
+                    name="startDate"
+                    type="month"
+                    value={form.startDate}
+                    onChange={handleChange}
                   />
-                </Box>
-              </FormControl>
 
+                  <FormErrorMessage>{errors.startDate}</FormErrorMessage>
+                </FormControl>
+
+                <FormControl flex="1" isInvalid={Boolean(errors.endDate)}>
+                  <FormLabel>End Date</FormLabel>
+
+                  <Input
+                    name="endDate"
+                    type="month"
+                    value={form.endDate}
+                    onChange={handleChange}
+                    disabled={form.current}
+                  />
+
+                  <FormErrorMessage>{errors.endDate}</FormErrorMessage>
+                </FormControl>
+              </Stack>
+
+              <Checkbox
+                mt={3}
+                isChecked={form.current}
+                onChange={handleCurrentChange}
+              >
+                I currently work here
+              </Checkbox>
+            </Box>
+
+            {/* Role description */}
+            <FormControl isInvalid={Boolean(errors.description)}>
+              <FormLabel>Role Description</FormLabel>
+
+              <Textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                placeholder={
+                  "Describe what you did in this role. " +
+                  "Focus on responsibilities, scope and contribution."
+                }
+                rows={5}
+                resize="vertical"
+              />
+
+              <FormHelperText>
+                Keep this to 2–4 sentences in plain language.
+              </FormHelperText>
+
+              <FormErrorMessage>{errors.description}</FormErrorMessage>
+            </FormControl>
+
+            {/* Reporting title */}
+            <FormControl>
+              <FormLabel>
+                Reported To
+                <Text as="span" ml={1} color="gray.400" fontWeight="normal">
+                  (optional)
+                </Text>
+              </FormLabel>
+
+              <Input
+                name="reportedToTitle"
+                value={form.reportedToTitle}
+                onChange={handleChange}
+                placeholder="e.g. VP Engineering"
+              />
+
+              <FormHelperText>Title only — no manager name.</FormHelperText>
+            </FormControl>
+
+            {/* Management type */}
+            <FormControl isInvalid={Boolean(errors.managementType)}>
+              <FormLabel>Management Type</FormLabel>
+
+              <Select
+                name="managementType"
+                value={form.managementType}
+                onChange={handleManagementTypeChange}
+                placeholder="Select management type"
+              >
+                <option value="INDIVIDUAL_CONTRIBUTOR">
+                  Individual Contributor
+                </option>
+
+                <option value="PEOPLE_MANAGER">People Manager</option>
+              </Select>
+
+              <FormErrorMessage>{errors.managementType}</FormErrorMessage>
+            </FormControl>
+
+            {/* Team size */}
+            {form.managementType === "PEOPLE_MANAGER" && (
+              <FormControl isInvalid={Boolean(errors.teamSize)}>
+                <FormLabel>Team Size</FormLabel>
+
+                <Input
+                  name="teamSize"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={form.teamSize}
+                  onChange={handleChange}
+                  placeholder="e.g. 8"
+                />
+
+                <FormHelperText>
+                  Number of people you directly managed.
+                </FormHelperText>
+
+                <FormErrorMessage>{errors.teamSize}</FormErrorMessage>
+              </FormControl>
+            )}
+
+            {/* Reason for leaving */}
+            {!form.current && (
               <FormControl>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>
+                  Reason for Leaving
+                  <Text as="span" ml={1} color="gray.400" fontWeight="normal">
+                    (optional)
+                  </Text>
+                </FormLabel>
 
                 <Textarea
-                  value={form.description}
-                  onChange={(e) => updateField("description", e.target.value)}
-                  placeholder="Briefly describe your role, responsibilities and impact..."
-                  rows={5}
+                  name="reasonForLeaving"
+                  value={form.reasonForLeaving}
+                  onChange={handleChange}
+                  placeholder="Optional context for Springboard coaching."
+                  rows={3}
                   resize="vertical"
                 />
+
+                <FormHelperText>
+                  This is private and used only for coaching context.
+                </FormHelperText>
               </FormControl>
-            </VStack>
-          </DrawerBody>
+            )}
+          </Stack>
+        </DrawerBody>
 
-          <DrawerFooter borderTop="1px solid" borderColor="gray.100" gap={3}>
-            <Button variant="ghost" onClick={onClose} isDisabled={saving}>
-              Cancel
-            </Button>
+        <DrawerFooter borderTopWidth="1px">
+          <Button variant="ghost" mr={3} onClick={onClose} isDisabled={saving}>
+            Cancel
+          </Button>
 
-            <Button
-              type="submit"
-              colorScheme="purple"
-              isLoading={saving}
-              loadingText="Saving"
-            >
-              {isEdit ? "Save changes" : "Save experience"}
-            </Button>
-          </DrawerFooter>
-        </form>
+          <Button
+            colorScheme="purple"
+            type="submit"
+            form="employment-history-form"
+            isLoading={saving}
+            loadingText="Saving"
+          >
+            {isEditing ? "Save Changes" : "Add Employment"}
+          </Button>
+        </DrawerFooter>
       </DrawerContent>
     </Drawer>
   );

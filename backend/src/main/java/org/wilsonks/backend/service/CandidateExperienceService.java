@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wilsonks.backend.domain.Candidate;
 import org.wilsonks.backend.domain.CandidateExperience;
+import org.wilsonks.backend.domain.enums.ManagementType;
 import org.wilsonks.backend.dto.requests.CandidateExperienceRequest;
 import org.wilsonks.backend.repository.CandidateExperiencesRepository;
 
@@ -13,116 +14,118 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CandidateExperienceService {
 
-    private final CandidateExperiencesRepository experiencesRepo;
     private final CandidateService candidateService;
+    private final CandidateExperiencesRepository experienceRepository;
 
     @Transactional(readOnly = true)
     public List<CandidateExperience> getMyExperiences(UUID userId) {
-
-        return experiencesRepo.findAllByCandidateUserIdOrderByDisplayOrderAsc(userId);
+        return experienceRepository.findAllByCandidateUserIdOrderByStartDateDesc(userId);
     }
 
-    @Transactional
     public CandidateExperience create(UUID userId, CandidateExperienceRequest request) {
 
         Candidate candidate = candidateService.getCandidateByUserId(userId);
 
-        validate(request);
+        validateCurrentRole(userId, null, request);
 
         CandidateExperience experience = new CandidateExperience();
 
         experience.setCandidate(candidate);
-        experience.setCompanyName(request.companyName().trim());
-        experience.setJobTitle(request.jobTitle().trim());
-        experience.setStartDate(request.startDate());
-        experience.setEndDate(request.current() ? null : request.endDate());
-        experience.setCurrent(request.current());
-        experience.setDescription(clean(request.description()));
+        applyRequest(experience, request);
 
-        experience.setDisplayOrder(nextDisplayOrder(candidate));
-
-        return experiencesRepo.save(experience);
+        return experienceRepository.save(experience);
     }
 
-    @Transactional
     public CandidateExperience update(UUID userId, UUID experienceId, CandidateExperienceRequest request) {
 
-        validate(request);
+        CandidateExperience experience = experienceRepository.findById(experienceId).orElseThrow(() -> new IllegalArgumentException("Employment experience not found."));
 
-        CandidateExperience experience = experiencesRepo.findById(experienceId).orElseThrow(() -> new IllegalArgumentException("Experience not found."));
+        validateOwnership(experience, userId);
 
-        // Ownership check
-        if (!experience.getCandidate().getUserId().equals(userId)) {
+        validateCurrentRole(userId, experienceId, request);
 
-            throw new IllegalArgumentException("Experience does not belong to this candidate.");
-        }
+        applyRequest(experience, request);
 
-        experience.setCompanyName(request.companyName().trim());
-
-        experience.setJobTitle(request.jobTitle().trim());
-
-        experience.setStartDate(request.startDate());
-
-        experience.setEndDate(request.current() ? null : request.endDate());
-
-        experience.setCurrent(request.current());
-
-        experience.setDescription(clean(request.description()));
-
-        return experiencesRepo.save(experience);
+        return experienceRepository.save(experience);
     }
 
-    @Transactional
     public void delete(UUID userId, UUID experienceId) {
 
-        CandidateExperience experience = experiencesRepo.findById(experienceId).orElseThrow(() -> new IllegalArgumentException("Experience not found."));
+        CandidateExperience experience = experienceRepository.findById(experienceId).orElseThrow(() -> new IllegalArgumentException("Employment experience not found."));
 
-        // Ownership check
-        if (!experience.getCandidate().getUserId().equals(userId)) {
+        validateOwnership(experience, userId);
 
-            throw new IllegalArgumentException("Experience does not belong to this candidate.");
-        }
-
-        experiencesRepo.delete(experience);
+        experienceRepository.delete(experience);
     }
 
-    private int nextDisplayOrder(Candidate candidate) {
+    private void applyRequest(CandidateExperience experience, CandidateExperienceRequest request) {
 
-        return candidate.getExperiences().stream().mapToInt(CandidateExperience::getDisplayOrder).max().orElse(-1) + 1;
+        experience.setCompanyName(request.companyName().trim());
+        experience.setJobTitle(request.jobTitle().trim());
+        experience.setStartDate(request.startDate());
+        experience.setEndDate(request.endDate());
+
+        experience.setDescription(request.description().trim());
+
+        experience.setReportedToTitle(trimToNull(request.reportedToTitle()));
+
+        experience.setManagementType(request.managementType());
+
+        experience.setTeamSize(normalizeTeamSize(request));
+
+        experience.setReasonForLeaving(trimToNull(request.reasonForLeaving()));
     }
 
-    private void validate(CandidateExperienceRequest request) {
+    private Integer normalizeTeamSize(CandidateExperienceRequest request) {
 
-        if (request.companyName() == null || request.companyName().isBlank()) {
-
-            throw new IllegalArgumentException("Company name is required.");
-        }
-
-        if (request.jobTitle() == null || request.jobTitle().isBlank()) {
-
-            throw new IllegalArgumentException("Job title is required.");
-        }
-
-        if (request.startDate() != null && request.endDate() != null && !request.current() && request.endDate().isBefore(request.startDate())) {
-
-            throw new IllegalArgumentException("End date cannot be before start date.");
-        }
-
-        if (request.current() && request.endDate() != null) {
-
-            throw new IllegalArgumentException("Current experience cannot have an end date.");
-        }
-    }
-
-    private String clean(String value) {
-
-        if (value == null || value.isBlank()) {
+        if (request.managementType() == ManagementType.INDIVIDUAL_CONTRIBUTOR) {
 
             return null;
         }
 
-        return value.trim();
+        return request.teamSize();
+    }
+
+    private void validateCurrentRole(UUID userId, UUID experienceId, CandidateExperienceRequest request) {
+
+        boolean currentRole = request.endDate() == null;
+
+        if (!currentRole) {
+            return;
+        }
+
+        boolean anotherCurrentRole;
+
+        if (experienceId == null) {
+            anotherCurrentRole = experienceRepository.existsByCandidateUserIdAndEndDateIsNull(userId);
+        } else {
+            anotherCurrentRole = experienceRepository.existsByCandidateUserIdAndIdNotAndEndDateIsNull(userId, experienceId);
+        }
+
+        if (anotherCurrentRole) {
+            throw new IllegalArgumentException("Only one current employment role is allowed.");
+        }
+    }
+
+    private void validateOwnership(CandidateExperience experience, UUID userId) {
+
+        if (!experience.getCandidate().getUser().getUserId().equals(userId)) {
+
+            throw new IllegalArgumentException("Employment experience does not belong to this candidate.");
+        }
+    }
+
+    private String trimToNull(String value) {
+
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

@@ -45,6 +45,7 @@ import { profileStrengthApi } from "../../api/candidateProfileStrengthApi";
 
 import CandidateHeader from "../../components/candidate/candidateHeader";
 
+import ExperienceInsights from "../../components/candidate/ExperienceInsights";
 import ExperienceSection from "../../components/candidate/sections/ExperienceSection";
 import ExperienceDrawer from "../../components/candidate/drawers/ExperienceDrawer";
 import { candidateExperienceApi } from "../../api/candidateExperienceApi";
@@ -101,6 +102,12 @@ export default function CandidateLandingPage() {
   const [experiences, setExperiences] = useState([]);
   const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState(null);
+  const [employmentAnalysis, setEmploymentAnalysis] = useState({
+    yearsExperience: 0,
+    currentTitle: null,
+    currentCompany: null,
+    employmentGaps: [],
+  });
 
   const [education, setEducation] = useState([]);
   const [educationDrawerOpen, setEducationDrawerOpen] = useState(false);
@@ -154,12 +161,14 @@ export default function CandidateLandingPage() {
         basicProfileData,
         compensationData,
         employmentVerificationData,
+        employmentAnalysisData,
       ] = await Promise.all([
         candidateApi.getMe(),
         profileStrengthApi.get(),
         candidateBasicProfileApi.get(),
         candidateCompensationApi.get(),
         candidateEmploymentVerificationApi.get(),
+        candidateExperienceApi.getAnalysis(),
       ]);
 
       setCandidate(candidateData);
@@ -174,6 +183,7 @@ export default function CandidateLandingPage() {
       setBasicProfile(basicProfileData);
       setCompensation(compensationData);
       setEmploymentVerification(employmentVerificationData);
+      setEmploymentAnalysis(employmentAnalysisData);
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -250,6 +260,10 @@ export default function CandidateLandingPage() {
 
       setExperiences((current) => [...current, created]);
 
+      const analysis = await candidateExperienceApi.getAnalysis();
+
+      setEmploymentAnalysis(analysis);
+
       await refreshProfileStrength();
     }
   }
@@ -260,6 +274,10 @@ export default function CandidateLandingPage() {
     setExperiences((current) =>
       current.filter((item) => item.id !== experience.id),
     );
+
+    const analysis = await candidateExperienceApi.getAnalysis();
+
+    setEmploymentAnalysis(analysis);
 
     await refreshProfileStrength();
   }
@@ -692,6 +710,7 @@ export default function CandidateLandingPage() {
                   onSectionAction={handleProfileSectionAction}
                 />
 
+                <ExperienceInsights analysis={employmentAnalysis} />
                 <ExperienceSection
                   experiences={experiences}
                   onAdd={handleAddExperience}

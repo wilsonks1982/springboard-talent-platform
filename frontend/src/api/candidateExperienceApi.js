@@ -1,6 +1,6 @@
 import { api } from "./http";
 
-const BASE_URL = "/candidates/me/experiences";
+const BASE_URL = "/candidates/me/employment-history";
 
 export const candidateExperienceApi = {
   async getAll() {
@@ -22,5 +22,11 @@ export const candidateExperienceApi = {
 
   async remove(id) {
     await api.delete(`${BASE_URL}/${id}`);
+  },
+
+  async getAnalysis() {
+    const response = await api.get(`${BASE_URL}/analysis`);
+
+    return response.data;
   },
 };

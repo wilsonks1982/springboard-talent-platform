@@ -1,44 +1,153 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import {
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay,
   Badge,
   Box,
   Button,
+  Divider,
   Flex,
   HStack,
-  IconButton,
+  Icon,
+  Stack,
   Text,
-  VStack,
 } from "@chakra-ui/react";
+import { FiBriefcase, FiEdit2, FiPlus, FiUsers } from "react-icons/fi";
 
-import { FiBriefcase, FiEdit2, FiPlus, FiTrash2 } from "react-icons/fi";
-
-function formatDate(date) {
-  if (!date) {
+function formatMonthYear(value) {
+  if (!value) {
     return "";
   }
 
-  return new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
+  const date = new Date(`${value}T00:00:00`);
+
+  return date.toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
   });
 }
 
-function getDateRange(experience) {
-  const start = formatDate(experience.startDate);
-
-  const end = experience.current ? "Present" : formatDate(experience.endDate);
-
-  if (!start && !end) {
-    return "";
+function getManagementLabel(managementType) {
+  if (managementType === "PEOPLE_MANAGER") {
+    return "People Manager";
   }
 
-  return `${start} — ${end}`;
+  if (managementType === "INDIVIDUAL_CONTRIBUTOR") {
+    return "Individual Contributor";
+  }
+
+  return null;
+}
+
+function ExperienceItem({ experience, onEdit }) {
+  const managementLabel = getManagementLabel(experience.managementType);
+
+  const isCurrent = experience.current || !experience.endDate;
+
+  return (
+    <Box>
+      <Flex justify="space-between" align="flex-start" gap={4}>
+        <HStack align="flex-start" spacing={4} minW={0}>
+          {/* Company avatar */}
+          <Box
+            flexShrink={0}
+            w="44px"
+            h="44px"
+            borderRadius="xl"
+            bg="purple.50"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            fontWeight="800"
+            fontSize="md"
+            color="purple.600"
+          >
+            {experience.companyName?.[0]?.toUpperCase() || "C"}
+          </Box>
+
+          <Box minW={0}>
+            <Text
+              fontWeight="700"
+              fontSize={{ base: "sm", md: "md" }}
+              color="gray.800"
+            >
+              {experience.jobTitle}
+            </Text>
+
+            <Text mt={1} fontSize="sm" color="gray.600" fontWeight="500">
+              {experience.companyName}
+            </Text>
+
+            <Text mt={1} fontSize="xs" color="gray.500">
+              {formatMonthYear(experience.startDate)}
+              {" — "}
+              {isCurrent ? "Present" : formatMonthYear(experience.endDate)}
+            </Text>
+
+            {managementLabel && (
+              <HStack mt={3} spacing={2}>
+                <Badge
+                  colorScheme={
+                    experience.managementType === "PEOPLE_MANAGER"
+                      ? "blue"
+                      : "purple"
+                  }
+                  variant="subtle"
+                  borderRadius="full"
+                  px={2.5}
+                  py={1}
+                  fontSize="xs"
+                >
+                  {managementLabel}
+                </Badge>
+
+                {experience.managementType === "PEOPLE_MANAGER" &&
+                  experience.teamSize != null && (
+                    <HStack spacing={1} color="gray.500" fontSize="xs">
+                      <Icon as={FiUsers} />
+                      <Text>
+                        {experience.teamSize}{" "}
+                        {experience.teamSize === 1 ? "person" : "people"}
+                      </Text>
+                    </HStack>
+                  )}
+              </HStack>
+            )}
+
+            {experience.description && (
+              <Text
+                mt={3}
+                fontSize="sm"
+                lineHeight="1.6"
+                color="gray.600"
+                maxW="720px"
+              >
+                {experience.description}
+              </Text>
+            )}
+
+            {experience.reportedToTitle && (
+              <Text mt={3} fontSize="xs" color="gray.500">
+                Reports to{" "}
+                <Text as="span" fontWeight="600" color="gray.600">
+                  {experience.reportedToTitle}
+                </Text>
+              </Text>
+            )}
+          </Box>
+        </HStack>
+
+        <Button
+          flexShrink={0}
+          size="sm"
+          variant="ghost"
+          colorScheme="purple"
+          leftIcon={<FiEdit2 />}
+          onClick={() => onEdit(experience)}
+        >
+          Edit
+        </Button>
+      </Flex>
+    </Box>
+  );
 }
 
 export default function ExperienceSection({
@@ -47,232 +156,87 @@ export default function ExperienceSection({
   onEdit,
   onDelete,
 }) {
-  const [experienceToDelete, setExperienceToDelete] = useState(null);
-
-  const cancelRef = useRef();
-
-  function requestDelete(experience) {
-    setExperienceToDelete(experience);
-  }
-
   return (
     <Box
       bg="white"
-      border="1px solid"
+      borderWidth="1px"
       borderColor="gray.100"
       borderRadius="2xl"
-      p={{ base: 5, md: 7 }}
+      p={{ base: 5, md: 6 }}
+      boxShadow="sm"
     >
-      <Flex align="center" justify="space-between" mb={6}>
-        <Box>
-          <Text fontSize="lg" fontWeight="700" color="gray.800">
-            Experience
-          </Text>
+      {/* Header */}
+      <Flex justify="space-between" align="center" mb={5}>
+        <HStack spacing={3}>
+          <Box
+            w="38px"
+            h="38px"
+            borderRadius="lg"
+            bg="purple.50"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Icon as={FiBriefcase} color="purple.600" />
+          </Box>
 
-          <Text fontSize="sm" color="gray.500" mt={1}>
-            Your professional journey
-          </Text>
-        </Box>
+          <Box>
+            <Text fontWeight="700" color="gray.800">
+              Experience
+            </Text>
+
+            <Text fontSize="xs" color="gray.500">
+              Your professional journey
+            </Text>
+          </Box>
+        </HStack>
 
         <Button
-          leftIcon={<FiPlus />}
+          size="sm"
           colorScheme="purple"
           variant="ghost"
-          size="sm"
+          leftIcon={<FiPlus />}
           onClick={onAdd}
         >
-          Add experience
+          Add Experience
         </Button>
       </Flex>
 
+      {/* Empty state */}
       {experiences.length === 0 ? (
         <Box
-          border="1px dashed"
-          borderColor="gray.300"
-          borderRadius="xl"
-          p={8}
+          py={10}
           textAlign="center"
+          borderWidth="1px"
+          borderStyle="dashed"
+          borderColor="gray.200"
+          borderRadius="xl"
         >
-          <Box
-            display="inline-flex"
-            alignItems="center"
-            justifyContent="center"
-            w="48px"
-            h="48px"
-            borderRadius="xl"
-            bg="purple.50"
-            color="purple.500"
-            mb={3}
-          >
-            <FiBriefcase />
-          </Box>
+          <Icon as={FiBriefcase} boxSize={8} color="gray.300" mb={3} />
 
           <Text fontWeight="600" color="gray.700">
-            Tell us about your experience
+            Your professional journey starts here.
           </Text>
 
-          <Text fontSize="sm" color="gray.500" mt={1} mb={4}>
-            Add your professional experience to build your career story.
+          <Text mt={1} fontSize="sm" color="gray.500">
+            Add your work experience to build your career story.
           </Text>
 
-          <Button
-            leftIcon={<FiPlus />}
-            colorScheme="purple"
-            size="sm"
-            onClick={onAdd}
-          >
-            Add experience
+          <Button mt={4} size="sm" colorScheme="purple" onClick={onAdd}>
+            Add your first role
           </Button>
         </Box>
       ) : (
-        <VStack align="stretch" spacing={0}>
+        <Stack spacing={5}>
           {experiences.map((experience, index) => (
-            <Flex
-              key={experience.id}
-              position="relative"
-              pb={index === experiences.length - 1 ? 0 : 7}
-              mb={index === experiences.length - 1 ? 0 : 7}
-            >
-              {/* Timeline */}
-              <Box w="40px" flexShrink={0} position="relative">
-                <Box
-                  w="12px"
-                  h="12px"
-                  borderRadius="full"
-                  bg="purple.500"
-                  mt={1}
-                  position="relative"
-                  zIndex="2"
-                />
+            <React.Fragment key={experience.id}>
+              {index > 0 && <Divider />}
 
-                {index !== experiences.length - 1 && (
-                  <Box
-                    position="absolute"
-                    left="5px"
-                    top="13px"
-                    bottom="-28px"
-                    w="2px"
-                    bg="gray.100"
-                  />
-                )}
-              </Box>
-
-              <Box flex="1" minW="0">
-                <Flex justify="space-between" align="flex-start" gap={4}>
-                  <Box>
-                    <Text fontWeight="700" color="gray.800">
-                      {experience.jobTitle}
-                    </Text>
-
-                    <Text
-                      fontSize="sm"
-                      fontWeight="500"
-                      color="purple.600"
-                      mt={1}
-                    >
-                      {experience.companyName}
-                    </Text>
-
-                    <HStack spacing={2} mt={1} flexWrap="wrap">
-                      <Text fontSize="xs" color="gray.400">
-                        {getDateRange(experience)}
-                      </Text>
-
-                      {experience.current && (
-                        <Badge
-                          colorScheme="green"
-                          variant="subtle"
-                          borderRadius="full"
-                          px={2}
-                          fontSize="10px"
-                          textTransform="none"
-                        >
-                          Current
-                        </Badge>
-                      )}
-                    </HStack>
-                  </Box>
-
-                  <HStack spacing={1}>
-                    <IconButton
-                      aria-label="Edit experience"
-                      icon={<FiEdit2 />}
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => onEdit(experience)}
-                    />
-
-                    <IconButton
-                      aria-label="Delete experience"
-                      icon={<FiTrash2 />}
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => requestDelete(experience)}
-                    />
-                  </HStack>
-                </Flex>
-
-                {experience.description && (
-                  <Text fontSize="sm" color="gray.600" lineHeight="1.7" mt={3}>
-                    {experience.description}
-                  </Text>
-                )}
-              </Box>
-            </Flex>
+              <ExperienceItem experience={experience} onEdit={onEdit} />
+            </React.Fragment>
           ))}
-        </VStack>
+        </Stack>
       )}
-      <AlertDialog
-        isOpen={Boolean(experienceToDelete)}
-        leastDestructiveRef={cancelRef}
-        onClose={() => setExperienceToDelete(null)}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="2xl">
-            <AlertDialogHeader fontSize="lg" fontWeight="700">
-              Delete experience?
-            </AlertDialogHeader>
-
-            <AlertDialogBody>
-              <Text color="gray.600">
-                This will permanently remove your experience at{" "}
-                <Text as="span" fontWeight="600" color="gray.800">
-                  {experienceToDelete?.companyName}
-                </Text>
-                .
-              </Text>
-
-              <Text fontSize="sm" color="gray.500" mt={2}>
-                This action cannot be undone.
-              </Text>
-            </AlertDialogBody>
-
-            <AlertDialogFooter gap={3}>
-              <Button
-                ref={cancelRef}
-                variant="ghost"
-                onClick={() => setExperienceToDelete(null)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                colorScheme="red"
-                onClick={async () => {
-                  const experience = experienceToDelete;
-
-                  setExperienceToDelete(null);
-
-                  await onDelete(experience);
-                }}
-              >
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </Box>
   );
 }
