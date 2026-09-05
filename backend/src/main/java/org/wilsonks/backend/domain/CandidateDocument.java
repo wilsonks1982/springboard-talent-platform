@@ -11,7 +11,15 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "candidate_documents")
+@Table(
+        name = "candidate_documents",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_candidate_document_type",
+                        columnNames = {"candidate_user_id", "document_type"}
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +29,8 @@ public class CandidateDocument {
     @GeneratedValue
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "candidate_user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidate_user_id", nullable = false)
     private Candidate candidate;
 
     @Enumerated(EnumType.STRING)

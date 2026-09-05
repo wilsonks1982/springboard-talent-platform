@@ -28,11 +28,17 @@ public class LocalDocumentStorageService implements DocumentStorageService {
     }
 
     @Override
-    public String store(String candidateEmail, MultipartFile file) throws IOException {
+    public String store(
+            String candidateEmail,
+            String documentName,
+            MultipartFile file
+    ) throws IOException {
 
-        String emailDirectory = candidateEmail.trim().toLowerCase(Locale.ROOT);
+        String emailDirectory =
+                candidateEmail.trim().toLowerCase(Locale.ROOT);
 
-        String storageKey = "candidates/" + emailDirectory + "/Resume.pdf";
+        String storageKey =
+                "candidates/" + emailDirectory + "/" + documentName + ".pdf";
 
         Path target = rootDirectory.resolve(storageKey).normalize();
 
@@ -43,11 +49,16 @@ public class LocalDocumentStorageService implements DocumentStorageService {
         Files.createDirectories(target.getParent());
 
         try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                    inputStream,
+                    target,
+                    StandardCopyOption.REPLACE_EXISTING
+            );
         }
 
         return storageKey;
     }
+
 
     @Override
     public void delete(String storageKey) throws IOException {

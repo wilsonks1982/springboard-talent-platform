@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.wilsonks.backend.domain.Candidate;
+import org.wilsonks.backend.domain.enums.DocumentType;
 import org.wilsonks.backend.domain.enums.EmploymentVerificationStatus;
+import org.wilsonks.backend.dto.CandidateDocumentResponse;
 import org.wilsonks.backend.dto.requests.CandidateEmploymentVerificationRequest;
 import org.wilsonks.backend.dto.responses.CandidateEmploymentVerificationResponse;
+import org.wilsonks.backend.repository.CandidateDocumentRepository;
 import org.wilsonks.backend.repository.CandidatesRepository;
 import org.wilsonks.backend.service.CandidateEmploymentVerificationService;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class CandidateEmploymentVerificationServiceImpl implements CandidateEmploymentVerificationService {
 
     private final CandidatesRepository candidateRepository;
+    private final CandidateDocumentRepository documentsRepo;
 
     @Transactional(readOnly = true)
     public Candidate getCandidate(UUID userId) {
@@ -30,19 +34,32 @@ public class CandidateEmploymentVerificationServiceImpl implements CandidateEmpl
     @Override
     @Transactional(readOnly = true)
     public CandidateEmploymentVerificationResponse get(Candidate candidate) {
-        return CandidateEmploymentVerificationResponse.of(candidate);
+        UUID candidateId = candidate.getUser().getUserId();
+
+        CandidateDocumentResponse lastIncrementLetter =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                candidateId,
+                                DocumentType.LAST_INCREMENT_LETTER
+                        )
+                        .map(CandidateDocumentResponse::of)
+                        .orElse(null);
+
+        CandidateDocumentResponse relievingLetter =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                candidateId,
+                                DocumentType.RELIEVING_LETTER
+                        )
+                        .map(CandidateDocumentResponse::of)
+                        .orElse(null);
+
+        return CandidateEmploymentVerificationResponse.of(candidate, lastIncrementLetter, relievingLetter);
     }
 
     @Override
     public CandidateEmploymentVerificationResponse update(Candidate candidate, CandidateEmploymentVerificationRequest request) {
 
-        candidate.setLastIncrementLetterUrl(request.lastIncrementLetterUrl());
-
-        candidate.setVariablePayLetterUrl(request.variablePayLetterUrl());
-
-        candidate.setRelievingLetterUrl(request.relievingLetterUrl());
-
-        candidate.setOtherSupportingDocumentUrl(request.otherSupportingDocumentUrl());
 
         candidate.setReportingManagerName(request.reportingManagerName());
 
@@ -64,7 +81,30 @@ public class CandidateEmploymentVerificationServiceImpl implements CandidateEmpl
 
         Candidate saved = candidateRepository.save(candidate);
 
-        return CandidateEmploymentVerificationResponse.of(saved);
+        CandidateDocumentResponse lastIncrementLetter =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                candidate.getUser().getUserId(),
+                                DocumentType.LAST_INCREMENT_LETTER
+                        )
+                        .map(CandidateDocumentResponse::of)
+                        .orElse(null);
+
+        CandidateDocumentResponse relievingLetter =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                candidate.getUser().getUserId(),
+                                DocumentType.RELIEVING_LETTER
+                        )
+                        .map(CandidateDocumentResponse::of)
+                        .orElse(null);
+
+        return CandidateEmploymentVerificationResponse.of(
+                saved,
+                lastIncrementLetter,
+                relievingLetter
+        );
+
     }
 
     @Override
@@ -82,7 +122,7 @@ public class CandidateEmploymentVerificationServiceImpl implements CandidateEmpl
             candidateRepository.save(candidate);
         }
 
-        return CandidateEmploymentVerificationResponse.of(candidate);
+        return get(candidate);
     }
 
     private void updateDisclosure(Candidate candidate, CandidateEmploymentVerificationRequest request) {

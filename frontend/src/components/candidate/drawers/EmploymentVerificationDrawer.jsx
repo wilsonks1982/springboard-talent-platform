@@ -17,6 +17,8 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
+  Flex,
+  HStack,
   Input,
   Radio,
   RadioGroup,
@@ -24,12 +26,16 @@ import {
   Text,
 } from "@chakra-ui/react";
 
-const EMPTY_FORM = {
-  lastIncrementLetterUrl: "",
-  variablePayLetterUrl: "",
-  relievingLetterUrl: "",
-  otherSupportingDocumentUrl: "",
+import {
+  FiCheckCircle,
+  FiDownload,
+  FiFileText,
+  FiLock,
+  FiTrash2,
+  FiUpload,
+} from "react-icons/fi";
 
+const EMPTY_FORM = {
   reportingManagerName: "",
   reportingManagerPhone: "",
   reportingManagerEmail: "",
@@ -60,6 +66,112 @@ const STATUS_CONFIG = {
   },
 };
 
+function VerificationDocumentRow({
+  label,
+  document,
+  documentType,
+  required,
+  onUpload,
+  onDownload,
+  onDelete,
+  uploadingType,
+}) {
+  const inputRef = React.useRef(null);
+
+  const isUploading = uploadingType === documentType;
+
+  async function handleFileChange(event) {
+    const file = event.target.files?.[0];
+
+    // Allow selecting the same file again.
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    await onUpload(documentType, file);
+  }
+
+  return (
+    <Box borderWidth="1px" borderRadius="lg" p={4} bg="gray.50">
+      <Flex justify="space-between" align="center" mb={3}>
+        <HStack>
+          <FiFileText />
+
+          <Text fontWeight="600">{label}</Text>
+
+          {required && <Badge colorScheme="orange">Required</Badge>}
+        </HStack>
+      </Flex>
+
+      <Input
+        ref={inputRef}
+        type="file"
+        accept="application/pdf,.pdf"
+        display="none"
+        onChange={handleFileChange}
+      />
+
+      {!document ? (
+        <Button
+          leftIcon={<FiUpload />}
+          size="sm"
+          variant="outline"
+          onClick={() => inputRef.current?.click()}
+          isLoading={isUploading}
+          loadingText="Uploading"
+        >
+          Upload
+        </Button>
+      ) : (
+        <Stack spacing={3}>
+          <HStack>
+            <FiCheckCircle />
+
+            <Text fontSize="sm" fontWeight="500" noOfLines={1}>
+              {document.originalFileName}
+            </Text>
+          </HStack>
+
+          <HStack spacing={2}>
+            <Button
+              size="sm"
+              leftIcon={<FiDownload />}
+              variant="ghost"
+              onClick={() =>
+                onDownload(documentType, document.originalFileName)
+              }
+            >
+              Download
+            </Button>
+
+            <Button
+              size="sm"
+              leftIcon={<FiUpload />}
+              variant="ghost"
+              onClick={() => inputRef.current?.click()}
+              isLoading={isUploading}
+            >
+              Replace
+            </Button>
+
+            <Button
+              size="sm"
+              leftIcon={<FiTrash2 />}
+              variant="ghost"
+              colorScheme="red"
+              onClick={() => onDelete(documentType)}
+            >
+              Delete
+            </Button>
+          </HStack>
+        </Stack>
+      )}
+    </Box>
+  );
+}
+
 export default function EmploymentVerificationDrawer({
   isOpen,
   onClose,
@@ -67,11 +179,15 @@ export default function EmploymentVerificationDrawer({
   currentlyEmployed,
   onSave,
   onTriggerVerification,
+  onUploadDocument,
+  onDownloadDocument,
+  onDeleteDocument,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [triggering, setTriggering] = useState(false);
   const [error, setError] = useState("");
+  const [uploadingType, setUploadingType] = useState(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -79,12 +195,6 @@ export default function EmploymentVerificationDrawer({
     }
 
     setForm({
-      lastIncrementLetterUrl: verification?.lastIncrementLetterUrl || "",
-      variablePayLetterUrl: verification?.variablePayLetterUrl || "",
-      relievingLetterUrl: verification?.relievingLetterUrl || "",
-      otherSupportingDocumentUrl:
-        verification?.otherSupportingDocumentUrl || "",
-
       reportingManagerName: verification?.reportingManagerName || "",
       reportingManagerPhone: verification?.reportingManagerPhone || "",
       reportingManagerEmail: verification?.reportingManagerEmail || "",
@@ -188,6 +298,16 @@ export default function EmploymentVerificationDrawer({
     }
   }
 
+  async function handleUploadDocument(documentType, file) {
+    try {
+      setUploadingType(documentType);
+
+      await onUploadDocument(documentType, file);
+    } finally {
+      setUploadingType(null);
+    }
+  }
+
   return (
     <Drawer isOpen={isOpen} placement="right" onClose={onClose} size="md">
       <DrawerOverlay />
@@ -230,65 +350,30 @@ export default function EmploymentVerificationDrawer({
                 Documents for your current or most recent role. These are kept
                 private within Springboard.
               </Text>
+              <Stack spacing={4}>
+                <VerificationDocumentRow
+                  label="Last Increment Letter"
+                  document={verification?.lastIncrementLetter}
+                  documentType="LAST_INCREMENT_LETTER"
+                  required
+                  onUpload={handleUploadDocument}
+                  onDownload={onDownloadDocument}
+                  onDelete={onDeleteDocument}
+                  uploadingType={uploadingType}
+                />
 
-              <Stack mt={4} spacing={4}>
-                <FormControl isRequired>
-                  <FormLabel>Last Increment Letter</FormLabel>
-
-                  <Input
-                    name="lastIncrementLetterUrl"
-                    value={form.lastIncrementLetterUrl}
-                    onChange={handleChange}
-                    placeholder="Document reference"
+                {currentlyEmployed === false && (
+                  <VerificationDocumentRow
+                    label="Relieving Letter"
+                    document={verification?.relievingLetter}
+                    documentType="RELIEVING_LETTER"
+                    required
+                    onUpload={handleUploadDocument}
+                    onDownload={onDownloadDocument}
+                    onDelete={onDeleteDocument}
+                    uploadingType={uploadingType}
                   />
-
-                  <FormHelperText>
-                    Required before your profile can be Published.
-                  </FormHelperText>
-                </FormControl>
-
-                <FormControl isRequired>
-                  <FormLabel>Variable Pay Letter</FormLabel>
-
-                  <Input
-                    name="variablePayLetterUrl"
-                    value={form.variablePayLetterUrl}
-                    onChange={handleChange}
-                    placeholder="Document reference"
-                  />
-
-                  <FormHelperText>
-                    Required before your profile can be Published.
-                  </FormHelperText>
-                </FormControl>
-
-                {currentlyEmployed == false && (
-                  <FormControl isRequired>
-                    <FormLabel>Relieving Letter</FormLabel>
-
-                    <Input
-                      name="relievingLetterUrl"
-                      value={form.relievingLetterUrl}
-                      onChange={handleChange}
-                      placeholder="Document reference"
-                    />
-
-                    <FormHelperText>
-                      Required because you are not currently employed.
-                    </FormHelperText>
-                  </FormControl>
                 )}
-
-                <FormControl>
-                  <FormLabel>Other Supporting Document</FormLabel>
-
-                  <Input
-                    name="otherSupportingDocumentUrl"
-                    value={form.otherSupportingDocumentUrl}
-                    onChange={handleChange}
-                    placeholder="Document reference"
-                  />
-                </FormControl>
               </Stack>
             </Box>
 

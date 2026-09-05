@@ -28,7 +28,7 @@ public record CandidateResponse(UserProfileResponse user,
 
                                 CandidateDocumentResponse resume) {
 
-    public static CandidateResponse of(Candidate candidate) {
+    public static CandidateResponse of(Candidate candidate, CandidateDocumentResponse resume) {
 
         return new CandidateResponse(UserProfileResponse.of(
                 candidate.getUser()),
@@ -55,7 +55,8 @@ public record CandidateResponse(UserProfileResponse user,
                 candidate.getAchievements().stream().map(CandidateAchievementResponse::of).toList(),
 
                 candidate.getReferences().stream().map(CandidateReferenceResponse::of).toList(),
+                resume
+        );
 
-                candidate.getResume() != null ? CandidateDocumentResponse.of(candidate.getResume()) : null);
     }
 }

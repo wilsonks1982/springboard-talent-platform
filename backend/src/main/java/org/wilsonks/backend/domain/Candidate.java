@@ -78,10 +78,6 @@ public class Candidate implements Persistable<UUID> {
     @OrderBy("displayOrder ASC")
     private List<CandidateReference> references = new ArrayList<>();
 
-    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("uploadedAt DESC")
-    private CandidateDocument resume;
-
     @Column(name = "desired_title")
     private String desiredTitle;
 

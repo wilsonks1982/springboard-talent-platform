@@ -3,18 +3,14 @@ package org.wilsonks.backend.dto.responses;
 
 import org.wilsonks.backend.domain.Candidate;
 import org.wilsonks.backend.domain.enums.EmploymentVerificationStatus;
+import org.wilsonks.backend.dto.CandidateDocumentResponse;
 
 import java.time.OffsetDateTime;
 
 public record CandidateEmploymentVerificationResponse(
 
-        String lastIncrementLetterUrl,
-
-        String variablePayLetterUrl,
-
-        String relievingLetterUrl,
-
-        String otherSupportingDocumentUrl,
+        CandidateDocumentResponse lastIncrementLetter,
+        CandidateDocumentResponse relievingLetter,
 
         String reportingManagerName,
 
@@ -39,7 +35,9 @@ public record CandidateEmploymentVerificationResponse(
 ) {
 
     public static CandidateEmploymentVerificationResponse of(
-            Candidate candidate
+            Candidate candidate,
+            CandidateDocumentResponse lastIncrementLetter,
+            CandidateDocumentResponse relievingLetter
     ) {
 
         EmploymentVerificationStatus status =
@@ -48,11 +46,8 @@ public record CandidateEmploymentVerificationResponse(
                         : EmploymentVerificationStatus.NOT_VERIFIED;
 
         return new CandidateEmploymentVerificationResponse(
-                candidate.getLastIncrementLetterUrl(),
-                candidate.getVariablePayLetterUrl(),
-                candidate.getRelievingLetterUrl(),
-                candidate.getOtherSupportingDocumentUrl(),
-
+                lastIncrementLetter,
+                relievingLetter,
                 candidate.getReportingManagerName(),
                 candidate.getReportingManagerPhone(),
                 candidate.getReportingManagerEmail(),

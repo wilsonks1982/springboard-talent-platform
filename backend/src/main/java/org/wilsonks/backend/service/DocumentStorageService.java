@@ -18,7 +18,11 @@ import java.util.UUID;
     *
  */
 public interface DocumentStorageService {
-    String store(String candidateEmail, MultipartFile file) throws IOException; // returns the storage key for the stored file
+    String store(
+            String candidateEmail,
+            String documentName,
+            MultipartFile file
+    ) throws IOException;
     void delete(String storageKey) throws IOException; // deletes the file associated with the given storage key
     Path load(String storageKey); // returns the path to the file associated with the given storage key
 }

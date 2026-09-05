@@ -28,8 +28,6 @@ public class ProfileStrengthService {
 
         boolean education = candidate.getEducation() != null && !candidate.getEducation().isEmpty();
 
-        boolean resume = candidate.getResume() != null;
-
         boolean careerDirection = isCareerDirectionComplete(candidate);
 
         boolean professionalPresence = isProfessionalPresenceComplete(candidate);
@@ -40,9 +38,7 @@ public class ProfileStrengthService {
 
                 section("EXPERIENCE", "Experience", 25, experience),
 
-                section("EDUCATION", "Education", 15, education),
-
-                section("RESUME", "Resume", 15, resume),
+                section("EDUCATION", "Education", 30, education),
 
                 section("CAREER_DIRECTION", "Career direction", 15, careerDirection),
 

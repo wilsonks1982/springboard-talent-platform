@@ -88,6 +88,8 @@ import EmploymentVerificationDrawer from "../../components/candidate/drawers/Emp
 
 import { candidateEmploymentVerificationApi } from "../../api/candidateEmploymentVerificationApi";
 
+import { candidateEmploymentVerificationDocumentApi } from "../../api/candidateEmploymentVerificationDocumentApi";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -534,6 +536,78 @@ export default function CandidateLandingPage() {
     setEmploymentVerification(updated);
   }
 
+  async function handleUploadEmploymentDocument(documentType, file) {
+    try {
+      const uploaded = await candidateEmploymentVerificationDocumentApi.upload(
+        documentType,
+        file,
+      );
+
+      setEmploymentVerification((current) => ({
+        ...current,
+        ...(documentType === "LAST_INCREMENT_LETTER"
+          ? {
+              lastIncrementLetter: uploaded,
+            }
+          : {
+              relievingLetter: uploaded,
+            }),
+      }));
+
+      await refreshProfileStrength();
+    } catch (error) {
+      console.error("Failed to upload employment document", error);
+      throw error;
+    }
+  }
+
+  async function handleDownloadEmploymentDocument(documentType, fileName) {
+    try {
+      const blob =
+        await candidateEmploymentVerificationDocumentApi.download(documentType);
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = fileName || `${documentType}.pdf`;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to download employment document", error);
+      throw error;
+    }
+  }
+
+  async function handleDeleteEmploymentDocument(documentType) {
+    try {
+      await candidateEmploymentVerificationDocumentApi.delete(documentType);
+
+      setEmploymentVerification((current) => ({
+        ...current,
+        ...(documentType === "LAST_INCREMENT_LETTER"
+          ? {
+              lastIncrementLetter: null,
+            }
+          : {
+              relievingLetter: null,
+            }),
+      }));
+
+      await refreshProfileStrength();
+    } catch (error) {
+      console.error("Failed to delete employment document", error);
+      throw error;
+    }
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -670,10 +744,13 @@ export default function CandidateLandingPage() {
                   candidate={candidate}
                   onEdit={() => setCareerPreferencesDrawerOpen(true)}
                 />
+
                 <EmploymentVerificationCard
                   verification={employmentVerification}
+                  currentlyEmployed={basicProfile?.currentlyEmployed}
                   onEdit={() => setEmploymentVerificationDrawerOpen(true)}
                 />
+
                 <CandidateCompensationCard
                   compensation={compensation}
                   onEdit={() => setIsCompensationOpen(true)}
@@ -755,6 +832,9 @@ export default function CandidateLandingPage() {
           currentlyEmployed={basicProfile?.currentlyEmployed}
           onSave={handleSaveEmploymentVerification}
           onTriggerVerification={handleTriggerEmploymentVerification}
+          onUploadDocument={handleUploadEmploymentDocument}
+          onDownloadDocument={handleDownloadEmploymentDocument}
+          onDeleteDocument={handleDeleteEmploymentDocument}
         />
       </Box>
     </Flex>

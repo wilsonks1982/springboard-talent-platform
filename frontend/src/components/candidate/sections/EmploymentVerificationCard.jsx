@@ -11,7 +11,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { FiCheckCircle, FiLock } from "react-icons/fi";
+import { FiLock } from "react-icons/fi";
 
 const STATUS_CONFIG = {
   NOT_VERIFIED: {
@@ -48,34 +48,41 @@ function DocumentStatus({ label, present }) {
   );
 }
 
-export default function EmploymentVerificationCard({ verification, onEdit }) {
+export default function EmploymentVerificationCard({
+  verification,
+  currentlyEmployed,
+  onEdit,
+}) {
   const status =
     STATUS_CONFIG[verification?.employmentVerificationStatus || "NOT_VERIFIED"];
 
+  /*
+   * MVP supporting documents:
+   * 1. Last Increment Letter - required
+   * 2. Relieving Letter - required only when not currently employed
+   *
+   * Variable Pay Letter and Other Supporting Document
+   * are intentionally excluded for now.
+   */
   const documents = [
     {
       label: "Last Increment Letter",
-      present: Boolean(verification?.lastIncrementLetterUrl),
-    },
-    {
-      label: "Variable Pay Letter",
-      present: Boolean(verification?.variablePayLetterUrl),
-    },
-    {
-      label: "Relieving Letter",
-      present: Boolean(verification?.relievingLetterUrl),
-    },
-    {
-      label: "Other Supporting Document",
-      present: Boolean(verification?.otherSupportingDocumentUrl),
+      present: Boolean(verification?.lastIncrementLetter),
+      required: true,
     },
   ];
 
-  const requiredDocuments = documents.slice(0, 2);
+  if (currentlyEmployed === false) {
+    documents.push({
+      label: "Relieving Letter",
+      present: Boolean(verification?.relievingLetter),
+      required: true,
+    });
+  }
 
-  const requiredComplete = requiredDocuments.every(
-    (document) => document.present,
-  );
+  const requiredComplete = documents
+    .filter((document) => document.required)
+    .every((document) => document.present);
 
   return (
     <Card borderWidth="1px">

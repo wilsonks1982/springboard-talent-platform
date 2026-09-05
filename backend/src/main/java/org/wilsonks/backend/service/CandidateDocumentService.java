@@ -30,7 +30,7 @@ public class CandidateDocumentService {
 
         Candidate candidate = candidatesRepo.findById(userId).orElseThrow(() -> new IllegalArgumentException("Candidate profile not found."));
 
-        CandidateDocument document = documentsRepo.findByCandidateUserId(userId).orElse(null);
+        CandidateDocument document = documentsRepo.findByCandidateUserIdAndDocumentType(userId, DocumentType.RESUME).orElse(null);
 
         if (document == null) {
 
@@ -41,7 +41,7 @@ public class CandidateDocumentService {
             document.setParsingStatus(ParsingStatus.NOT_STARTED);
         }
 
-        String storageKey = storageService.store(candidate.getUser().getEmail(), file);
+        String storageKey = storageService.store(candidate.getUser().getEmail(), "Resume", file);
 
         document.setOriginalFileName(file.getOriginalFilename());
 
@@ -63,17 +63,163 @@ public class CandidateDocumentService {
     @Transactional(readOnly = true)
     public CandidateDocument getResume(UUID userId) {
 
-        return documentsRepo.findByCandidateUserId(userId).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
+        return documentsRepo.findByCandidateUserIdAndDocumentType(userId, DocumentType.RESUME).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
     }
 
     @Transactional
     public void deleteResume(UUID userId) throws IOException {
 
-        CandidateDocument document = documentsRepo.findByCandidateUserId(userId).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
+        CandidateDocument document = documentsRepo.findByCandidateUserIdAndDocumentType(userId, DocumentType.RESUME).orElseThrow(() -> new IllegalArgumentException("Resume not found."));
 
         storageService.delete(document.getStorageKey());
 
         documentsRepo.delete(document);
+    }
+
+
+    @Transactional
+    public CandidateDocument uploadDocument(
+            UUID userId,
+            DocumentType documentType,
+            MultipartFile file
+    ) throws IOException {
+
+        validate(file, documentType);
+
+        Candidate candidate = candidatesRepo.findById(userId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Candidate profile not found.")
+                );
+
+        CandidateDocument document =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                userId,
+                                documentType
+                        )
+                        .orElse(null);
+
+        if (document == null) {
+            document = new CandidateDocument();
+            document.setCandidate(candidate);
+            document.setDocumentType(documentType);
+            document.setParsingStatus(ParsingStatus.NOT_STARTED);
+        }
+
+        String documentName = switch (documentType) {
+            case LAST_INCREMENT_LETTER -> "Last-Increment-Letter";
+            case RELIEVING_LETTER -> "Relieving-Letter";
+            default -> throw new IllegalArgumentException(
+                    "Unsupported employment verification document type."
+            );
+        };
+
+        String oldStorageKey = document.getStorageKey();
+
+        String storageKey = storageService.store(
+                candidate.getUser().getEmail(),
+                documentName,
+                file
+        );
+
+        document.setOriginalFileName(file.getOriginalFilename());
+        document.setStorageKey(storageKey);
+        document.setContentType(file.getContentType());
+        document.setFileSize(file.getSize());
+        document.setUploadedAt(OffsetDateTime.now());
+        document.setParsingStatus(ParsingStatus.NOT_STARTED);
+        document.setParsingError(null);
+
+        CandidateDocument saved = documentsRepo.save(document);
+
+        /*
+         * Storage currently uses deterministic names, so replacement
+         * normally overwrites the same physical file.
+         *
+         * If an older storage key differs, clean it up.
+         */
+        if (oldStorageKey != null &&
+                !oldStorageKey.equals(storageKey)) {
+
+            storageService.delete(oldStorageKey);
+        }
+
+        return saved;
+    }
+
+    @Transactional(readOnly = true)
+    public CandidateDocument getDocument(
+            UUID userId,
+            DocumentType documentType
+    ) {
+
+        return documentsRepo
+                .findByCandidateUserIdAndDocumentType(
+                        userId,
+                        documentType
+                )
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Document not found."
+                        )
+                );
+    }
+
+    @Transactional
+    public void deleteDocument(
+            UUID userId,
+            DocumentType documentType
+    ) throws IOException {
+
+        CandidateDocument document =
+                documentsRepo
+                        .findByCandidateUserIdAndDocumentType(
+                                userId,
+                                documentType
+                        )
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "Document not found."
+                                )
+                        );
+
+        storageService.delete(document.getStorageKey());
+
+        documentsRepo.delete(document);
+    }
+
+    private void validate(
+            MultipartFile file,
+            DocumentType documentType
+    ) {
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Document file is required."
+            );
+        }
+
+        if (documentType != DocumentType.LAST_INCREMENT_LETTER &&
+                documentType != DocumentType.RELIEVING_LETTER) {
+
+            throw new IllegalArgumentException(
+                    "Unsupported employment verification document type."
+            );
+        }
+
+        String contentType = file.getContentType();
+
+        if (!"application/pdf".equalsIgnoreCase(contentType)) {
+            throw new IllegalArgumentException(
+                    "Only PDF documents are currently supported."
+            );
+        }
+
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new IllegalArgumentException(
+                    "Document must not exceed 5 MB."
+            );
+        }
     }
 
     private void validate(MultipartFile file) {
