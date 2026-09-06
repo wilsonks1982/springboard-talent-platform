@@ -17,7 +17,7 @@ import java.util.UUID;
 @Transactional
 public class CareerSummaryService {
 
-    private static final int MIN_WORDS = 150;
+    private static final int MIN_WORDS = 15;
     private static final int MAX_WORDS = 300;
 
     private final CandidateService candidateService;

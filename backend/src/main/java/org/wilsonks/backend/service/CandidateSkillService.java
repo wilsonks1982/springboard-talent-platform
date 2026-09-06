@@ -1,6 +1,5 @@
 package org.wilsonks.backend.service;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,55 +26,46 @@ public class CandidateSkillService {
     private final SkillTagRepository skillTagRepository;
 
     @Transactional(readOnly = true)
-    public List<CandidateSkillResponse> getMySkills(
-            UUID userId) {
+    public List<CandidateSkillResponse> getMySkills(UUID userId) {
 
-        return candidateSkillRepository
-                .findAllByCandidateUserId(userId)
-                .stream()
-                .map(CandidateSkillResponse::of)
-                .toList();
+        return candidateSkillRepository.findAllByCandidateUserId(userId).stream().map(CandidateSkillResponse::of).toList();
     }
 
-    public List<CandidateSkillResponse> replaceSkills(
-            UUID userId,
-            CandidateTagSelectionRequest request) {
+    public List<CandidateSkillResponse> replaceSkills(UUID userId, CandidateTagSelectionRequest request) {
 
-        Candidate candidate =
-                candidateService.getCandidateByUserId(userId);
+        Candidate candidate = candidateService.getCandidateByUserId(userId);
 
         List<UUID> tagIds = request.tagIds();
 
         validateNoDuplicates(tagIds);
 
-        List<SkillTag> tags =
-                skillTagRepository.findAllById(tagIds);
+        List<SkillTag> tags = skillTagRepository.findAllById(tagIds);
 
         validateAllTagsExist(tagIds, tags);
 
         validateAllTagsActive(tags);
 
-        candidateSkillRepository
-                .deleteAllByCandidateUserId(userId);
+        /*
+         * Complete replacement:
+         * 1. Delete existing candidate skills
+         * 2. Force DELETE SQL to execute
+         * 3. Insert the new selections
+         *
+         * The explicit flush prevents a unique-constraint
+         * violation when the same skill is selected again.
+         */
+        candidateSkillRepository.deleteAllByCandidateUserId(userId);
 
-        List<CandidateSkill> selections =
-                tags.stream()
-                        .map(tag -> createSelection(candidate, tag))
-                        .toList();
+        candidateSkillRepository.flush();
 
-        return candidateSkillRepository
-                .saveAll(selections)
-                .stream()
-                .map(CandidateSkillResponse::of)
-                .toList();
+        List<CandidateSkill> selections = tags.stream().map(tag -> createSelection(candidate, tag)).toList();
+
+        return candidateSkillRepository.saveAll(selections).stream().map(CandidateSkillResponse::of).toList();
     }
 
-    private CandidateSkill createSelection(
-            Candidate candidate,
-            SkillTag tag) {
+    private CandidateSkill createSelection(Candidate candidate, SkillTag tag) {
 
-        CandidateSkill selection =
-                new CandidateSkill();
+        CandidateSkill selection = new CandidateSkill();
 
         selection.setCandidate(candidate);
         selection.setSkillTag(tag);
@@ -83,40 +73,28 @@ public class CandidateSkillService {
         return selection;
     }
 
-    private void validateNoDuplicates(
-            List<UUID> tagIds) {
+    private void validateNoDuplicates(List<UUID> tagIds) {
 
         if (new HashSet<>(tagIds).size() != tagIds.size()) {
-            throw new IllegalArgumentException(
-                    "Duplicate skill tags are not allowed.");
+            throw new IllegalArgumentException("Duplicate skill tags are not allowed.");
         }
     }
 
-    private void validateAllTagsExist(
-            List<UUID> requestedIds,
-            List<SkillTag> foundTags) {
+    private void validateAllTagsExist(List<UUID> requestedIds, List<SkillTag> foundTags) {
 
-        Set<UUID> foundIds =
-                foundTags.stream()
-                        .map(SkillTag::getId)
-                        .collect(java.util.stream.Collectors.toSet());
+        Set<UUID> foundIds = foundTags.stream().map(SkillTag::getId).collect(java.util.stream.Collectors.toSet());
 
         if (!foundIds.containsAll(requestedIds)) {
-            throw new IllegalArgumentException(
-                    "One or more skill tags do not exist.");
+            throw new IllegalArgumentException("One or more skill tags do not exist.");
         }
     }
 
-    private void validateAllTagsActive(
-            List<SkillTag> tags) {
+    private void validateAllTagsActive(List<SkillTag> tags) {
 
-        boolean inactiveTag =
-                tags.stream()
-                        .anyMatch(tag -> !tag.isActive());
+        boolean inactiveTag = tags.stream().anyMatch(tag -> !tag.isActive());
 
         if (inactiveTag) {
-            throw new IllegalArgumentException(
-                    "Inactive skill tags cannot be selected.");
+            throw new IllegalArgumentException("Inactive skill tags cannot be selected.");
         }
     }
 }

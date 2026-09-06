@@ -26,55 +26,48 @@ public class CandidateIndustryService {
     private final IndustryTagRepository industryTagRepository;
 
     @Transactional(readOnly = true)
-    public List<CandidateIndustryResponse> getMyIndustries(
-            UUID userId) {
+    public List<CandidateIndustryResponse> getMyIndustries(UUID userId) {
 
-        return candidateIndustryRepository
-                .findAllByCandidateUserId(userId)
-                .stream()
-                .map(CandidateIndustryResponse::of)
-                .toList();
+        return candidateIndustryRepository.findAllByCandidateUserId(userId).stream().map(CandidateIndustryResponse::of).toList();
     }
 
-    public List<CandidateIndustryResponse> replaceIndustries(
-            UUID userId,
-            CandidateTagSelectionRequest request) {
+    public List<CandidateIndustryResponse> replaceIndustries(UUID userId, CandidateTagSelectionRequest request) {
 
-        Candidate candidate =
-                candidateService.getCandidateByUserId(userId);
+        Candidate candidate = candidateService.getCandidateByUserId(userId);
 
         List<UUID> tagIds = request.tagIds();
 
         validateNoDuplicates(tagIds);
 
-        List<IndustryTag> tags =
-                industryTagRepository.findAllById(tagIds);
+        List<IndustryTag> tags = industryTagRepository.findAllById(tagIds);
 
         validateAllTagsExist(tagIds, tags);
 
         validateAllTagsActive(tags);
 
-        candidateIndustryRepository
-                .deleteAllByCandidateUserId(userId);
+        /*
+         * Replace existing candidate industries.
+         *
+         * Flush is required here because the database has a unique
+         * constraint on (candidate_user_id, industry_tag_id).
+         *
+         * Without the flush, Hibernate may execute the INSERT for the
+         * new selection before executing the pending DELETE, resulting
+         * in a unique constraint violation when the same industry is
+         * selected again.
+         */
+        candidateIndustryRepository.deleteAllByCandidateUserId(userId);
 
-        List<CandidateIndustry> selections =
-                tags.stream()
-                        .map(tag -> createSelection(candidate, tag))
-                        .toList();
+        candidateIndustryRepository.flush();
 
-        return candidateIndustryRepository
-                .saveAll(selections)
-                .stream()
-                .map(CandidateIndustryResponse::of)
-                .toList();
+        List<CandidateIndustry> selections = tags.stream().map(tag -> createSelection(candidate, tag)).toList();
+
+        return candidateIndustryRepository.saveAll(selections).stream().map(CandidateIndustryResponse::of).toList();
     }
 
-    private CandidateIndustry createSelection(
-            Candidate candidate,
-            IndustryTag tag) {
+    private CandidateIndustry createSelection(Candidate candidate, IndustryTag tag) {
 
-        CandidateIndustry selection =
-                new CandidateIndustry();
+        CandidateIndustry selection = new CandidateIndustry();
 
         selection.setCandidate(candidate);
         selection.setIndustryTag(tag);
@@ -82,40 +75,28 @@ public class CandidateIndustryService {
         return selection;
     }
 
-    private void validateNoDuplicates(
-            List<UUID> tagIds) {
+    private void validateNoDuplicates(List<UUID> tagIds) {
 
         if (new HashSet<>(tagIds).size() != tagIds.size()) {
-            throw new IllegalArgumentException(
-                    "Duplicate industry tags are not allowed.");
+            throw new IllegalArgumentException("Duplicate industry tags are not allowed.");
         }
     }
 
-    private void validateAllTagsExist(
-            List<UUID> requestedIds,
-            List<IndustryTag> foundTags) {
+    private void validateAllTagsExist(List<UUID> requestedIds, List<IndustryTag> foundTags) {
 
-        Set<UUID> foundIds =
-                foundTags.stream()
-                        .map(IndustryTag::getId)
-                        .collect(java.util.stream.Collectors.toSet());
+        Set<UUID> foundIds = foundTags.stream().map(IndustryTag::getId).collect(java.util.stream.Collectors.toSet());
 
         if (!foundIds.containsAll(requestedIds)) {
-            throw new IllegalArgumentException(
-                    "One or more industry tags do not exist.");
+            throw new IllegalArgumentException("One or more industry tags do not exist.");
         }
     }
 
-    private void validateAllTagsActive(
-            List<IndustryTag> tags) {
+    private void validateAllTagsActive(List<IndustryTag> tags) {
 
-        boolean inactiveTag =
-                tags.stream()
-                        .anyMatch(tag -> !tag.isActive());
+        boolean inactiveTag = tags.stream().anyMatch(tag -> !tag.isActive());
 
         if (inactiveTag) {
-            throw new IllegalArgumentException(
-                    "Inactive industry tags cannot be selected.");
+            throw new IllegalArgumentException("Inactive industry tags cannot be selected.");
         }
     }
 }

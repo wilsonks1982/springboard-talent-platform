@@ -91,6 +91,12 @@ import { candidateEmploymentVerificationApi } from "../../api/candidateEmploymen
 
 import { candidateEmploymentVerificationDocumentApi } from "../../api/candidateEmploymentVerificationDocumentApi";
 
+import { candidateCareerSummaryApi } from "../../api/candidateCareerSummaryApi";
+import { candidateIndustryApi } from "../../api/candidateIndustryApi";
+import { candidateSkillApi } from "../../api/candidateSkillApi";
+
+import ProfessionalSnapshotCard from "../../components/candidate/sections/ProfessionalSnapshotCard";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -146,6 +152,14 @@ export default function CandidateLandingPage() {
     setEmploymentVerificationDrawerOpen,
   ] = useState(false);
 
+  const [careerSummary, setCareerSummary] = useState(null);
+
+  const [industries, setIndustries] = useState([]);
+  const [selectedIndustryIds, setSelectedIndustryIds] = useState([]);
+
+  const [skills, setSkills] = useState([]);
+  const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+
   useEffect(() => {
     loadCandidate();
   }, []);
@@ -162,6 +176,11 @@ export default function CandidateLandingPage() {
         compensationData,
         employmentVerificationData,
         employmentAnalysisData,
+        careerSummaryData,
+        availableIndustries,
+        selectedIndustries,
+        availableSkills,
+        selectedSkills,
       ] = await Promise.all([
         candidateApi.getMe(),
         profileStrengthApi.get(),
@@ -169,6 +188,11 @@ export default function CandidateLandingPage() {
         candidateCompensationApi.get(),
         candidateEmploymentVerificationApi.get(),
         candidateExperienceApi.getAnalysis(),
+        candidateCareerSummaryApi.get(),
+        candidateIndustryApi.getAvailable(),
+        candidateIndustryApi.getSelected(),
+        candidateSkillApi.getAvailable(),
+        candidateSkillApi.getSelected(),
       ]);
 
       setCandidate(candidateData);
@@ -184,6 +208,19 @@ export default function CandidateLandingPage() {
       setCompensation(compensationData);
       setEmploymentVerification(employmentVerificationData);
       setEmploymentAnalysis(employmentAnalysisData);
+
+      setCareerSummary(careerSummaryData);
+
+      setIndustries(availableIndustries || []);
+
+      setSelectedIndustryIds(
+        (selectedIndustries || []).map((item) => item.industryTagId),
+      );
+
+      setSkills(availableSkills || []);
+      setSelectedSkillIds(
+        (selectedSkills || []).map((item) => item.skillTagId),
+      );
     } catch (err) {
       console.error("Failed to load candidate profile", err);
 
@@ -626,6 +663,32 @@ export default function CandidateLandingPage() {
     }
   }
 
+  async function handleSaveProfessionalSnapshot({
+    summary,
+    industryIds,
+    skillIds,
+  }) {
+    const [savedSummary, savedIndustries, savedSkills] = await Promise.all([
+      candidateCareerSummaryApi.update({
+        summary,
+      }),
+
+      candidateIndustryApi.update(industryIds),
+
+      candidateSkillApi.update(skillIds),
+    ]);
+
+    setCareerSummary(savedSummary);
+
+    setSelectedIndustryIds(
+      (savedIndustries || []).map((item) => item.industryTagId),
+    );
+
+    setSelectedSkillIds((savedSkills || []).map((item) => item.skillTagId));
+
+    await refreshProfileStrength();
+  }
+
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
@@ -711,6 +774,16 @@ export default function CandidateLandingPage() {
                 />
 
                 <ExperienceInsights analysis={employmentAnalysis} />
+
+                <ProfessionalSnapshotCard
+                  careerSummary={careerSummary}
+                  industries={industries}
+                  selectedIndustryIds={selectedIndustryIds}
+                  skills={skills}
+                  selectedSkillIds={selectedSkillIds}
+                  onSave={handleSaveProfessionalSnapshot}
+                />
+
                 <ExperienceSection
                   experiences={experiences}
                   onAdd={handleAddExperience}
