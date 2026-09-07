@@ -63,8 +63,12 @@ public class ProfileStrengthService {
     }
 
     private boolean isCareerDirectionComplete(Candidate candidate) {
-
-        return hasText(candidate.getGrowthAspiration()) || hasText(candidate.getFunctionalArea()) || hasText(candidate.getCurrentChallenge());
+        return hasText(candidate.getDesiredTitle()) &&
+                candidate.getDesiredIndustries() != null &&
+                !candidate.getDesiredIndustries().isEmpty() &&
+                candidate.getDesiredLocations() != null &&
+                !candidate.getDesiredLocations().isEmpty() &&
+                candidate.getNoticePeriod() >= 0;
     }
 
     private boolean isProfessionalPresenceComplete(Candidate candidate) {

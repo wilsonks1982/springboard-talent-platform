@@ -1,13 +1,17 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
 import RegistrationGuard from "./RegistrationGuard";
+import CandidateProfileGate from "./CandidateProfileGate";
 
 import PublicLandingPage from "../pages/PublicLandingPage";
 import LoginPage from "../pages/LoginPage";
+
 import CandidateLandingPage from "../pages/candidate/CandidateLandingPage";
 import CandidateProfilePage from "../pages/candidate/CandidateProfilePage";
+import CandidateProfileSetupPage from "../pages/candidate/CandidateProfileSetupPage";
 import AssessmentsPage from "../pages/candidate/AssessmentsPage";
 
 import WelcomePage from "../pages/registration/WelcomePage";
@@ -36,14 +40,25 @@ export default function AppRoutes() {
         <Route path="/register/confirmation" element={<ConfirmationPage />} />
       </Route>
 
-      {/* Protected Routes */}
+      {/* Protected Candidate Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/candidate" element={<CandidateLandingPage />} />
-        <Route path="/candidate/profile" element={<CandidateProfilePage />} />
-        <Route path="/candidate/assessments" element={<AssessmentsPage />} />
+        {/* Profile setup must remain accessible before completion */}
+        <Route
+          path="/candidate/profile-setup"
+          element={<CandidateProfileSetupPage />}
+        />
+
+        {/* Candidate workspace requires completed profile */}
+        <Route element={<CandidateProfileGate />}>
+          <Route path="/candidate" element={<CandidateLandingPage />} />
+
+          <Route path="/candidate/profile" element={<CandidateProfilePage />} />
+
+          <Route path="/candidate/assessments" element={<AssessmentsPage />} />
+        </Route>
       </Route>
 
-      {/* Fallbacks */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
