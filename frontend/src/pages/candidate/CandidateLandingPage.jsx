@@ -21,18 +21,19 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
-  FiAward,
-  FiBookOpen,
-  FiBriefcase,
-  FiCheckCircle,
-  FiChevronRight,
-  FiFileText,
   FiGrid,
-  FiLogOut,
-  FiMapPin,
-  FiMenu,
-  FiSettings,
   FiUser,
+  FiBriefcase,
+  FiBookOpen,
+  FiAward,
+  FiStar,
+  FiUsers,
+  FiFileText,
+  FiTarget,
+  FiDollarSign,
+  FiShield,
+  FiCheckCircle,
+  FiSettings,
 } from "react-icons/fi";
 
 import { useDispatch } from "react-redux";
@@ -359,12 +360,24 @@ export default function CandidateLandingPage() {
 
   function handleProfileSectionAction(sectionKey) {
     switch (sectionKey) {
+      case "BASIC_INFORMATION":
+        setIsBasicProfileOpen(true);
+        break;
+
       case "EXPERIENCE":
         handleAddExperience();
         break;
 
       case "EDUCATION":
         handleAddEducation();
+        break;
+
+      case "CAREER_DIRECTION":
+        setCareerPreferencesDrawerOpen(true);
+        break;
+
+      case "PROFESSIONAL_PRESENCE":
+        setIsBasicProfileOpen(true);
         break;
 
       default:
@@ -694,7 +707,21 @@ export default function CandidateLandingPage() {
   return (
     <Flex minH="100vh" bg="#F7F8FC">
       {/* Sidebar */}
-      <Sidebar navigate={navigate} />
+      <Sidebar
+        navigate={navigate}
+        onOpenBasicProfile={() => setIsBasicProfileOpen(true)}
+        onOpenExperience={handleAddExperience}
+        onOpenEducation={handleAddEducation}
+        onOpenCertification={handleAddCertification}
+        onOpenAchievement={handleAddAchievement}
+        onOpenReference={handleAddReference}
+        onOpenCareerPreferences={() => setCareerPreferencesDrawerOpen(true)}
+        onOpenResume={handleUploadResume}
+        onOpenCompensation={() => setIsCompensationOpen(true)}
+        onOpenEmploymentVerification={() =>
+          setEmploymentVerificationDrawerOpen(true)
+        }
+      />
 
       {/* Main */}
       <Box flex="1" minW="0">
@@ -892,8 +919,19 @@ export default function CandidateLandingPage() {
 /* ------------------------------------------------------------------ */
 /* Sidebar */
 /* ------------------------------------------------------------------ */
-
-function Sidebar({ navigate }) {
+function Sidebar({
+  navigate,
+  onOpenBasicProfile,
+  onOpenExperience,
+  onOpenEducation,
+  onOpenCertification,
+  onOpenAchievement,
+  onOpenReference,
+  onOpenCareerPreferences,
+  onOpenResume,
+  onOpenCompensation,
+  onOpenEmploymentVerification,
+}) {
   return (
     <Box
       display={{ base: "none", lg: "block" }}
@@ -902,107 +940,185 @@ function Sidebar({ navigate }) {
       bg="white"
       borderRight="1px solid"
       borderColor="gray.200"
-      minH="100vh"
       position="sticky"
       top="0"
       h="100vh"
     >
-      <Flex
-        h="72px"
-        px={6}
-        align="center"
-        borderBottom="1px solid"
-        borderColor="gray.100"
-      >
+      {/* =========================================================
+          SPRINGBOARD HEADER — FIXED
+          ========================================================= */}
+      <Box px={5} py={5} borderBottom="1px solid" borderColor="gray.100">
         <HStack spacing={3}>
           <Box
             w="34px"
             h="34px"
             borderRadius="10px"
-            bgGradient="linear(to-br, purple.500, blue.500)"
+            bg="purple.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
-            color="white"
-            fontWeight="800"
-            fontSize="lg"
           >
-            S
+            <Text color="white" fontSize="sm" fontWeight="800">
+              S
+            </Text>
           </Box>
 
-          <Text fontWeight="800" letterSpacing="0.04em" color="gray.800">
-            SPRINGBOARD
-          </Text>
+          <Box>
+            <Text
+              fontSize="md"
+              fontWeight="800"
+              color="gray.800"
+              lineHeight="1.1"
+            >
+              Springboard
+            </Text>
+
+            <Text fontSize="xs" color="gray.400" mt={0.5}>
+              Candidate Workspace
+            </Text>
+          </Box>
         </HStack>
-      </Flex>
+      </Box>
 
-      <Stack spacing={1} px={4} py={6}>
-        <SidebarSection title="WORKSPACE">
-          <SidebarItem icon={FiGrid} label="Overview" active />
-        </SidebarSection>
+      {/* =========================================================
+          SCROLLABLE NAVIGATION
+          ========================================================= */}
+      <Box
+        h="calc(100vh - 82px)"
+        overflowY="auto"
+        px={4}
+        py={6}
+        pb="190px"
+        sx={{
+          "&::-webkit-scrollbar": {
+            width: "5px",
+          },
+          "&::-webkit-scrollbar-track": {
+            background: "transparent",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#CBD5E0",
+            borderRadius: "10px",
+          },
+          scrollbarWidth: "thin",
+        }}
+      >
+        <Stack spacing={1}>
+          {/* WORKSPACE */}
+          <SidebarSection title="WORKSPACE">
+            <SidebarItem icon={FiGrid} label="Overview" active />
+          </SidebarSection>
 
-        <SidebarSection title="MY CAREER">
-          <SidebarItem
-            icon={FiUser}
-            label="Profile"
-            onClick={() => navigate("/candidate/profile")}
-          />
+          {/* MY CAREER */}
+          <SidebarSection title="MY CAREER">
+            <SidebarItem
+              icon={FiUser}
+              label="Profile"
+              onClick={onOpenBasicProfile}
+            />
 
-          <SidebarItem
-            icon={FiBriefcase}
-            label="Experience"
-            onClick={() => navigate("/candidate/profile")}
-          />
+            <SidebarItem
+              icon={FiBriefcase}
+              label="Experience"
+              onClick={onOpenExperience}
+            />
 
-          <SidebarItem
-            icon={FiBookOpen}
-            label="Education"
-            onClick={() => navigate("/candidate/profile")}
-          />
+            <SidebarItem
+              icon={FiBookOpen}
+              label="Education"
+              onClick={onOpenEducation}
+            />
 
-          <SidebarItem
-            icon={FiAward}
-            label="Certifications"
-            onClick={() => navigate("/candidate/profile")}
-          />
-        </SidebarSection>
+            <SidebarItem
+              icon={FiAward}
+              label="Certifications"
+              onClick={onOpenCertification}
+            />
 
-        <SidebarSection title="OPPORTUNITIES">
-          <SidebarItem icon={FiBriefcase} label="Opportunities" muted />
+            <SidebarItem
+              icon={FiStar}
+              label="Achievements"
+              onClick={onOpenAchievement}
+            />
 
-          <SidebarItem
-            icon={FiCheckCircle}
-            label="Assessments"
-            onClick={() => navigate("/candidate/assessments")}
-          />
-        </SidebarSection>
+            <SidebarItem
+              icon={FiUsers}
+              label="References"
+              onClick={onOpenReference}
+            />
 
-        <SidebarSection title="ACCOUNT">
-          <SidebarItem icon={FiSettings} label="Settings" muted />
-        </SidebarSection>
-      </Stack>
+            <SidebarItem
+              icon={FiFileText}
+              label="Resume"
+              onClick={onOpenResume}
+            />
+          </SidebarSection>
 
+          {/* CAREER MANAGEMENT */}
+          <SidebarSection title="CAREER MANAGEMENT">
+            <SidebarItem
+              icon={FiTarget}
+              label="Career Preferences"
+              onClick={onOpenCareerPreferences}
+            />
+
+            <SidebarItem
+              icon={FiDollarSign}
+              label="Compensation"
+              onClick={onOpenCompensation}
+            />
+
+            <SidebarItem
+              icon={FiShield}
+              label="Employment Verification"
+              onClick={onOpenEmploymentVerification}
+            />
+          </SidebarSection>
+
+          {/* OPPORTUNITIES */}
+          <SidebarSection title="OPPORTUNITIES">
+            <SidebarItem icon={FiBriefcase} label="Opportunities" muted />
+
+            <SidebarItem
+              icon={FiCheckCircle}
+              label="Assessments"
+              onClick={() => navigate("/candidate/assessments")}
+            />
+          </SidebarSection>
+
+          {/* ACCOUNT */}
+          <SidebarSection title="ACCOUNT">
+            <SidebarItem icon={FiSettings} label="Settings" muted />
+          </SidebarSection>
+        </Stack>
+      </Box>
+
+      {/* =========================================================
+          PROFILE TIP — FIXED
+          ========================================================= */}
       <Box
         position="absolute"
-        bottom="20px"
-        left="16px"
-        right="16px"
-        p={4}
-        borderRadius="xl"
+        left={4}
+        right={4}
+        bottom={5}
         bg="purple.50"
+        border="1px solid"
+        borderColor="purple.100"
+        borderRadius="xl"
+        p={4}
+        boxShadow="sm"
       >
-        <Text fontSize="xs" fontWeight="700" color="purple.700">
-          PROFILE TIP
+        <Text fontSize="xs" fontWeight="700" color="purple.700" mb={1}>
+          Complete your profile
         </Text>
 
-        <Text mt={1} fontSize="xs" color="gray.600" lineHeight="1.5">
-          A complete profile helps us understand your career better.
+        <Text fontSize="xs" lineHeight="1.5" color="gray.600">
+          A complete profile helps recruiters discover and evaluate you faster.
         </Text>
       </Box>
     </Box>
   );
 }
-
 function SidebarSection({ title, children }) {
   return (
     <Box mb={5}>

@@ -1,196 +1,347 @@
 import React, { useMemo } from "react";
-
 import {
   Badge,
   Box,
   Button,
+  Card,
+  CardBody,
+  Divider,
   Flex,
   HStack,
+  Icon,
   Progress,
-  SimpleGrid,
+  Stack,
   Text,
-  VStack,
 } from "@chakra-ui/react";
+import { FiArrowRight, FiCheck, FiCircle, FiTarget } from "react-icons/fi";
 
-import { FiArrowRight, FiCheck, FiCircle } from "react-icons/fi";
+const LEVEL_STYLES = {
+  EXCELLENT: {
+    label: "Excellent",
+    colorScheme: "green",
+  },
+  STRONG: {
+    label: "Strong",
+    colorScheme: "purple",
+  },
+  GOOD: {
+    label: "Good",
+    colorScheme: "blue",
+  },
+  GETTING_STARTED: {
+    label: "Getting started",
+    colorScheme: "orange",
+  },
+};
 
-function getSectionAction(key) {
-  const actions = {
-    BASIC_INFORMATION: "Update information",
-    EXPERIENCE: "Add experience",
-    EDUCATION: "Add education",
-    RESUME: "Add resume",
-    CAREER_DIRECTION: "Complete career direction",
-    PROFESSIONAL_PRESENCE: "Add LinkedIn",
-  };
+function getLevelStyle(level) {
+  return (
+    LEVEL_STYLES[level] || {
+      label: level || "In progress",
+      colorScheme: "gray",
+    }
+  );
+}
 
-  return actions[key] || "Complete";
+function getSectionDescription(key) {
+  switch (key) {
+    case "BASIC_INFORMATION":
+      return "Contact and personal details";
+
+    case "EXPERIENCE":
+      return "Your professional experience";
+
+    case "EDUCATION":
+      return "Your academic background";
+
+    case "CAREER_DIRECTION":
+      return "Your career goals and direction";
+
+    case "PROFESSIONAL_PRESENCE":
+      return "Your LinkedIn presence";
+
+    default:
+      return "";
+  }
 }
 
 export default function ProfileStrengthCard({
   profileStrength,
   onSectionAction,
 }) {
-  const incompleteSection = useMemo(
-    () => profileStrength?.sections?.find((section) => !section.completed),
-    [profileStrength],
+  const score = Number(profileStrength?.score || 0);
+  const sections = Array.isArray(profileStrength?.sections)
+    ? profileStrength.sections
+    : [];
+
+  const levelStyle = getLevelStyle(profileStrength?.level);
+
+  const incompleteSections = useMemo(
+    () => sections.filter((section) => !section.completed),
+    [sections],
   );
+
+  const completedCount = sections.length - incompleteSections.length;
 
   if (!profileStrength) {
     return null;
   }
 
   return (
-    <Box
-      bg="white"
-      border="1px solid"
-      borderColor="gray.100"
+    <Card
       borderRadius="2xl"
-      p={{
-        base: 5,
-        md: 7,
-      }}
+      border="1px solid"
+      borderColor="gray.200"
+      bg="white"
+      boxShadow="0 8px 30px rgba(15, 23, 42, 0.05)"
+      overflow="hidden"
     >
-      <Flex
-        direction={{
-          base: "column",
-          lg: "row",
-        }}
-        gap={8}
-        align={{
-          base: "stretch",
-          lg: "center",
-        }}
-      >
-        {/* Score */}
-
-        <Box
-          minW={{
-            base: "full",
-            lg: "180px",
-          }}
-          textAlign="center"
-        >
-          <Text
-            fontSize="xs"
-            fontWeight="700"
-            letterSpacing="0.08em"
-            color="gray.400"
-            textTransform="uppercase"
-            mb={3}
+      <CardBody p={{ base: 5, md: 6 }}>
+        <Stack spacing={5}>
+          {/* Header */}
+          <Flex
+            justify="space-between"
+            align={{ base: "flex-start", md: "center" }}
+            direction={{ base: "column", md: "row" }}
+            gap={4}
           >
-            Profile Strength
-          </Text>
-
-          <Text
-            fontSize={{
-              base: "5xl",
-              md: "6xl",
-            }}
-            lineHeight="1"
-            fontWeight="800"
-            color="purple.600"
-          >
-            {profileStrength.score}%
-          </Text>
-
-          <Badge mt={3} colorScheme="purple" borderRadius="full" px={3} py={1}>
-            {profileStrength.level.replaceAll("_", " ")}
-          </Badge>
-        </Box>
-
-        {/* Details */}
-
-        <Box flex="1">
-          <Text fontSize="lg" fontWeight="700" color="gray.800">
-            {profileStrength.message}
-          </Text>
-
-          <Text fontSize="sm" color="gray.500" mt={1}>
-            Complete your profile to make it easier for recruiters to understand
-            your experience.
-          </Text>
-
-          <Progress
-            value={profileStrength.score}
-            size="sm"
-            borderRadius="full"
-            mt={5}
-            bg="gray.100"
-            colorScheme="purple"
-          />
-
-          <SimpleGrid
-            columns={{
-              base: 1,
-              md: 2,
-            }}
-            spacing={3}
-            mt={5}
-          >
-            {profileStrength.sections.map((section) => (
-              <HStack
-                key={section.key}
-                spacing={3}
-                cursor={section.completed ? "default" : "pointer"}
-                onClick={() => {
-                  if (!section.completed && onSectionAction) {
-                    onSectionAction(section.key);
-                  }
-                }}
+            <HStack spacing={3} align="flex-start">
+              <Flex
+                w="42px"
+                h="42px"
+                flexShrink={0}
+                borderRadius="12px"
+                bg="purple.50"
+                color="purple.600"
+                align="center"
+                justify="center"
               >
-                <Box
-                  w="22px"
-                  h="22px"
-                  borderRadius="full"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  bg={section.completed ? "green.50" : "gray.50"}
-                  color={section.completed ? "green.500" : "gray.400"}
-                >
-                  {section.completed ? (
-                    <FiCheck size={12} />
-                  ) : (
-                    <FiCircle size={10} />
-                  )}
-                </Box>
+                <Icon as={FiTarget} boxSize={5} />
+              </Flex>
 
+              <Box>
                 <Text
-                  fontSize="sm"
-                  color={section.completed ? "gray.600" : "gray.700"}
-                  fontWeight={section.completed ? "400" : "600"}
+                  fontSize="xs"
+                  fontWeight="800"
+                  letterSpacing="0.08em"
+                  textTransform="uppercase"
+                  color="gray.500"
                 >
-                  {section.label}
+                  Profile strength
                 </Text>
 
-                {!section.completed && (
-                  <Text fontSize="xs" color="purple.500" ml="auto">
-                    {getSectionAction(section.key)}
-                  </Text>
-                )}
-              </HStack>
-            ))}
-          </SimpleGrid>
+                <Text
+                  mt={1}
+                  fontSize={{ base: "lg", md: "xl" }}
+                  fontWeight="800"
+                  color="gray.800"
+                >
+                  {profileStrength.message}
+                </Text>
+              </Box>
+            </HStack>
 
-          {incompleteSection && (
-            <Button
-              mt={6}
+            <HStack spacing={3}>
+              <Badge
+                colorScheme={levelStyle.colorScheme}
+                borderRadius="full"
+                px={3}
+                py={1}
+                fontSize="xs"
+                fontWeight="700"
+                textTransform="capitalize"
+              >
+                {levelStyle.label}
+              </Badge>
+
+              <Text
+                fontSize={{ base: "2xl", md: "3xl" }}
+                lineHeight="1"
+                fontWeight="800"
+                color="gray.800"
+              >
+                {score}%
+              </Text>
+            </HStack>
+          </Flex>
+
+          {/* Progress */}
+          <Box>
+            <Flex justify="space-between" align="center" mb={2}>
+              <Text fontSize="sm" color="gray.500">
+                Recruiter readiness
+              </Text>
+
+              <Text fontSize="sm" fontWeight="700" color="gray.700">
+                {completedCount} of {sections.length} sections complete
+              </Text>
+            </Flex>
+
+            <Progress
+              value={score}
               size="sm"
-              variant="ghost"
-              colorScheme="purple"
-              rightIcon={<FiArrowRight />}
-              onClick={() => {
-                if (onSectionAction) {
-                  onSectionAction(incompleteSection.key);
-                }
-              }}
+              borderRadius="full"
+              colorScheme={levelStyle.colorScheme}
+              bg="gray.100"
+            />
+          </Box>
+
+          <Divider />
+
+          {/* Section checklist */}
+          <Stack spacing={1}>
+            {sections.map((section) => {
+              const completed = Boolean(section.completed);
+              const description = getSectionDescription(section.key);
+
+              return (
+                <Flex
+                  key={section.key}
+                  align="center"
+                  justify="space-between"
+                  gap={4}
+                  px={3}
+                  py={3}
+                  borderRadius="xl"
+                  transition="background 0.15s ease"
+                  _hover={{
+                    bg: completed ? "gray.50" : "purple.50",
+                  }}
+                >
+                  <HStack spacing={3} minW={0}>
+                    <Flex
+                      w="30px"
+                      h="30px"
+                      flexShrink={0}
+                      borderRadius="full"
+                      align="center"
+                      justify="center"
+                      bg={completed ? "green.50" : "gray.100"}
+                      color={completed ? "green.500" : "gray.400"}
+                    >
+                      <Icon
+                        as={completed ? FiCheck : FiCircle}
+                        boxSize={completed ? 4 : 3.5}
+                      />
+                    </Flex>
+
+                    <Box minW={0}>
+                      <Text
+                        fontSize="sm"
+                        fontWeight="700"
+                        color={completed ? "gray.700" : "gray.800"}
+                      >
+                        {section.label}
+                      </Text>
+
+                      {description && (
+                        <Text
+                          mt={0.5}
+                          fontSize="xs"
+                          color="gray.500"
+                          noOfLines={1}
+                        >
+                          {description}
+                        </Text>
+                      )}
+                    </Box>
+                  </HStack>
+
+                  <HStack spacing={3} flexShrink={0}>
+                    <Text
+                      fontSize="xs"
+                      fontWeight="700"
+                      color={completed ? "green.600" : "gray.500"}
+                    >
+                      {section.weight}%
+                    </Text>
+
+                    {!completed && onSectionAction && (
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="purple"
+                        rightIcon={<FiArrowRight />}
+                        onClick={() => onSectionAction(section.key)}
+                      >
+                        Complete
+                      </Button>
+                    )}
+                  </HStack>
+                </Flex>
+              );
+            })}
+          </Stack>
+
+          {/* Footer */}
+          {incompleteSections.length > 0 ? (
+            <Flex
+              mt={1}
+              px={4}
+              py={3}
+              borderRadius="xl"
+              bg="purple.50"
+              align={{ base: "flex-start", sm: "center" }}
+              justify="space-between"
+              direction={{ base: "column", sm: "row" }}
+              gap={3}
             >
-              Continue building your profile
-            </Button>
+              <Box>
+                <Text fontSize="sm" fontWeight="700" color="purple.900">
+                  {incompleteSections.length}{" "}
+                  {incompleteSections.length === 1 ? "section" : "sections"}{" "}
+                  remaining
+                </Text>
+
+                <Text fontSize="xs" color="purple.700">
+                  Complete them to strengthen your recruiter profile.
+                </Text>
+              </Box>
+
+              <Button
+                size="sm"
+                colorScheme="purple"
+                variant="solid"
+                rightIcon={<FiArrowRight />}
+                onClick={() => onSectionAction?.(incompleteSections[0].key)}
+              >
+                Continue
+              </Button>
+            </Flex>
+          ) : (
+            <Flex
+              px={4}
+              py={3}
+              borderRadius="xl"
+              bg="green.50"
+              align="center"
+              gap={3}
+            >
+              <Flex
+                w="28px"
+                h="28px"
+                borderRadius="full"
+                bg="green.100"
+                color="green.600"
+                align="center"
+                justify="center"
+              >
+                <Icon as={FiCheck} boxSize={4} />
+              </Flex>
+
+              <Box>
+                <Text fontSize="sm" fontWeight="700" color="green.800">
+                  Your profile is complete
+                </Text>
+
+                <Text fontSize="xs" color="green.700">
+                  You've covered all recruiter-readiness sections.
+                </Text>
+              </Box>
+            </Flex>
           )}
-        </Box>
-      </Flex>
-    </Box>
+        </Stack>
+      </CardBody>
+    </Card>
   );
 }
