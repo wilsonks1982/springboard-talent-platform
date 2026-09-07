@@ -97,6 +97,8 @@ import { candidateSkillApi } from "../../api/candidateSkillApi";
 
 import ProfessionalSnapshotCard from "../../components/candidate/sections/ProfessionalSnapshotCard";
 
+import CandidateHero from "../../components/candidate/CandidateHero";
+
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -708,53 +710,13 @@ export default function CandidateLandingPage() {
           py={{ base: 6, md: 8 }}
         >
           {/* Hero */}
-          <Box mb={8}>
-            <Text fontSize="sm" fontWeight="600" color="purple.600" mb={2}>
-              YOUR CAREER WORKSPACE
-            </Text>
-
-            <Heading size={{ base: "lg", md: "xl" }} color="gray.800">
-              Good morning, {firstName} 👋
-            </Heading>
-
-            <Text
-              mt={2}
-              fontSize={{ base: "sm", md: "md" }}
-              color="gray.600"
-              maxW="650px"
-            >
-              Let's build your professional story and connect you with the right
-              opportunities.
-            </Text>
-          </Box>
-
-          {/* Top cards */}
-          <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={5} mb={6}>
-            <BasicProfileCard
-              profile={basicProfile}
-              onEdit={() => setIsBasicProfileOpen(true)}
-            />
-
-            <ResumeSection
-              resume={resume}
-              onUpload={handleUploadResume}
-              onDownload={handleDownloadResume}
-              onDelete={handleDeleteResume}
-            />
-
-            {/* <ResumeCard
-              resume={candidate.resume}
-              onUpload={() => navigate("/candidate/profile")}
-            /> */}
-
-            {/* <QuickActions candidate={candidate} navigate={navigate} /> */}
-          </SimpleGrid>
-
-          {/* Completion */}
-          <CompletionCard
+          <CandidateHero
             candidate={candidate}
+            profileStrength={profileStrength}
             completion={completion}
-            navigate={navigate}
+            basicProfile={basicProfile}
+            onEditProfile={() => navigate("/candidate/profile")}
+            onEditBasicProfile={() => setIsBasicProfileOpen(true)}
           />
 
           {/* Main content */}
@@ -773,8 +735,6 @@ export default function CandidateLandingPage() {
                   onSectionAction={handleProfileSectionAction}
                 />
 
-                <ExperienceInsights analysis={employmentAnalysis} />
-
                 <ProfessionalSnapshotCard
                   careerSummary={careerSummary}
                   industries={industries}
@@ -791,27 +751,6 @@ export default function CandidateLandingPage() {
                   onDelete={handleDeleteExperience}
                 />
 
-                <EducationSection
-                  education={education}
-                  onAdd={handleAddEducation}
-                  onEdit={handleEditEducation}
-                  onDelete={handleDeleteEducation}
-                />
-
-                {/* <ResumeSection
-                  resume={resume}
-                  onUpload={handleUploadResume}
-                  onDownload={handleDownloadResume}
-                  onDelete={handleDeleteResume}
-                /> */}
-
-                <CertificationsSection
-                  certifications={candidate.certifications || []}
-                  onAdd={handleAddCertification}
-                  onEdit={handleEditCertification}
-                  onDelete={handleDeleteCertification}
-                />
-
                 <AchievementsSection
                   achievements={candidate.achievements || []}
                   onAdd={handleAddAchievement}
@@ -825,16 +764,39 @@ export default function CandidateLandingPage() {
                   onEdit={handleEditReference}
                   onDelete={handleDeleteReference}
                 />
+
+                <EducationSection
+                  education={education}
+                  onAdd={handleAddEducation}
+                  onEdit={handleEditEducation}
+                  onDelete={handleDeleteEducation}
+                />
+
+                <CertificationsSection
+                  certifications={candidate.certifications || []}
+                  onAdd={handleAddCertification}
+                  onEdit={handleEditCertification}
+                  onDelete={handleDeleteCertification}
+                />
               </Stack>
             </GridItem>
 
             <GridItem>
               <Stack spacing={5}>
-                {/* <ProfileSummaryCard candidate={candidate} navigate={navigate} /> */}
-
                 <CareerPreferencesCard
                   candidate={candidate}
                   onEdit={() => setCareerPreferencesDrawerOpen(true)}
+                />
+
+                <CandidateCompensationCard
+                  compensation={compensation}
+                  onEdit={() => setIsCompensationOpen(true)}
+                />
+                <ResumeSection
+                  resume={resume}
+                  onUpload={handleUploadResume}
+                  onDownload={handleDownloadResume}
+                  onDelete={handleDeleteResume}
                 />
 
                 <EmploymentVerificationCard
@@ -842,12 +804,6 @@ export default function CandidateLandingPage() {
                   currentlyEmployed={basicProfile?.currentlyEmployed}
                   onEdit={() => setEmploymentVerificationDrawerOpen(true)}
                 />
-
-                <CandidateCompensationCard
-                  compensation={compensation}
-                  onEdit={() => setIsCompensationOpen(true)}
-                />
-                {/* <OpportunityCard navigate={navigate} /> */}
               </Stack>
             </GridItem>
           </Grid>
