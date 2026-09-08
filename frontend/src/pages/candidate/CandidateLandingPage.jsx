@@ -96,7 +96,8 @@ import { candidateCareerSummaryApi } from "../../api/candidateCareerSummaryApi";
 import { candidateIndustryApi } from "../../api/candidateIndustryApi";
 import { candidateSkillApi } from "../../api/candidateSkillApi";
 
-import ProfessionalSnapshotCard from "../../components/candidate/sections/ProfessionalSnapshotCard";
+import ProfessionalSnapshotSection from "../../components/candidate/sections/ProfessionalSnapshotSection";
+import ProfessionalSnapshotDrawer from "../../components/candidate/drawers/ProfessionalSnapshotDrawer";
 
 import CandidateHero from "../../components/candidate/CandidateHero";
 
@@ -162,6 +163,8 @@ export default function CandidateLandingPage() {
 
   const [skills, setSkills] = useState([]);
   const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+  const [professionalSnapshotOpen, setProfessionalSnapshotOpen] =
+    useState(false);
 
   useEffect(() => {
     loadCandidate();
@@ -762,13 +765,13 @@ export default function CandidateLandingPage() {
                   onSectionAction={handleProfileSectionAction}
                 />
 
-                <ProfessionalSnapshotCard
+                <ProfessionalSnapshotSection
                   careerSummary={careerSummary}
                   industries={industries}
                   selectedIndustryIds={selectedIndustryIds}
                   skills={skills}
                   selectedSkillIds={selectedSkillIds}
-                  onSave={handleSaveProfessionalSnapshot}
+                  onEdit={() => setProfessionalSnapshotOpen(true)}
                 />
 
                 <ExperienceSection
@@ -910,6 +913,17 @@ export default function CandidateLandingPage() {
           onUploadDocument={handleUploadEmploymentDocument}
           onDownloadDocument={handleDownloadEmploymentDocument}
           onDeleteDocument={handleDeleteEmploymentDocument}
+        />
+
+        <ProfessionalSnapshotDrawer
+          isOpen={professionalSnapshotOpen}
+          onClose={() => setProfessionalSnapshotOpen(false)}
+          careerSummary={careerSummary}
+          industries={industries}
+          selectedIndustryIds={selectedIndustryIds}
+          skills={skills}
+          selectedSkillIds={selectedSkillIds}
+          onSave={handleSaveProfessionalSnapshot}
         />
       </Box>
     </Flex>

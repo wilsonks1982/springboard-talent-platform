@@ -17,103 +17,43 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class ProfessionalSnapshotService {
 
-    private final EmploymentHistoryAnalysisService
-            employmentHistoryAnalysisService;
+    private final EmploymentHistoryAnalysisService employmentHistoryAnalysisService;
 
-    private final CandidateExperiencesRepository
-            experienceRepository;
+    private final CandidateExperiencesRepository experienceRepository;
 
-    private final CandidateIndustryRepository
-            industryRepository;
+    private final CandidateIndustryRepository industryRepository;
 
-    private final CandidateSkillRepository
-            skillRepository;
+    private final CandidateSkillRepository skillRepository;
 
-    private final KeyStrengthRepository
-            keyStrengthRepository;
+    private final KeyStrengthRepository keyStrengthRepository;
 
-    private final CandidatesEducationRepository
-            educationRepository;
+    private final CandidatesEducationRepository educationRepository;
 
-    private final CandidateCertificationsRepository
-            certificationRepository;
+    private final CandidateCertificationsRepository certificationRepository;
 
-    private final CareerSummaryRepository
-            careerSummaryRepository;
+    private final CareerSummaryRepository careerSummaryRepository;
 
-    private final NotableAchievementRepository
-            notableAchievementRepository;
+    private final NotableAchievementRepository notableAchievementRepository;
 
-    public ProfessionalSnapshotResponse getMySnapshot(
-            UUID userId) {
+    public ProfessionalSnapshotResponse getMySnapshot(UUID userId) {
 
-        EmploymentHistoryAnalysisResponse analysis =
-                employmentHistoryAnalysisService
-                        .analyzeMyEmploymentHistory(
-                                userId,
-                                LocalDate.now()
-                        );
+        EmploymentHistoryAnalysisResponse analysis = employmentHistoryAnalysisService.analyzeMyEmploymentHistory(userId, LocalDate.now());
 
-        List<CandidateExperienceResponse> employmentHistory =
-                experienceRepository
-                        .findAllByCandidateUserIdOrderByStartDateDesc(userId)
-                        .stream()
-                        .map(CandidateExperienceResponse::of)
-                        .toList();
+        List<CandidateExperienceResponse> employmentHistory = experienceRepository.findAllByCandidateUserIdOrderByStartDateDesc(userId).stream().map(CandidateExperienceResponse::of).toList();
 
-        List<IndustryTagResponse> industryTags =
-                industryRepository
-                        .findAllByCandidateUserId(userId)
-                        .stream()
-                        .map(candidateIndustry ->
-                                IndustryTagResponse.of(
-                                        candidateIndustry.getIndustryTag()
-                                ))
-                        .toList();
+        List<IndustryTagResponse> industryTags = industryRepository.findAllByCandidateUserId(userId).stream().map(candidateIndustry -> IndustryTagResponse.of(candidateIndustry.getIndustryTag())).toList();
 
-        List<SkillTagResponse> skillTags =
-                skillRepository
-                        .findAllByCandidateUserId(userId)
-                        .stream()
-                        .map(candidateSkill ->
-                                SkillTagResponse.of(
-                                        candidateSkill.getSkillTag()
-                                ))
-                        .toList();
+        List<SkillTagResponse> skillTags = skillRepository.findAllByCandidateUserId(userId).stream().map(candidateSkill -> SkillTagResponse.of(candidateSkill.getSkillTag())).toList();
 
-        List<KeyStrengthResponse> keyStrengths =
-                keyStrengthRepository
-                        .findAllByCandidateUserIdOrderByDisplayOrderAsc(userId)
-                        .stream()
-                        .map(KeyStrengthResponse::of)
-                        .toList();
+        List<KeyStrengthResponse> keyStrengths = keyStrengthRepository.findAllByCandidateUserIdOrderByDisplayOrderAsc(userId).stream().map(KeyStrengthResponse::of).toList();
 
-        List<CandidateEducationResponse> education =
-                educationRepository
-                        .findByCandidateUserIdOrderByDisplayOrderAsc(userId)
-                        .stream()
-                        .map(CandidateEducationResponse::of)
-                        .toList();
+        List<CandidateEducationResponse> education = educationRepository.findByCandidateUserIdOrderByDisplayOrderAsc(userId).stream().map(CandidateEducationResponse::of).toList();
 
-        List<CandidateCertificationResponse> certifications =
-                certificationRepository
-                        .findAllByCandidateUserIdOrderByDisplayOrderAsc(userId)
-                        .stream()
-                        .map(CandidateCertificationResponse::of)
-                        .toList();
+        List<CandidateCertificationResponse> certifications = certificationRepository.findAllByCandidateUserIdOrderByDisplayOrderAsc(userId).stream().map(CandidateCertificationResponse::of).toList();
 
-        CareerSummaryResponse careerSummary =
-                careerSummaryRepository
-                        .findByCandidateUserId(userId)
-                        .map(CareerSummaryResponse::of)
-                        .orElse(null);
+        CareerSummaryResponse careerSummary = careerSummaryRepository.findByCandidateUserId(userId).map(CareerSummaryResponse::of).orElse(null);
 
-        List<NotableAchievementResponse> notableAchievements =
-                notableAchievementRepository
-                        .findAllByCandidateUserIdOrderByDisplayOrderAsc(userId)
-                        .stream()
-                        .map(NotableAchievementResponse::of)
-                        .toList();
+        List<NotableAchievementResponse> notableAchievements = notableAchievementRepository.findAllByCandidateUserIdOrderByDisplayOrderAsc(userId).stream().map(NotableAchievementResponse::of).toList();
 
         return new ProfessionalSnapshotResponse(
                 analysis.currentTitle(),
