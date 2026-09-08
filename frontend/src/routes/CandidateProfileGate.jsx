@@ -9,7 +9,7 @@ const REQUIRED_KEYS = [
   "EXPERIENCE",
   "EDUCATION",
   "CAREER_DIRECTION",
-  "PROFESSIONAL_PRESENCE",
+  "PROFESSIONAL_SNAPSHOT",
 ];
 
 export default function CandidateProfileGate() {

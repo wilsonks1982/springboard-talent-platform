@@ -34,18 +34,22 @@ import { candidateExperienceApi } from "../../api/candidateExperienceApi";
 import { candidateEducationApi } from "../../api/candidateEducationApi";
 import { candidateCareerPreferencesApi } from "../../api/candidateCareerPreferencesApi";
 import { candidateBasicProfileApi } from "../../api/candidateBasicProfileApi";
+import { candidateCareerSummaryApi } from "../../api/candidateCareerSummaryApi";
+import { candidateIndustryApi } from "../../api/candidateIndustryApi";
+import { candidateSkillApi } from "../../api/candidateSkillApi";
 
 import ExperienceDrawer from "../../components/candidate/drawers/ExperienceDrawer";
 import EducationDrawer from "../../components/candidate/drawers/EducationDrawer";
 import CareerPreferencesDrawer from "../../components/candidate/drawers/CareerPreferencesDrawer";
 import BasicProfileDrawer from "../../components/candidate/drawers/BasicProfileDrawer";
+import ProfessionalSnapshotDrawer from "../../components/candidate/drawers/ProfessionalSnapshotDrawer";
 
 const REQUIRED_KEYS = [
   "BASIC_INFORMATION",
   "EXPERIENCE",
   "EDUCATION",
   "CAREER_DIRECTION",
-  "PROFESSIONAL_PRESENCE",
+  "PROFESSIONAL_SNAPSHOT",
 ];
 
 const SECTION_META = {
@@ -77,9 +81,9 @@ const SECTION_META = {
     icon: FiTarget,
   },
 
-  PROFESSIONAL_PRESENCE: {
-    title: "Professional presence",
-    description: "Your LinkedIn presence",
+  PROFESSIONAL_SNAPSHOT: {
+    title: "Professional snapshot",
+    description: "How recruiters understand your professional profile",
     weight: 10,
     icon: FiLink2,
   },
@@ -101,6 +105,48 @@ function CandidateProfileSetupPage({ onComplete }) {
 
   const [careerPreferencesDrawerOpen, setCareerPreferencesDrawerOpen] =
     useState(false);
+
+  const [professionalSnapshotDrawerOpen, setProfessionalSnapshotDrawerOpen] =
+    useState(false);
+
+  const [careerSummary, setCareerSummary] = useState(null);
+  const [industries, setIndustries] = useState([]);
+  const [selectedIndustryIds, setSelectedIndustryIds] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+
+  async function loadProfessionalSnapshot() {
+    try {
+      const [
+        savedSummary,
+        availableIndustries,
+        selectedIndustries,
+        availableSkills,
+        selectedSkills,
+      ] = await Promise.all([
+        candidateCareerSummaryApi.get(),
+        candidateIndustryApi.getAvailable(),
+        candidateIndustryApi.getSelected(),
+        candidateSkillApi.getAvailable(),
+        candidateSkillApi.getSelected(),
+      ]);
+
+      setCareerSummary(savedSummary || null);
+      setIndustries(availableIndustries || []);
+
+      setSelectedIndustryIds(
+        (selectedIndustries || []).map((item) => item.industryTagId),
+      );
+
+      setSkills(availableSkills || []);
+
+      setSelectedSkillIds(
+        (selectedSkills || []).map((item) => item.skillTagId),
+      );
+    } catch (err) {
+      console.error("Failed to load professional snapshot", err);
+    }
+  }
 
   async function loadProfileStrength({ silent = false } = {}) {
     try {
@@ -130,6 +176,7 @@ function CandidateProfileSetupPage({ onComplete }) {
 
   useEffect(() => {
     loadProfileStrength();
+    loadProfessionalSnapshot();
   }, []);
 
   const requiredSections = useMemo(() => {
@@ -152,9 +199,7 @@ function CandidateProfileSetupPage({ onComplete }) {
     (section) => section.completed,
   ).length;
 
-  const requiredProgress = Math.round(
-    (completedCount / REQUIRED_KEYS.length) * 100,
-  );
+  const requiredProgress = Number(profileStrength?.score ?? 0);
 
   const requiredComplete = completedCount === REQUIRED_KEYS.length;
 
@@ -176,13 +221,41 @@ function CandidateProfileSetupPage({ onComplete }) {
         setCareerPreferencesDrawerOpen(true);
         break;
 
-      case "PROFESSIONAL_PRESENCE":
-        setBasicProfileDrawerOpen(true);
+      case "PROFESSIONAL_SNAPSHOT":
+        setProfessionalSnapshotDrawerOpen(true);
         break;
 
       default:
         break;
     }
+  }
+
+  async function handleProfessionalSnapshotSave({
+    summary,
+    industryIds,
+    skillIds,
+  }) {
+    const [savedSummary, savedIndustries, savedSkills] = await Promise.all([
+      candidateCareerSummaryApi.update({
+        summary,
+      }),
+
+      candidateIndustryApi.update(industryIds),
+
+      candidateSkillApi.update(skillIds),
+    ]);
+
+    setCareerSummary(savedSummary);
+
+    setSelectedIndustryIds(
+      (savedIndustries || []).map((item) => item.industryTagId),
+    );
+
+    setSelectedSkillIds((savedSkills || []).map((item) => item.skillTagId));
+
+    await loadProfileStrength();
+
+    setProfessionalSnapshotDrawerOpen(false);
   }
 
   async function handleBasicProfileSave(data) {
@@ -571,6 +644,17 @@ function CandidateProfileSetupPage({ onComplete }) {
         isOpen={careerPreferencesDrawerOpen}
         onClose={() => setCareerPreferencesDrawerOpen(false)}
         onSave={handleCareerPreferencesSave}
+      />
+
+      <ProfessionalSnapshotDrawer
+        isOpen={professionalSnapshotDrawerOpen}
+        onClose={() => setProfessionalSnapshotDrawerOpen(false)}
+        careerSummary={careerSummary}
+        industries={industries}
+        selectedIndustryIds={selectedIndustryIds}
+        skills={skills}
+        selectedSkillIds={selectedSkillIds}
+        onSave={handleProfessionalSnapshotSave}
       />
     </>
   );

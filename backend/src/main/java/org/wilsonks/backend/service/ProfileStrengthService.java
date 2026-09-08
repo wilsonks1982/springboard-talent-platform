@@ -6,7 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.wilsonks.backend.domain.Candidate;
 import org.wilsonks.backend.dto.responses.ProfileStrengthResponse;
 import org.wilsonks.backend.dto.responses.ProfileStrengthSectionResponse;
+import org.wilsonks.backend.repository.CandidateIndustryRepository;
+import org.wilsonks.backend.repository.CandidateSkillRepository;
 import org.wilsonks.backend.repository.CandidatesRepository;
+import org.wilsonks.backend.repository.CareerSummaryRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,13 +19,16 @@ import java.util.UUID;
 public class ProfileStrengthService {
 
     private final CandidatesRepository candidatesRepository;
+    private final CareerSummaryRepository careerSummaryRepository;
+    private final CandidateIndustryRepository candidateIndustryRepository;
+    private final CandidateSkillRepository candidateSkillRepository;
 
     @Transactional(readOnly = true)
     public ProfileStrengthResponse calculate(UUID userId) {
 
         Candidate candidate = candidatesRepository.findByUserId(userId).orElseThrow(() -> new IllegalArgumentException("Candidate profile not found."));
 
-        boolean basicInformation = isBasicInformationComplete(candidate);
+        boolean basicInformation = isBasicProfileComplete(candidate);
 
         boolean experience = candidate.getExperiences() != null && !candidate.getExperiences().isEmpty();
 
@@ -30,7 +36,8 @@ public class ProfileStrengthService {
 
         boolean careerDirection = isCareerDirectionComplete(candidate);
 
-        boolean professionalPresence = isProfessionalPresenceComplete(candidate);
+        boolean professionalSnapshot = isProfessionalSnapshotComplete(userId);
+
 
         List<ProfileStrengthSectionResponse> sections = List.of(
 
@@ -42,8 +49,12 @@ public class ProfileStrengthService {
 
                 section("CAREER_DIRECTION", "Career direction", 15, careerDirection),
 
-                section("PROFESSIONAL_PRESENCE", "Professional presence", 10, professionalPresence));
-
+                section("PROFESSIONAL_SNAPSHOT",
+                        "Professional Snapshot",
+                        10,
+                        professionalSnapshot
+                )
+        );
         int score = sections.stream().filter(ProfileStrengthSectionResponse::completed).mapToInt(ProfileStrengthSectionResponse::weight).sum();
 
         return new ProfileStrengthResponse(score, determineLevel(score), determineMessage(score), sections);
@@ -53,28 +64,55 @@ public class ProfileStrengthService {
         return new ProfileStrengthSectionResponse(key, label, weight, completed);
     }
 
-    private boolean isBasicInformationComplete(Candidate candidate) {
+    private boolean isBasicProfileComplete(Candidate candidate) {
 
-        if (candidate.getUser() == null) {
+        if (!hasText(candidate.getFullName())
+                || !hasText(candidate.getPhone())
+                || !hasText(candidate.getCity())
+                || !hasText(candidate.getStateCountry())
+                || candidate.getCurrentlyEmployed() == null) {
             return false;
         }
 
-        return hasText(candidate.getUser().getFullName()) && hasText(candidate.getUser().getEmail()) && hasText(candidate.getUser().getPhone()) && hasText(candidate.getUser().getLocation());
+        if (Boolean.TRUE.equals(candidate.getCurrentlyEmployed())) {
+            return candidate.getJobSearchStatus() != null;
+        }
+
+        return candidate.getNonEmploymentReason() != null;
     }
 
     private boolean isCareerDirectionComplete(Candidate candidate) {
-        return hasText(candidate.getDesiredTitle()) &&
-                candidate.getDesiredIndustries() != null &&
-                !candidate.getDesiredIndustries().isEmpty() &&
-                candidate.getDesiredLocations() != null &&
-                !candidate.getDesiredLocations().isEmpty() &&
-                candidate.getNoticePeriod() >= 0;
+        return hasText(candidate.getDesiredTitle())
+                && candidate.getDesiredLocations() != null
+                && !candidate.getDesiredLocations().isEmpty()
+                && candidate.getOpenToRemote() != null
+                && candidate.getNoticePeriod() != null
+                && candidate.getNoticePeriod() >= 0
+                && candidate.getWorkAuthorization() != null;
     }
 
-    private boolean isProfessionalPresenceComplete(Candidate candidate) {
+    private boolean isProfessionalSnapshotComplete(UUID userId) {
 
-        return hasText(candidate.getLinkedinUrl());
+        boolean hasCareerSummary =
+                careerSummaryRepository.findByCandidateUserId(userId)
+                        .map(summary -> hasText(summary.getSummary()))
+                        .orElse(false);
+
+        boolean hasIndustry =
+                !candidateIndustryRepository
+                        .findAllByCandidateUserId(userId)
+                        .isEmpty();
+
+        boolean hasSkill =
+                !candidateSkillRepository
+                        .findAllByCandidateUserId(userId)
+                        .isEmpty();
+
+        return hasCareerSummary
+                && hasIndustry
+                && hasSkill;
     }
+
 
     private boolean hasText(String value) {
         return value != null && !value.trim().isEmpty();
