@@ -2,9 +2,12 @@
 set -e
 
 EC2_IP=${1:-}
+REGISTRY_ALIAS=${2:-}
+ECR_REPO_NAME=${3:-springboard-talent-backend}
+IMAGE_TAG=${4:-latest}
 
 if [ -z "$EC2_IP" ]; then
-  echo "Usage: ./deploy-backend.sh <ec2-ip>"
+  echo "Usage: ./deploy-backend.sh <ec2-ip> <registry-alias> [ecr-repo-name] [image-tag]"
   exit 1
 fi
 
@@ -50,7 +53,7 @@ ssh -i $SSH_KEY ubuntu@$EC2_IP << EOSSH
 
   docker compose down || true
 
-  docker pull public.ecr.aws/l1s7l1v5/springboard-talent-backend:latest
+  docker pull public.ecr.aws/$REGISTRY_ALIAS/$ECR_REPO_NAME:$IMAGE_TAG
 
   docker compose up -d
   
