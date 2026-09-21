@@ -17,7 +17,11 @@ import Progress from "./Progress";
 export default function RegistrationLayout({ children }) {
   const step = useSelector((s) => s.registration.step);
   const navigate = useNavigate();
-  const isMobile = useBreakpointValue({ base: true, md: false });
+
+  const isMobile = useBreakpointValue({
+    base: true,
+    md: false,
+  });
 
   const getStepTitle = (step) => {
     const titles = {
@@ -25,9 +29,9 @@ export default function RegistrationLayout({ children }) {
       ONBOARDING: "Create Your Account",
       NDA: "Non-Disclosure Agreement",
       PRIVACY: "Privacy & Data Policy",
-      VERIFICATION: "Verify Your Account",
       CONFIRMATION: "You're All Set!",
     };
+
     return titles[step] || "Registration";
   };
 
@@ -37,9 +41,9 @@ export default function RegistrationLayout({ children }) {
       ONBOARDING: "Tell us about yourself and your career goals",
       NDA: "Please review and accept our agreement",
       PRIVACY: "Understand how we protect your data",
-      VERIFICATION: "Secure your account with email and phone verification",
       CONFIRMATION: "Your account is ready to use",
     };
+
     return descriptions[step] || "";
   };
 
@@ -183,6 +187,7 @@ export default function RegistrationLayout({ children }) {
             >
               <HStack spacing={1.5}>
                 <Sparkles size={13} color="#805AD5" />
+
                 <Text
                   fontSize="xs"
                   fontWeight="700"
@@ -200,7 +205,10 @@ export default function RegistrationLayout({ children }) {
               color="gray.800"
               fontWeight="800"
               letterSpacing="-0.6px"
-              fontSize={{ base: "25px", md: "30px" }}
+              fontSize={{
+                base: "25px",
+                md: "30px",
+              }}
               lineHeight="1.2"
             >
               {getStepTitle(step)}
@@ -208,7 +216,10 @@ export default function RegistrationLayout({ children }) {
 
             <Box
               h="3px"
-              w={{ base: "48px", md: "60px" }}
+              w={{
+                base: "48px",
+                md: "60px",
+              }}
               borderRadius="full"
               bgGradient="linear(to-r, purple.700, purple.500)"
             />
@@ -217,9 +228,16 @@ export default function RegistrationLayout({ children }) {
           {/* Main Card */}
           <Box
             bg="white"
-            borderRadius={{ base: "xl", md: "2xl" }}
+            borderRadius={{
+              base: "xl",
+              md: "2xl",
+            }}
             boxShadow="0 14px 40px rgba(88, 28, 135, 0.08)"
-            p={{ base: 5, sm: 6, md: 9 }}
+            p={{
+              base: 5,
+              sm: 6,
+              md: 9,
+            }}
             border="1px solid"
             borderColor="purple.100"
             position="relative"
@@ -243,7 +261,10 @@ export default function RegistrationLayout({ children }) {
             <Box
               bg="purple.50"
               borderRadius="xl"
-              p={{ base: 4, md: 5 }}
+              p={{
+                base: 4,
+                md: 5,
+              }}
               border="1px solid"
               borderColor="purple.100"
               boxShadow="0 4px 14px rgba(128, 90, 213, 0.05)"

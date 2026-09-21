@@ -48,8 +48,11 @@ export default function PrivacyPage() {
         jurisdiction: "IN",
       });
 
-      dispatch(setStep("VERIFICATION"));
-      navigate("/register/verification");
+      // Privacy is the final consent step.
+      // Verification is intentionally not part of onboarding.
+      dispatch(setStep("CONFIRMATION"));
+
+      navigate("/register/confirmation");
     } catch (e) {
       dispatch(
         setError(
@@ -98,7 +101,7 @@ export default function PrivacyPage() {
               justifyContent="center"
               flexShrink={0}
             >
-              <Icon as={Shield} w={21} h={21} color="purple.600" />
+              <Icon as={Shield} w={18} h={18} color="purple.600" />
             </Box>
 
             <Text
@@ -221,7 +224,7 @@ export default function PrivacyPage() {
               mr={3}
               flexShrink={0}
             >
-              <Icon as={CheckCircle2} w={18} h={18} color="purple.600" />
+              <Icon as={CheckCircle2} w={16} h={16} color="purple.600" />
             </Box>
 
             <Box>
@@ -230,8 +233,8 @@ export default function PrivacyPage() {
               </Text>
 
               <Text color="purple.700" fontSize="xs" mt={0.5}>
-                Your privacy consent has been recorded. You can continue to
-                verification.
+                Your privacy consent has been recorded. You can now complete
+                your registration.
               </Text>
             </Box>
           </Alert>
@@ -277,7 +280,7 @@ export default function PrivacyPage() {
             color="white"
             bgGradient="linear(to-r, purple.700, purple.600)"
             boxShadow="0 10px 28px rgba(128, 90, 213, 0.22)"
-            rightIcon={<ArrowRight size={18} />}
+            rightIcon={<ArrowRight size={16} />}
             _hover={{
               bgGradient: "linear(to-r, purple.800, purple.700)",
               boxShadow: "0 14px 32px rgba(128, 90, 213, 0.28)",
@@ -288,7 +291,7 @@ export default function PrivacyPage() {
             }}
             transition="all 0.2s ease"
           >
-            Continue to Verification
+            Continue to Confirmation
           </Button>
 
           <HStack justify="center" spacing={2} mt={4}>

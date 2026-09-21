@@ -1,0 +1,2 @@
+templateFile="storage1.json"
+az deployment group create --name wilson-deployment-1 --resource-group rg-sample --template-file $templateFile

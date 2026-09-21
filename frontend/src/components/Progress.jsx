@@ -7,7 +7,6 @@ const steps = [
   ["ONBOARDING", "Account"],
   ["NDA", "NDA"],
   ["PRIVACY", "Privacy"],
-  ["VERIFICATION", "Verify"],
   ["CONFIRMATION", "Done"],
 ];
 
@@ -102,7 +101,10 @@ export default function Progress({ current }) {
 
                   {/* Step Label */}
                   <Text
-                    fontSize={{ base: "9px", sm: "xs" }}
+                    fontSize={{
+                      base: "9px",
+                      sm: "xs",
+                    }}
                     fontWeight={isCurrent || isCompleted ? "700" : "500"}
                     color={
                       isCompleted

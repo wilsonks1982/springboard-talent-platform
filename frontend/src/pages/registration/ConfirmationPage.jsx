@@ -4,9 +4,9 @@ import {
   Button,
   Heading,
   HStack,
+  VStack,
   Icon,
   Text,
-  VStack,
   Badge,
   SimpleGrid,
 } from "@chakra-ui/react";
@@ -29,6 +29,7 @@ import { setStep } from "../../store/registrationSlice";
 export default function ConfirmationPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { account } = useSelector((s) => s.registration);
 
   const goToLogin = () => {
@@ -164,7 +165,7 @@ export default function ConfirmationPage() {
               </Text>
 
               <Text fontSize="xs" color="gray.500" mt={0.5}>
-                All required account and consent steps are done.
+                Your account and required consent steps are complete.
               </Text>
             </Box>
           </HStack>
@@ -176,12 +177,8 @@ export default function ConfirmationPage() {
                 detail: account.email,
               },
               {
-                title: "Email Verified",
-                detail: "Email address confirmed",
-              },
-              {
-                title: "Phone Verified",
-                detail: account.phone,
+                title: "Registration Details Completed",
+                detail: "Your account information has been saved",
               },
               {
                 title: "Agreements Accepted",

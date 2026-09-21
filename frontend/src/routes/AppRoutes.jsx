@@ -18,29 +18,31 @@ import WelcomePage from "../pages/registration/WelcomePage";
 import OnboardingPage from "../pages/registration/OnboardingPage";
 import NdaPage from "../pages/registration/NdaPage";
 import PrivacyPage from "../pages/registration/PrivacyPage";
-import VerificationPage from "../pages/registration/VerificationPage";
 import ConfirmationPage from "../pages/registration/ConfirmationPage";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* ==================== PUBLIC ROUTES ==================== */}
       <Route element={<PublicRoute />}>
         <Route path="/" element={<PublicLandingPage />} />
         <Route path="/login" element={<LoginPage />} />
       </Route>
 
-      {/* Registration Routes */}
+      {/* ==================== REGISTRATION ROUTES ==================== */}
       <Route element={<RegistrationGuard />}>
         <Route path="/register/welcome" element={<WelcomePage />} />
+
         <Route path="/register/onboarding" element={<OnboardingPage />} />
+
         <Route path="/register/nda" element={<NdaPage />} />
+
         <Route path="/register/privacy" element={<PrivacyPage />} />
-        <Route path="/register/verification" element={<VerificationPage />} />
+
         <Route path="/register/confirmation" element={<ConfirmationPage />} />
       </Route>
 
-      {/* Protected Candidate Routes */}
+      {/* ==================== PROTECTED CANDIDATE ROUTES ==================== */}
       <Route element={<ProtectedRoute />}>
         {/* Profile setup must remain accessible before completion */}
         <Route
@@ -58,7 +60,7 @@ export default function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Fallback */}
+      {/* ==================== FALLBACK ==================== */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
