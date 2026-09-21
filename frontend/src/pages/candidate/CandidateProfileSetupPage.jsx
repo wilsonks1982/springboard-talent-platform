@@ -98,6 +98,7 @@ function CandidateProfileSetupPage({ onComplete }) {
   const [error, setError] = useState("");
 
   const [basicProfileDrawerOpen, setBasicProfileDrawerOpen] = useState(false);
+  const [basicProfile, setBasicProfile] = useState(null);
 
   const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
 
@@ -114,6 +115,16 @@ function CandidateProfileSetupPage({ onComplete }) {
   const [selectedIndustryIds, setSelectedIndustryIds] = useState([]);
   const [skills, setSkills] = useState([]);
   const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+
+  async function loadBasicProfile() {
+    try {
+      const data = await candidateBasicProfileApi.get();
+      setBasicProfile(data || null);
+      console.log("Loaded basic profile:", data);
+    } catch (err) {
+      console.error("Failed to load basic profile", err);
+    }
+  }
 
   async function loadProfessionalSnapshot() {
     try {
@@ -177,6 +188,7 @@ function CandidateProfileSetupPage({ onComplete }) {
   useEffect(() => {
     loadProfileStrength();
     loadProfessionalSnapshot();
+    loadBasicProfile();
   }, []);
 
   const requiredSections = useMemo(() => {
@@ -259,7 +271,9 @@ function CandidateProfileSetupPage({ onComplete }) {
   }
 
   async function handleBasicProfileSave(data) {
-    await candidateBasicProfileApi.update(data);
+    const savedProfile = await candidateBasicProfileApi.update(data);
+
+    setBasicProfile(savedProfile || data);
 
     await loadProfileStrength({ silent: true });
 
@@ -625,6 +639,7 @@ function CandidateProfileSetupPage({ onComplete }) {
       <BasicProfileDrawer
         isOpen={basicProfileDrawerOpen}
         onClose={() => setBasicProfileDrawerOpen(false)}
+        profile={basicProfile}
         onSave={handleBasicProfileSave}
       />
 

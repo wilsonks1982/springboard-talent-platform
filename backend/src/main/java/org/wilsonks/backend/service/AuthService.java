@@ -74,6 +74,11 @@ public class AuthService {
         candidate.setUser(user); // Set the user for the candidate
         candidatesRepo.save(candidate);
 
+        // Initialize candidate profile from registration data
+        candidate.setFullName(user.getFullName());
+        candidate.setPhone(user.getPhone());
+        candidate.setCity(user.getLocation());
+
         log.info("User and candidate registered successfully with ID: {}", user.getUserId());
 
         // 5. Continue existing registration flow
