@@ -260,14 +260,14 @@ export default function CareerPreferencesDrawer({
               )}
 
               <FormControl isRequired>
-                <FormLabel>Desired title</FormLabel>
+                <FormLabel>Career Objectives</FormLabel>
 
                 <Input
                   value={form.desiredTitle}
                   onChange={(event) =>
                     updateField("desiredTitle", event.target.value)
                   }
-                  placeholder="e.g. Senior Java Engineer"
+                  placeholder="Share your career aspirations, e.g. becoming a team lead"
                 />
               </FormControl>
 

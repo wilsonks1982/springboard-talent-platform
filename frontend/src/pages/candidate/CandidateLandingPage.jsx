@@ -760,10 +760,10 @@ export default function CandidateLandingPage() {
           >
             <GridItem>
               <Stack spacing={5}>
-                <ProfileStrengthCard
+                {/* <ProfileStrengthCard
                   profileStrength={profileStrength}
                   onSectionAction={handleProfileSectionAction}
-                />
+                /> */}
 
                 <ProfessionalSnapshotSection
                   careerSummary={careerSummary}

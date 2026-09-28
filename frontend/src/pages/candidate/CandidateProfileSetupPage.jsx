@@ -61,8 +61,8 @@ const SECTION_META = {
   },
 
   EXPERIENCE: {
-    title: "Experience",
-    description: "Your professional experience",
+    title: "Employment",
+    description: "Your latest employment details only.",
     weight: 25,
     icon: FiBriefcase,
   },

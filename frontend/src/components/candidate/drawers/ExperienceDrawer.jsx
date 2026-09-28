@@ -221,11 +221,11 @@ export default function ExperienceDrawer({
 
         <DrawerHeader>
           <Text fontSize="lg" fontWeight="bold">
-            {isEditing ? "Edit Employment" : "Add Employment"}
+            {isEditing ? "Edit Employment" : "Add Last Employment"}
           </Text>
 
           <Text mt={1} fontSize="sm" fontWeight="normal" color="gray.500">
-            Tell us about your role and responsibilities.
+            Latest One Only.
           </Text>
         </DrawerHeader>
 
