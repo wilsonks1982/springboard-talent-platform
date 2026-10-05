@@ -24,7 +24,7 @@ a newly-created Candidate is new even though its ID is already assigned.
 @Getter
 @Setter
 @NoArgsConstructor
-public class Candidate implements Persistable<UUID> {
+public class    Candidate implements Persistable<UUID> {
 
     @Id
     @Column(name = "user_id")

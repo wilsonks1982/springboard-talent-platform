@@ -20,7 +20,7 @@ app:
     max-age: 3600
   jwt:
     secret: ${JWT_SECRET:VGhpc0lzQURldmVsb3BtZW50S2V5Rm9yU2JUb25seV9DaGFuZ2VNZQ==}
-    access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:15}
+    access-token-minutes: ${JWT_ACCESS_TOKEN_MINUTES:1440}
     issuer: ${JWT_ISSUER:springboard-talent}
   verification:
     expiry-minutes: ${VERIFICATION_EXPIRY_MINUTES:10}

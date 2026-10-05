@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogBody,
@@ -17,6 +18,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+
 import {
   FiAward,
   FiCheckCircle,
@@ -57,45 +59,48 @@ function CertificationItem({ certification, onEdit, onDelete }) {
   return (
     <Box
       border="1px solid"
-      borderColor="gray.100"
-      borderRadius="xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       p={{ base: 4, md: 5 }}
-      transition="all 0.2s ease"
+      bg="white"
+      transition="all 0.18s ease"
       _hover={{
-        borderColor: "purple.100",
-        boxShadow: "0 4px 16px rgba(15, 23, 42, 0.04)",
+        borderColor: "accent.300",
+        boxShadow: "sm",
       }}
     >
       <Flex justify="space-between" align="flex-start" gap={4}>
         <HStack align="flex-start" spacing={4} minW={0}>
+          {/* Certification marker */}
           <Box
             flexShrink={0}
-            w={{ base: "42px", md: "46px" }}
-            h={{ base: "42px", md: "46px" }}
-            borderRadius="xl"
-            bg="purple.50"
-            color="purple.600"
+            w={{ base: "36px", md: "38px" }}
+            h={{ base: "36px", md: "38px" }}
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="accent.300"
+            bg="cream.100"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <Icon as={FiAward} boxSize={5} />
+            <Icon as={FiAward} boxSize={4} />
           </Box>
 
           <Box minW={0}>
             <Text
-              fontWeight="800"
-              fontSize={{ base: "sm", md: "md" }}
-              color="gray.800"
+              fontFamily="heading"
+              fontWeight="500"
+              fontSize={{ base: "md", md: "lg" }}
+              color="brand.500"
               lineHeight="1.4"
             >
               {certification.name}
             </Text>
 
             {certification.issuingOrganization && (
-              <Text mt={1} fontSize="sm" fontWeight="600" color="purple.600">
+              <Text mt={1} fontSize="sm" fontWeight="600" color="accent.600">
                 {certification.issuingOrganization}
               </Text>
             )}
@@ -103,13 +108,14 @@ function CertificationItem({ certification, onEdit, onDelete }) {
             <HStack spacing={2} mt={3} flexWrap="wrap">
               {certification.issueDate && (
                 <Badge
-                  colorScheme="purple"
-                  variant="subtle"
-                  borderRadius="full"
-                  px={2.5}
-                  py={1}
-                  fontSize="10px"
+                  bg="cream.200"
+                  color="taupe.700"
+                  borderRadius="2px"
+                  px={2}
+                  py="2px"
+                  fontSize="9px"
                   fontWeight="700"
+                  letterSpacing="0.05em"
                 >
                   Issued {formatDate(certification.issueDate)}
                 </Badge>
@@ -117,13 +123,14 @@ function CertificationItem({ certification, onEdit, onDelete }) {
 
               {certification.expiryDate && (
                 <Badge
-                  colorScheme={status === "Expired" ? "red" : "gray"}
-                  variant="subtle"
-                  borderRadius="full"
-                  px={2.5}
-                  py={1}
-                  fontSize="10px"
+                  bg={status === "Expired" ? "error.50" : "cream.200"}
+                  color={status === "Expired" ? "error.600" : "taupe.700"}
+                  borderRadius="2px"
+                  px={2}
+                  py="2px"
+                  fontSize="9px"
                   fontWeight="700"
+                  letterSpacing="0.05em"
                 >
                   {status === "Expired"
                     ? "Expired"
@@ -133,13 +140,14 @@ function CertificationItem({ certification, onEdit, onDelete }) {
 
               {!certification.expiryDate && (
                 <Badge
-                  colorScheme="green"
-                  variant="subtle"
-                  borderRadius="full"
-                  px={2.5}
-                  py={1}
-                  fontSize="10px"
+                  bg="success.50"
+                  color="success.600"
+                  borderRadius="2px"
+                  px={2}
+                  py="2px"
+                  fontSize="9px"
                   fontWeight="700"
+                  letterSpacing="0.05em"
                 >
                   No expiry
                 </Badge>
@@ -154,7 +162,12 @@ function CertificationItem({ certification, onEdit, onDelete }) {
             icon={<FiEdit2 />}
             size="sm"
             variant="ghost"
-            colorScheme="purple"
+            color="brand.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "brand.50",
+              color: "brand.600",
+            }}
             onClick={() => onEdit(certification)}
           />
 
@@ -163,7 +176,12 @@ function CertificationItem({ certification, onEdit, onDelete }) {
             icon={<FiTrash2 />}
             size="sm"
             variant="ghost"
-            colorScheme="red"
+            color="error.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "error.50",
+              color: "error.600",
+            }}
             onClick={() => onDelete(certification)}
           />
         </HStack>
@@ -186,13 +204,13 @@ export default function CertificationsSection({
     <Box
       bg="white"
       border="1px solid"
-      borderColor="gray.200"
-      borderRadius="2xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       overflow="hidden"
-      boxShadow="0 4px 20px rgba(15, 23, 42, 0.04)"
+      boxShadow="sm"
     >
       {/* Header */}
-      <Box p={{ base: 5, md: 6 }}>
+      <Box p={{ base: 5, md: 7 }}>
         <Flex
           justify="space-between"
           align={{ base: "flex-start", sm: "center" }}
@@ -200,29 +218,33 @@ export default function CertificationsSection({
         >
           <HStack spacing={3} align="flex-start">
             <Box
-              w="40px"
-              h="40px"
-              borderRadius="xl"
-              bg="purple.50"
-              color="purple.600"
+              w="34px"
+              h="34px"
+              border="1px solid"
+              borderColor="accent.300"
+              bg="cream.100"
+              color="accent.600"
               display="flex"
               alignItems="center"
               justifyContent="center"
               flexShrink={0}
+              borderRadius="4px"
             >
-              <Icon as={FiAward} boxSize={5} />
+              <Icon as={FiAward} boxSize={4} />
             </Box>
 
             <Box>
               <Text
-                fontSize={{ base: "md", md: "lg" }}
-                fontWeight="800"
-                color="gray.900"
+                fontFamily="heading"
+                fontSize={{ base: "xl", md: "2xl" }}
+                fontWeight="500"
+                color="brand.500"
+                lineHeight="1.2"
               >
                 Certifications
               </Text>
 
-              <Text mt={1} fontSize="sm" color="gray.500">
+              <Text mt={1.5} fontSize="sm" color="taupe.600">
                 Your professional credentials
               </Text>
             </Box>
@@ -230,8 +252,7 @@ export default function CertificationsSection({
 
           <Button
             size="sm"
-            colorScheme="purple"
-            variant="outline"
+            variant="outlineGold"
             leftIcon={<FiPlus />}
             onClick={onAdd}
             flexShrink={0}
@@ -241,47 +262,54 @@ export default function CertificationsSection({
         </Flex>
       </Box>
 
-      <Divider />
+      <Divider borderColor="cream.300" />
 
       {/* Empty state */}
       {certifications.length === 0 ? (
         <Box
-          mx={{ base: 5, md: 6 }}
-          my={{ base: 5, md: 6 }}
+          mx={{ base: 5, md: 7 }}
+          my={{ base: 5, md: 7 }}
           py={10}
           px={5}
           textAlign="center"
           border="1px dashed"
-          borderColor="gray.200"
-          borderRadius="xl"
-          bg="gray.50"
+          borderColor="cream.400"
+          borderRadius="4px"
+          bg="cream.50"
         >
           <Box
             mx="auto"
-            w="52px"
-            h="52px"
-            borderRadius="2xl"
-            bg="white"
+            w="42px"
+            h="42px"
             border="1px solid"
-            borderColor="gray.200"
+            borderColor="accent.300"
+            bg="white"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <Icon as={FiAward} boxSize={6} color="gray.400" />
+            <Icon as={FiAward} boxSize={5} />
           </Box>
 
-          <Text mt={4} fontWeight="700" color="gray.700">
+          <Text
+            mt={4}
+            fontFamily="heading"
+            fontSize="lg"
+            fontWeight="500"
+            color="brand.500"
+          >
             Strengthen your professional profile
           </Text>
 
           <Text
-            mt={1}
+            mt={1.5}
             fontSize="sm"
-            color="gray.500"
+            color="taupe.600"
             maxW="420px"
             mx="auto"
-            lineHeight="1.6"
+            lineHeight="1.7"
           >
             Add certifications and professional credentials that demonstrate
             your expertise.
@@ -290,7 +318,7 @@ export default function CertificationsSection({
           <Button
             mt={5}
             size="sm"
-            colorScheme="purple"
+            variant="solid"
             leftIcon={<FiPlus />}
             onClick={onAdd}
           >
@@ -298,9 +326,9 @@ export default function CertificationsSection({
           </Button>
         </Box>
       ) : (
-        <Box px={{ base: 5, md: 6 }} py={{ base: 6, md: 7 }}>
-          <HStack mb={5} spacing={2} fontSize="xs" color="gray.500">
-            <Icon as={FiCheckCircle} boxSize={3.5} color="green.500" />
+        <Box px={{ base: 5, md: 7 }} py={{ base: 6, md: 7 }}>
+          <HStack mb={5} spacing={2} fontSize="xs" color="taupe.600">
+            <Icon as={FiCheckCircle} boxSize={3.5} color="success.500" />
 
             <Text>
               {certifications.length}{" "}
@@ -309,16 +337,13 @@ export default function CertificationsSection({
           </HStack>
 
           <Stack spacing={3}>
-            {certifications.map((certification, index) => (
-              <React.Fragment key={certification.id}>
-                {index > 0 && <Divider />}
-
-                <CertificationItem
-                  certification={certification}
-                  onEdit={onEdit}
-                  onDelete={setDeleteTarget}
-                />
-              </React.Fragment>
+            {certifications.map((certification) => (
+              <CertificationItem
+                key={certification.id}
+                certification={certification}
+                onEdit={onEdit}
+                onDelete={setDeleteTarget}
+              />
             ))}
           </Stack>
         </Box>
@@ -331,23 +356,37 @@ export default function CertificationsSection({
         onClose={() => setDeleteTarget(null)}
       >
         <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="2xl">
-            <AlertDialogHeader fontSize="lg" fontWeight="800">
+          <AlertDialogContent
+            borderRadius="6px"
+            border="1px solid"
+            borderColor="cream.300"
+          >
+            <AlertDialogHeader
+              fontFamily="heading"
+              fontSize="lg"
+              fontWeight="500"
+              color="brand.500"
+            >
               Delete certification?
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Text color="gray.600">
+              <Text color="charcoal.700" lineHeight="1.7">
                 This certification will be removed from your profile.
               </Text>
 
               {deleteTarget?.name && (
-                <Text mt={2} fontSize="sm" fontWeight="700" color="gray.800">
+                <Text
+                  mt={2}
+                  fontSize="sm"
+                  fontWeight="700"
+                  color="charcoal.800"
+                >
                   {deleteTarget.name}
                 </Text>
               )}
 
-              <Text mt={2} fontSize="sm" color="gray.500">
+              <Text mt={2} fontSize="sm" color="taupe.500">
                 This action cannot be undone.
               </Text>
             </AlertDialogBody>
@@ -355,14 +394,14 @@ export default function CertificationsSection({
             <AlertDialogFooter gap={3}>
               <Button
                 ref={cancelRef}
-                variant="ghost"
+                variant="ghostBrand"
                 onClick={() => setDeleteTarget(null)}
               >
                 Cancel
               </Button>
 
               <Button
-                colorScheme="red"
+                variant="danger"
                 onClick={async () => {
                   const id = deleteTarget.id;
 

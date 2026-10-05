@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Box, Checkbox, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Checkbox, HStack, Icon, Text, VStack } from "@chakra-ui/react";
 import { FileText, LockKeyhole, CheckCircle2 } from "lucide-react";
 
 export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
@@ -16,67 +16,81 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
 
   return (
     <VStack align="stretch" spacing={{ base: 5, md: 6 }}>
-      {/* Document Header */}
+      {/* =====================================================
+          DOCUMENT HEADER
+      ===================================================== */}
       <HStack spacing={4} align="start">
         <Box
-          w={{ base: 11, md: 12 }}
-          h={{ base: 11, md: 12 }}
-          borderRadius="xl"
-          bg="purple.50"
+          w={{ base: "42px", md: "44px" }}
+          h={{ base: "42px", md: "44px" }}
+          borderRadius="4px"
+          bg="accent.50"
           border="1px solid"
-          borderColor="purple.100"
+          borderColor="accent.200"
           display="flex"
           alignItems="center"
           justifyContent="center"
           flexShrink={0}
         >
-          <FileText size={22} color="#805AD5" strokeWidth={1.8} />
+          <Icon
+            as={FileText}
+            boxSize="19px"
+            color="accent.600"
+            strokeWidth={1.8}
+          />
         </Box>
 
         <VStack align="start" spacing={1}>
           <Text
-            fontSize={{ base: "xl", md: "2xl" }}
-            fontWeight="800"
-            color="gray.800"
-            letterSpacing="-0.4px"
+            fontFamily="heading"
+            fontSize={{
+              base: "xl",
+              md: "2xl",
+            }}
+            fontWeight="500"
+            color="brand.500"
             lineHeight="1.25"
           >
             {title}
           </Text>
 
-          <Text fontSize="sm" color="gray.500" lineHeight="1.5">
+          <Text fontSize="sm" color="taupe.500" lineHeight="1.5">
             Please review the complete document before continuing.
           </Text>
         </VStack>
       </HStack>
 
-      {/* Document Viewer */}
+      {/* =====================================================
+          DOCUMENT VIEWER
+      ===================================================== */}
       <Box
         border="1px solid"
-        borderColor="purple.100"
-        borderRadius="xl"
+        borderColor="cream.300"
+        borderRadius="5px"
         overflow="hidden"
         bg="white"
-        boxShadow="0 6px 20px rgba(88, 28, 135, 0.06)"
+        boxShadow="0 8px 24px rgba(46, 42, 40, 0.05)"
       >
-        {/* Viewer Header */}
+        {/* ===================================================
+            VIEWER HEADER
+        =================================================== */}
         <HStack
           justify="space-between"
           px={{ base: 4, md: 5 }}
           py={3}
-          bg="purple.50"
+          bg="cream.100"
           borderBottom="1px solid"
-          borderColor="purple.100"
+          borderColor="cream.300"
         >
           <HStack spacing={2}>
-            <LockKeyhole size={15} color="#805AD5" />
+            <Icon as={LockKeyhole} boxSize="15px" color="accent.600" />
 
             <Text
-              fontSize="xs"
-              fontWeight="700"
-              color="purple.700"
+              fontSize="10px"
+              fontWeight="800"
+              color="brand.500"
               textTransform="uppercase"
-              letterSpacing="0.5px"
+              letterSpacing="0.12em"
             >
               Secure Document
             </Text>
@@ -85,35 +99,66 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
           {!reached.current && (
             <Text
               fontSize="xs"
-              color="gray.500"
-              display={{ base: "none", sm: "block" }}
+              color="taupe.500"
+              display={{
+                base: "none",
+                sm: "block",
+              }}
             >
               Scroll to review
             </Text>
           )}
+
+          {reached.current && (
+            <Text
+              fontSize="xs"
+              color="accent.700"
+              fontWeight="600"
+              display={{
+                base: "none",
+                sm: "block",
+              }}
+            >
+              Document reviewed
+            </Text>
+          )}
         </HStack>
 
-        {/* Scrollable Document */}
+        {/* ===================================================
+            SCROLLABLE DOCUMENT
+        =================================================== */}
         <Box
           onScroll={handleScroll}
-          h={{ base: "320px", md: "360px" }}
+          h={{
+            base: "320px",
+            md: "360px",
+          }}
           overflowY="auto"
-          px={{ base: 4, md: 6 }}
-          py={{ base: 5, md: 6 }}
-          bg="linear-gradient(180deg, #faf9ff 0%, #ffffff 18%, #ffffff 100%)"
+          px={{
+            base: 4,
+            md: 6,
+          }}
+          py={{
+            base: 5,
+            md: 6,
+          }}
+          bg="cream.50"
           sx={{
             "&::-webkit-scrollbar": {
-              width: "8px",
+              width: "7px",
             },
+
             "&::-webkit-scrollbar-track": {
-              background: "#f7f5ff",
+              background: "#F2F0EE",
             },
+
             "&::-webkit-scrollbar-thumb": {
-              background: "#d6bcfa",
-              borderRadius: "999px",
+              background: "#B3AAA3",
+              borderRadius: "4px",
             },
+
             "&::-webkit-scrollbar-thumb:hover": {
-              background: "#b794f4",
+              background: "#8A7F76",
             },
           }}
         >
@@ -124,7 +169,7 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
                   <Text
                     fontSize="sm"
                     fontWeight="600"
-                    color="gray.700"
+                    color="charcoal.700"
                     lineHeight="1.75"
                   >
                     Placeholder legal text. Replace with counsel-reviewed final
@@ -135,13 +180,13 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
                     <Text
                       fontSize="sm"
                       fontWeight="700"
-                      color="purple.700"
+                      color="brand.500"
                       mb={1}
                     >
                       Section {index}
                     </Text>
 
-                    <Text fontSize="sm" color="gray.600" lineHeight="1.75">
+                    <Text fontSize="sm" color="taupe.600" lineHeight="1.75">
                       This prototype document content represents the
                       confidentiality/privacy terms that the candidate must
                       review before acceptance.
@@ -154,22 +199,31 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
         </Box>
       </Box>
 
-      {/* Acceptance Area */}
+      {/* =====================================================
+          ACCEPTANCE AREA
+      ===================================================== */}
       <Box
-        p={{ base: 4, md: 5 }}
-        borderRadius="xl"
+        p={{
+          base: 4,
+          md: 5,
+        }}
+        borderRadius="5px"
         border="1px solid"
         borderColor={
-          accepted ? "purple.200" : reached.current ? "purple.100" : "gray.200"
+          accepted
+            ? "success.200"
+            : reached.current
+              ? "accent.200"
+              : "cream.300"
         }
-        bg={accepted ? "purple.50" : "white"}
-        transition="all 0.25s ease"
+        bg={accepted ? "success.50" : reached.current ? "accent.50" : "white"}
+        transition="all 0.2s ease"
       >
         <Checkbox
           isChecked={accepted}
           isDisabled={!reached.current}
           onChange={(e) => e.target.checked && onAccept()}
-          colorScheme="purple"
+          colorScheme="brand"
           size="lg"
         >
           <Text
@@ -177,10 +231,10 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
             fontWeight="600"
             color={
               accepted
-                ? "purple.800"
+                ? "success.700"
                 : reached.current
-                  ? "gray.700"
-                  : "gray.400"
+                  ? "charcoal.700"
+                  : "taupe.400"
             }
             ml={1}
           >
@@ -188,28 +242,32 @@ export default function ScrollGate({ title, accepted, onEnd, onAccept }) {
           </Text>
         </Checkbox>
 
-        {/* Scroll Instruction */}
+        {/* ===================================================
+            SCROLL INSTRUCTION
+        =================================================== */}
         {!reached.current && (
-          <HStack mt={3} spacing={2} align="start" color="gray.500">
+          <HStack mt={3} spacing={2} align="start">
             <Box
               w="6px"
               h="6px"
               borderRadius="full"
-              bg="purple.400"
+              bg="accent.500"
               mt="6px"
               flexShrink={0}
             />
 
-            <Text fontSize="xs" lineHeight="1.5">
+            <Text fontSize="xs" color="taupe.500" lineHeight="1.5">
               Scroll to the end of the document to enable acceptance.
             </Text>
           </HStack>
         )}
 
-        {/* Accepted State */}
+        {/* ===================================================
+            ACCEPTED STATE
+        =================================================== */}
         {accepted && (
-          <HStack mt={3} spacing={2} color="purple.700">
-            <CheckCircle2 size={15} />
+          <HStack mt={3} spacing={2} color="success.600">
+            <Icon as={CheckCircle2} boxSize="15px" />
 
             <Text fontSize="xs" fontWeight="600">
               Document reviewed and accepted.

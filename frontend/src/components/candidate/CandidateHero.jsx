@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import {
   Avatar,
-  Badge,
   Box,
   Button,
   Divider,
@@ -10,11 +9,9 @@ import {
   Icon,
   Progress,
   Stack,
-  Tag,
   Text,
-  Wrap,
-  WrapItem,
 } from "@chakra-ui/react";
+
 import {
   FiBriefcase,
   FiEdit3,
@@ -24,6 +21,25 @@ import {
   FiPhone,
   FiShield,
 } from "react-icons/fi";
+
+/* =============================================================
+   CANDIDATE HERO
+
+   Springboard candidate identity / professional summary.
+
+   Responsibilities:
+   - Candidate identity
+   - Current professional position
+   - Location
+   - Professional pitch
+   - Contact details
+   - Experience summary
+   - Employment status
+   - LinkedIn
+   - Basic profile edit action
+
+   Existing business logic and callback contracts preserved.
+============================================================= */
 
 export default function CandidateHero({
   candidate,
@@ -35,6 +51,10 @@ export default function CandidateHero({
 }) {
   const fullName = basicProfile?.fullName || "Your Name";
 
+  /* =========================================================
+     INITIALS
+  ========================================================== */
+
   const initials = useMemo(() => {
     return fullName
       .split(" ")
@@ -43,6 +63,10 @@ export default function CandidateHero({
       .map((part) => part.charAt(0).toUpperCase())
       .join("");
   }, [fullName]);
+
+  /* =========================================================
+     CURRENT EXPERIENCE
+  ========================================================== */
 
   const currentExperience = useMemo(() => {
     const experiences = candidate?.experiences || [];
@@ -53,14 +77,27 @@ export default function CandidateHero({
 
     return [...experiences].sort((a, b) => {
       const aCurrent = a.current || a.isCurrent;
+
       const bCurrent = b.current || b.isCurrent;
 
-      if (aCurrent && !bCurrent) return -1;
-      if (!aCurrent && bCurrent) return 1;
+      if (aCurrent && !bCurrent) {
+        return -1;
+      }
+
+      if (!aCurrent && bCurrent) {
+        return 1;
+      }
 
       return new Date(b.startDate || 0) - new Date(a.startDate || 0);
     })[0];
   }, [candidate?.experiences]);
+
+  /* =========================================================
+     YEARS OF EXPERIENCE
+
+     Overlapping employment periods are merged so concurrent
+     roles are not counted twice.
+  ========================================================== */
 
   const yearsOfExperience = useMemo(() => {
     const experiences = candidate?.experiences || [];
@@ -98,15 +135,16 @@ export default function CandidateHero({
       return 0;
     }
 
-    // Merge overlapping experience periods so concurrent roles
-    // are not counted twice.
     const merged = [];
 
     ranges.forEach((range) => {
       const last = merged[merged.length - 1];
 
       if (!last || range.start > last.end) {
-        merged.push({ ...range });
+        merged.push({
+          ...range,
+        });
+
         return;
       }
 
@@ -125,6 +163,10 @@ export default function CandidateHero({
 
     return Math.round((totalMonths / 12) * 10) / 10;
   }, [candidate?.experiences]);
+
+  /* =========================================================
+     DERIVED DISPLAY DATA
+  ========================================================== */
 
   const professionalTitle =
     currentExperience?.jobTitle ||
@@ -164,229 +206,405 @@ export default function CandidateHero({
     <Box
       position="relative"
       overflow="hidden"
-      borderRadius="3xl"
       bg="white"
       border="1px solid"
-      borderColor="gray.200"
-      boxShadow="0 8px 30px rgba(15, 23, 42, 0.06)"
+      borderColor="cream.300"
+      borderRadius="6px"
+      boxShadow="0 6px 22px rgba(46, 42, 40, 0.04)"
     >
-      {/* Decorative background */}
-      <Box
-        position="absolute"
-        top="-120px"
-        right="-100px"
-        w="320px"
-        h="320px"
-        borderRadius="full"
-        bgGradient="linear(to-br, purple.100, blue.50)"
-        opacity={0.8}
-      />
+      {/* =====================================================
+          EDITORIAL ACCENT
+      ====================================================== */}
 
       <Box
         position="absolute"
-        bottom="-140px"
-        left="-100px"
-        w="280px"
-        h="280px"
-        borderRadius="full"
-        bg="purple.50"
-        opacity={0.6}
+        top="0"
+        left="0"
+        right="0"
+        h="3px"
+        bg="brand.500"
       />
 
-      <Box position="relative" p={{ base: 5, md: 7, xl: 8 }}>
+      <Box
+        position="relative"
+        p={{
+          base: 5,
+          md: 7,
+          xl: 8,
+        }}
+      >
+        {/* ===================================================
+            TOP IDENTITY
+        ==================================================== */}
+
         <Flex
-          direction={{ base: "column", xl: "row" }}
+          direction={{
+            base: "column",
+            md: "row",
+          }}
+          align={{
+            base: "stretch",
+            md: "flex-start",
+          }}
           justify="space-between"
-          align="flex-start"
-          gap={{ base: 7, xl: 10 }}
+          gap={{
+            base: 6,
+            md: 8,
+          }}
         >
-          {/* ============================================================
+          {/* =================================================
               IDENTITY
-             ============================================================ */}
+          ================================================== */}
+
           <HStack
             align="flex-start"
-            spacing={{ base: 4, md: 5 }}
+            spacing={{
+              base: 4,
+              md: 5,
+            }}
             flex="1"
             minW="0"
           >
+            {/* Avatar */}
+
             <Avatar
-              size={{ base: "lg", md: "xl" }}
+              size={{
+                base: "lg",
+                md: "xl",
+              }}
               name={fullName}
-              bg="purple.100"
-              color="purple.700"
-              fontWeight="800"
-              initials={initials}
+              bg="brand.500"
+              color="white"
+              fontWeight="600"
+              getInitials={() => initials}
               flexShrink={0}
             />
 
             <Stack spacing={2} minW="0">
-              <HStack spacing={2} flexWrap="wrap">
-                <Badge
-                  colorScheme="green"
-                  borderRadius="full"
-                  px={2.5}
-                  py={1}
-                  fontSize="10px"
-                  fontWeight="700"
-                  letterSpacing="0.04em"
-                >
-                  ACTIVE PROFILE
-                </Badge>
+              {/* Status */}
 
+              <HStack spacing={3} flexWrap="wrap">
                 <HStack
-                  spacing={1}
-                  color="gray.400"
-                  fontSize="xs"
-                  display={{ base: "none", sm: "flex" }}
+                  spacing={1.5}
+                  color="taupe.500"
+                  fontSize="10px"
+                  display={{
+                    base: "none",
+                    sm: "flex",
+                  }}
                 >
-                  <Icon as={FiShield} boxSize={3.5} />
+                  <Icon as={FiShield} boxSize="13px" color="accent.600" />
+
                   <Text>Professional profile</Text>
                 </HStack>
               </HStack>
 
+              {/* Name */}
+
               <Text
-                fontSize={{ base: "2xl", md: "3xl" }}
-                fontWeight="800"
-                color="gray.900"
-                letterSpacing="-0.025em"
-                lineHeight="1.1"
+                fontFamily="heading"
+                fontSize={{
+                  base: "2xl",
+                  md: "3xl",
+                  xl: "4xl",
+                }}
+                fontWeight="500"
+                color="brand.500"
+                lineHeight="1.12"
+                letterSpacing="-0.015em"
               >
                 {fullName}
               </Text>
 
+              {/* Professional title */}
+
               <HStack
                 spacing={2}
                 flexWrap="wrap"
-                color="gray.600"
-                fontSize={{ base: "sm", md: "md" }}
+                color="charcoal.700"
+                fontSize={{
+                  base: "sm",
+                  md: "md",
+                }}
               >
-                <HStack spacing={1.5}>
-                  <Icon as={FiBriefcase} boxSize={4} color="purple.500" />
+                <HStack spacing={2}>
+                  <Icon as={FiBriefcase} boxSize="15px" color="accent.600" />
+
                   <Text fontWeight="600">{professionalTitle}</Text>
                 </HStack>
 
                 {companyName && (
                   <>
-                    <Text color="gray.300">•</Text>
-                    <Text>{companyName}</Text>
+                    <Text color="cream.500">/</Text>
+
+                    <Text color="taupe.600">{companyName}</Text>
                   </>
                 )}
               </HStack>
 
+              {/* Location */}
+
               {location && (
-                <HStack spacing={1.5} color="gray.500" fontSize="sm">
-                  <Icon as={FiMapPin} boxSize={4} />
+                <HStack spacing={1.5} color="taupe.500" fontSize="sm">
+                  <Icon as={FiMapPin} boxSize="14px" />
+
                   <Text>{location}</Text>
                 </HStack>
               )}
-
-              <Text
-                pt={2}
-                maxW="680px"
-                color="gray.600"
-                fontSize={{ base: "sm", md: "md" }}
-                lineHeight="1.75"
-              >
-                {pitch}
-              </Text>
-
-              {/* ==========================================================
-    PERSONAL + CAREER DETAILS
-   ========================================================== */}
-              <Flex
-                pt={3}
-                gap={{ base: 3, md: 5 }}
-                flexWrap="wrap"
-                align="center"
-              >
-                {basicProfile?.phone && (
-                  <HStack spacing={1.5} color="gray.500" fontSize="xs">
-                    <Icon as={FiPhone} boxSize={3.5} />
-                    <Text>{basicProfile.phone}</Text>
-                  </HStack>
-                )}
-
-                {basicProfile?.email && (
-                  <HStack spacing={1.5} color="gray.500" fontSize="xs" minW="0">
-                    <Icon as={FiMail} boxSize={3.5} />
-                    <Text noOfLines={1}>{basicProfile.email}</Text>
-                  </HStack>
-                )}
-
-                {basicLocation && !location && (
-                  <HStack spacing={1.5} color="gray.500" fontSize="xs">
-                    <Icon as={FiMapPin} boxSize={3.5} />
-                    <Text>{basicLocation}</Text>
-                  </HStack>
-                )}
-
-                {yearsOfExperience > 0 && (
-                  <HStack spacing={1.5} color="gray.500" fontSize="xs">
-                    <Icon as={FiBriefcase} boxSize={3.5} />
-                    <Text>
-                      <Text as="span" fontWeight="700" color="gray.700">
-                        {yearsOfExperience}
-                      </Text>{" "}
-                      {yearsOfExperience === 1 ? "year" : "years"} experience
-                    </Text>
-                  </HStack>
-                )}
-
-                {basicProfile?.currentlyEmployed != null && (
-                  <HStack spacing={1.5}>
-                    <Box
-                      w="6px"
-                      h="6px"
-                      borderRadius="full"
-                      bg={
-                        basicProfile.currentlyEmployed
-                          ? "green.400"
-                          : "orange.400"
-                      }
-                    />
-
-                    <Text fontSize="xs" color="gray.500">
-                      {basicProfile.currentlyEmployed
-                        ? "Currently employed"
-                        : "Not currently employed"}
-                    </Text>
-                  </HStack>
-                )}
-
-                {linkedinUrl && (
-                  <Button
-                    as="a"
-                    href={linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="xs"
-                    variant="ghost"
-                    colorScheme="purple"
-                    leftIcon={<FiExternalLink />}
-                  >
-                    LinkedIn
-                  </Button>
-                )}
-
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  colorScheme="purple"
-                  leftIcon={<FiEdit3 />}
-                  onClick={onEditBasicProfile}
-                >
-                  Edit details
-                </Button>
-              </Flex>
             </Stack>
           </HStack>
         </Flex>
 
-        <Divider mt={7} />
+        {/* ===================================================
+            PROFESSIONAL PITCH
+        ==================================================== */}
+
+        <Box
+          mt={{
+            base: 6,
+            md: 7,
+          }}
+          pl={{
+            base: 0,
+            md: "84px",
+          }}
+        >
+          <Box
+            borderLeft="2px solid"
+            borderColor="accent.500"
+            pl={4}
+            maxW="780px"
+          >
+            <Text
+              fontFamily="heading"
+              fontSize={{
+                base: "md",
+                md: "lg",
+              }}
+              fontStyle="italic"
+              color="charcoal.700"
+              lineHeight="1.7"
+            >
+              {pitch}
+            </Text>
+          </Box>
+        </Box>
+
+        {/* ===================================================
+            DETAILS
+        ==================================================== */}
+
+        <Flex
+          mt={6}
+          pl={{
+            base: 0,
+            md: "84px",
+          }}
+          gap={{
+            base: 3,
+            md: 5,
+          }}
+          flexWrap="wrap"
+          align="center"
+        >
+          {basicProfile?.phone && (
+            <DetailItem icon={FiPhone} value={basicProfile.phone} />
+          )}
+
+          {basicProfile?.email && (
+            <DetailItem icon={FiMail} value={basicProfile.email} truncate />
+          )}
+
+          {basicLocation && !location && (
+            <DetailItem icon={FiMapPin} value={basicLocation} />
+          )}
+
+          {yearsOfExperience > 0 && (
+            <DetailItem
+              icon={FiBriefcase}
+              value={
+                <>
+                  <Text as="span" fontWeight="700" color="charcoal.800">
+                    {yearsOfExperience}
+                  </Text>{" "}
+                  {yearsOfExperience === 1 ? "year" : "years"} experience
+                </>
+              }
+            />
+          )}
+
+          {basicProfile?.currentlyEmployed != null && (
+            <HStack spacing={2}>
+              <Box
+                w="6px"
+                h="6px"
+                borderRadius="full"
+                bg={
+                  basicProfile.currentlyEmployed ? "success.500" : "accent.500"
+                }
+              />
+
+              <Text fontSize="xs" color="taupe.600">
+                {basicProfile.currentlyEmployed
+                  ? "Currently employed"
+                  : "Not currently employed"}
+              </Text>
+            </HStack>
+          )}
+
+          {linkedinUrl && (
+            <Button
+              as="a"
+              href={linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="xs"
+              variant="outlineGold"
+              borderRadius="4px"
+              leftIcon={<FiExternalLink />}
+            >
+              LinkedIn
+            </Button>
+          )}
+
+          <Button
+            size="xs"
+            variant="ghostBrand"
+            borderRadius="4px"
+            leftIcon={<FiEdit3 />}
+            onClick={onEditBasicProfile}
+          >
+            Edit details
+          </Button>
+        </Flex>
+
+        {/* ===================================================
+            FOOTER DIVIDER
+        ==================================================== */}
+
+        <Divider mt={7} borderColor="cream.300" />
+
+        <Flex
+          pt={4}
+          justify="space-between"
+          align="center"
+          gap={4}
+          flexWrap="wrap"
+        >
+          <Text
+            fontSize="9px"
+            fontWeight="800"
+            letterSpacing="0.13em"
+            color="taupe.500"
+            textTransform="uppercase"
+          >
+            Springboard professional profile
+          </Text>
+
+          <Text fontSize="xs" color="taupe.500">
+            Your potential. Your platform.
+          </Text>
+        </Flex>
       </Box>
     </Box>
   );
 }
+
+/* =============================================================
+   PROFILE STRENGTH
+============================================================= */
+
+function ProfileStrength({ value }) {
+  return (
+    <Box
+      w={{
+        base: "100%",
+        md: "190px",
+      }}
+      flexShrink={0}
+      borderLeft={{
+        base: "0",
+        md: "1px solid",
+      }}
+      borderTop={{
+        base: "1px solid",
+        md: "0",
+      }}
+      borderColor="cream.300"
+      pl={{
+        base: 0,
+        md: 6,
+      }}
+      pt={{
+        base: 4,
+        md: 0,
+      }}
+    >
+      <HStack justify="space-between" mb={2}>
+        <Text
+          fontSize="9px"
+          fontWeight="800"
+          letterSpacing="0.13em"
+          color="taupe.500"
+        >
+          PROFILE STRENGTH
+        </Text>
+
+        <Text
+          fontFamily="heading"
+          fontSize="md"
+          fontWeight="500"
+          color="brand.500"
+        >
+          {value}%
+        </Text>
+      </HStack>
+
+      <Progress
+        value={value}
+        size="xs"
+        borderRadius="0"
+        bg="cream.200"
+        sx={{
+          "& > div": {
+            background: "linear-gradient(90deg, #601230 0%, #C89732 100%)",
+          },
+        }}
+      />
+
+      <Text mt={2} fontSize="10px" color="taupe.500" lineHeight="1.5">
+        A complete profile helps employers see your potential.
+      </Text>
+    </Box>
+  );
+}
+
+/* =============================================================
+   DETAIL ITEM
+============================================================= */
+
+function DetailItem({ icon, value, truncate = false }) {
+  return (
+    <HStack
+      spacing={1.5}
+      color="taupe.500"
+      fontSize="xs"
+      minW="0"
+      maxW={truncate ? "240px" : undefined}
+    >
+      <Icon as={icon} boxSize="13px" flexShrink={0} />
+
+      <Text noOfLines={truncate ? 1 : undefined}>{value}</Text>
+    </HStack>
+  );
+}
+
+/* =============================================================
+   LEGACY HELPERS
+
+   Retained intentionally so this replacement does not silently
+   change the existing component's helper surface.
+============================================================= */
 
 function formatLabel(value) {
   if (!value) {

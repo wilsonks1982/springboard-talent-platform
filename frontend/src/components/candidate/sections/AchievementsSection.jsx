@@ -25,14 +25,14 @@ function AchievementItem({ achievement, onEdit, onDelete }) {
   return (
     <Box
       border="1px solid"
-      borderColor="gray.100"
-      borderRadius="xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       p={{ base: 4, md: 5 }}
-      transition="all 0.2s ease"
+      bg="white"
+      transition="all 0.18s ease"
       _hover={{
-        borderColor: "purple.100",
+        borderColor: "accent.300",
         boxShadow: "sm",
-        transform: "translateY(-1px)",
       }}
     >
       <Flex
@@ -41,36 +41,44 @@ function AchievementItem({ achievement, onEdit, onDelete }) {
         gap={4}
       >
         <HStack align="flex-start" spacing={4} minW={0}>
+          {/* Achievement marker */}
           <Box
             flexShrink={0}
-            w="44px"
-            h="44px"
-            borderRadius="lg"
-            bg="purple.50"
-            color="purple.500"
+            w="36px"
+            h="36px"
+            border="1px solid"
+            borderColor="accent.300"
+            bg="cream.100"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <FiAward size={20} />
+            <FiAward size={17} />
           </Box>
 
           <Box minW={0}>
             <HStack spacing={2} flexWrap="wrap">
               <Text
-                fontSize={{ base: "sm", md: "md" }}
-                fontWeight="700"
-                color="gray.800"
+                fontFamily="heading"
+                fontSize={{ base: "md", md: "lg" }}
+                fontWeight="500"
+                color="brand.500"
               >
                 {achievement.title}
               </Text>
 
               <Badge
-                colorScheme="purple"
-                variant="subtle"
-                borderRadius="full"
-                fontSize="10px"
+                bg="cream.200"
+                color="taupe.700"
+                borderRadius="2px"
+                fontSize="9px"
+                fontWeight="700"
+                letterSpacing="0.08em"
+                textTransform="uppercase"
                 px={2}
+                py="2px"
               >
                 Achievement
               </Badge>
@@ -80,7 +88,7 @@ function AchievementItem({ achievement, onEdit, onDelete }) {
               <Text
                 fontSize="sm"
                 lineHeight="1.7"
-                color="gray.500"
+                color="charcoal.700"
                 mt={2}
                 whiteSpace="pre-wrap"
               >
@@ -96,7 +104,12 @@ function AchievementItem({ achievement, onEdit, onDelete }) {
             icon={<FiEdit2 />}
             size="sm"
             variant="ghost"
-            colorScheme="purple"
+            color="brand.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "brand.50",
+              color: "brand.600",
+            }}
             onClick={() => onEdit(achievement)}
           />
 
@@ -105,7 +118,12 @@ function AchievementItem({ achievement, onEdit, onDelete }) {
             icon={<FiTrash2 />}
             size="sm"
             variant="ghost"
-            colorScheme="red"
+            color="error.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "error.50",
+              color: "error.600",
+            }}
             onClick={() => onDelete(achievement)}
           />
         </HStack>
@@ -128,9 +146,10 @@ export default function AchievementsSection({
     <Box
       bg="white"
       border="1px solid"
-      borderColor="gray.100"
-      borderRadius="2xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       p={{ base: 5, md: 7 }}
+      boxShadow="sm"
     >
       {/* Header */}
       <Flex
@@ -142,24 +161,32 @@ export default function AchievementsSection({
         <HStack align="flex-start" spacing={3}>
           <Box
             flexShrink={0}
-            w="42px"
-            h="42px"
-            borderRadius="xl"
-            bg="purple.50"
-            color="purple.500"
+            w="34px"
+            h="34px"
+            border="1px solid"
+            borderColor="accent.300"
+            bg="cream.100"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <FiAward size={20} />
+            <FiAward size={17} />
           </Box>
 
           <Box>
-            <Text fontSize="lg" fontWeight="700" color="gray.800">
+            <Text
+              fontFamily="heading"
+              fontSize={{ base: "xl", md: "2xl" }}
+              fontWeight="500"
+              color="brand.500"
+              lineHeight="1.2"
+            >
               Achievements
             </Text>
 
-            <Text fontSize="sm" color="gray.500" mt={1}>
+            <Text fontSize="sm" color="taupe.600" mt={1.5}>
               Showcase the impact and milestones that set you apart
             </Text>
           </Box>
@@ -167,8 +194,7 @@ export default function AchievementsSection({
 
         <Button
           size="sm"
-          variant="outline"
-          colorScheme="purple"
+          variant="outlineGold"
           leftIcon={<FiPlus />}
           onClick={onAdd}
           flexShrink={0}
@@ -177,41 +203,50 @@ export default function AchievementsSection({
         </Button>
       </Flex>
 
+      {/* Gold section rule */}
+      <Box h="1px" bg="cream.300" mb={5} />
+
       {/* Content */}
       {achievements.length === 0 ? (
         <Box
           border="1px dashed"
-          borderColor="gray.300"
-          borderRadius="xl"
+          borderColor="cream.400"
+          borderRadius="4px"
           px={6}
           py={9}
           textAlign="center"
-          bg="gray.50"
+          bg="cream.50"
         >
           <Box
             mx="auto"
             display="flex"
             alignItems="center"
             justifyContent="center"
-            w="56px"
-            h="56px"
-            borderRadius="xl"
-            bg="white"
-            color="purple.500"
+            w="42px"
+            h="42px"
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="accent.300"
+            bg="white"
+            color="accent.600"
+            borderRadius="4px"
             mb={4}
           >
-            <FiAward size={24} />
+            <FiAward size={19} />
           </Box>
 
-          <Text fontWeight="700" color="gray.700">
+          <Text
+            fontFamily="heading"
+            fontSize="lg"
+            fontWeight="500"
+            color="brand.500"
+          >
             No achievements yet
           </Text>
 
           <Text
             fontSize="sm"
-            color="gray.500"
+            lineHeight="1.7"
+            color="taupe.600"
             mt={2}
             mb={5}
             maxW="420px"
@@ -223,7 +258,7 @@ export default function AchievementsSection({
 
           <Button
             size="sm"
-            colorScheme="purple"
+            variant="solid"
             leftIcon={<FiPlus />}
             onClick={onAdd}
           >
@@ -234,15 +269,18 @@ export default function AchievementsSection({
         <Stack spacing={0}>
           <Flex align="center" justify="space-between" mb={4}>
             <HStack spacing={2}>
-              <Text fontSize="sm" fontWeight="600" color="gray.700">
+              <Text fontSize="sm" fontWeight="700" color="charcoal.800">
                 Your accomplishments
               </Text>
 
               <Badge
-                colorScheme="purple"
-                variant="subtle"
-                borderRadius="full"
+                bg="cream.200"
+                color="brand.500"
+                borderRadius="2px"
                 px={2}
+                py="2px"
+                fontSize="10px"
+                fontWeight="700"
               >
                 {achievements.length}
               </Badge>
@@ -250,14 +288,14 @@ export default function AchievementsSection({
 
             <Text
               fontSize="xs"
-              color="gray.400"
+              color="taupe.500"
               display={{ base: "none", sm: "block" }}
             >
               Proof of professional impact
             </Text>
           </Flex>
 
-          <Divider mb={4} />
+          <Divider borderColor="cream.300" mb={4} />
 
           <VStack align="stretch" spacing={3}>
             {achievements.map((achievement) => (
@@ -279,11 +317,21 @@ export default function AchievementsSection({
         onClose={() => setDeleteTarget(null)}
       >
         <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="2xl">
-            <AlertDialogHeader>Delete achievement?</AlertDialogHeader>
+          <AlertDialogContent
+            borderRadius="6px"
+            border="1px solid"
+            borderColor="cream.300"
+          >
+            <AlertDialogHeader
+              fontFamily="heading"
+              fontWeight="500"
+              color="brand.500"
+            >
+              Delete achievement?
+            </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Text color="gray.600">
+              <Text color="charcoal.700" lineHeight="1.7">
                 {deleteTarget?.title
                   ? `"${deleteTarget.title}" will be removed from your profile.`
                   : "This achievement will be removed from your profile."}
@@ -293,14 +341,14 @@ export default function AchievementsSection({
             <AlertDialogFooter gap={3}>
               <Button
                 ref={cancelRef}
-                variant="ghost"
+                variant="ghostBrand"
                 onClick={() => setDeleteTarget(null)}
               >
                 Cancel
               </Button>
 
               <Button
-                colorScheme="red"
+                variant="danger"
                 onClick={async () => {
                   const id = deleteTarget.id;
 

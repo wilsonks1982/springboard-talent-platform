@@ -31,14 +31,14 @@ function ReferenceItem({ reference, onEdit, onDelete }) {
   return (
     <Box
       border="1px solid"
-      borderColor="gray.100"
-      borderRadius="xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       p={{ base: 4, md: 5 }}
-      transition="all 0.2s ease"
+      bg="white"
+      transition="all 0.18s ease"
       _hover={{
-        borderColor: "purple.100",
+        borderColor: "accent.300",
         boxShadow: "sm",
-        transform: "translateY(-1px)",
       }}
     >
       <Flex
@@ -47,51 +47,59 @@ function ReferenceItem({ reference, onEdit, onDelete }) {
         gap={4}
       >
         <HStack align="flex-start" spacing={4} minW={0}>
+          {/* Reference marker */}
           <Box
             flexShrink={0}
-            w="44px"
-            h="44px"
-            borderRadius="full"
-            bg="purple.50"
-            color="purple.500"
+            w="36px"
+            h="36px"
+            border="1px solid"
+            borderColor="accent.300"
+            bg="cream.100"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <FiUser size={20} />
+            <FiUser size={17} />
           </Box>
 
           <Box minW={0}>
             <HStack spacing={2} flexWrap="wrap">
               <Text
-                fontSize={{ base: "sm", md: "md" }}
-                fontWeight="700"
-                color="gray.800"
+                fontFamily="heading"
+                fontSize={{ base: "md", md: "lg" }}
+                fontWeight="500"
+                color="brand.500"
               >
                 {reference.name}
               </Text>
 
               <Badge
-                colorScheme="purple"
-                variant="subtle"
-                borderRadius="full"
-                fontSize="10px"
+                bg="cream.200"
+                color="taupe.700"
+                borderRadius="2px"
+                fontSize="9px"
+                fontWeight="700"
+                letterSpacing="0.08em"
+                textTransform="uppercase"
                 px={2}
+                py="2px"
               >
                 Professional reference
               </Badge>
             </HStack>
 
             {reference.relationship && (
-              <Text fontSize="sm" color="gray.500" mt={1}>
+              <Text fontSize="sm" color="taupe.600" mt={1.5}>
                 {reference.relationship}
               </Text>
             )}
 
             <HStack spacing={1.5} mt={2}>
-              <FiCheckCircle size={13} />
+              <FiCheckCircle size={13} color="currentColor" />
 
-              <Text fontSize="xs" color="gray.400">
+              <Text fontSize="xs" color="taupe.500">
                 Contact information protected
               </Text>
             </HStack>
@@ -104,7 +112,12 @@ function ReferenceItem({ reference, onEdit, onDelete }) {
             icon={<FiEdit2 />}
             size="sm"
             variant="ghost"
-            colorScheme="purple"
+            color="brand.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "brand.50",
+              color: "brand.600",
+            }}
             onClick={() => onEdit(reference)}
           />
 
@@ -113,7 +126,12 @@ function ReferenceItem({ reference, onEdit, onDelete }) {
             icon={<FiTrash2 />}
             size="sm"
             variant="ghost"
-            colorScheme="red"
+            color="error.500"
+            borderRadius="4px"
+            _hover={{
+              bg: "error.50",
+              color: "error.600",
+            }}
             onClick={() => onDelete(reference)}
           />
         </HStack>
@@ -136,9 +154,10 @@ export default function ReferencesSection({
     <Box
       bg="white"
       border="1px solid"
-      borderColor="gray.100"
-      borderRadius="2xl"
+      borderColor="cream.300"
+      borderRadius="6px"
       p={{ base: 5, md: 7 }}
+      boxShadow="sm"
     >
       {/* Header */}
       <Flex
@@ -150,24 +169,32 @@ export default function ReferencesSection({
         <HStack align="flex-start" spacing={3}>
           <Box
             flexShrink={0}
-            w="42px"
-            h="42px"
-            borderRadius="xl"
-            bg="purple.50"
-            color="purple.500"
+            w="34px"
+            h="34px"
+            border="1px solid"
+            borderColor="accent.300"
+            bg="cream.100"
+            color="accent.600"
             display="flex"
             alignItems="center"
             justifyContent="center"
+            borderRadius="4px"
           >
-            <FiUser size={20} />
+            <FiUser size={17} />
           </Box>
 
           <Box>
-            <Text fontSize="lg" fontWeight="700" color="gray.800">
+            <Text
+              fontFamily="heading"
+              fontSize={{ base: "xl", md: "2xl" }}
+              fontWeight="500"
+              color="brand.500"
+              lineHeight="1.2"
+            >
               References
             </Text>
 
-            <Text fontSize="sm" color="gray.500" mt={1}>
+            <Text fontSize="sm" color="taupe.600" mt={1.5}>
               Build credibility with people who can speak to your experience
             </Text>
           </Box>
@@ -175,8 +202,7 @@ export default function ReferencesSection({
 
         <Button
           size="sm"
-          variant="outline"
-          colorScheme="purple"
+          variant="outlineGold"
           leftIcon={<FiPlus />}
           onClick={onAdd}
           flexShrink={0}
@@ -185,41 +211,50 @@ export default function ReferencesSection({
         </Button>
       </Flex>
 
+      {/* Section rule */}
+      <Box h="1px" bg="cream.300" mb={5} />
+
       {/* Content */}
       {references.length === 0 ? (
         <Box
           border="1px dashed"
-          borderColor="gray.300"
-          borderRadius="xl"
+          borderColor="cream.400"
+          borderRadius="4px"
           px={6}
           py={9}
           textAlign="center"
-          bg="gray.50"
+          bg="cream.50"
         >
           <Box
             mx="auto"
             display="flex"
             alignItems="center"
             justifyContent="center"
-            w="56px"
-            h="56px"
-            borderRadius="full"
-            bg="white"
-            color="purple.500"
+            w="42px"
+            h="42px"
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="accent.300"
+            bg="white"
+            color="accent.600"
+            borderRadius="4px"
             mb={4}
           >
-            <FiUser size={24} />
+            <FiUser size={19} />
           </Box>
 
-          <Text fontWeight="700" color="gray.700">
+          <Text
+            fontFamily="heading"
+            fontSize="lg"
+            fontWeight="500"
+            color="brand.500"
+          >
             No references yet
           </Text>
 
           <Text
             fontSize="sm"
-            color="gray.500"
+            lineHeight="1.7"
+            color="taupe.600"
             mt={2}
             mb={5}
             maxW="430px"
@@ -231,7 +266,7 @@ export default function ReferencesSection({
 
           <Button
             size="sm"
-            colorScheme="purple"
+            variant="solid"
             leftIcon={<FiPlus />}
             onClick={onAdd}
           >
@@ -242,15 +277,18 @@ export default function ReferencesSection({
         <Stack spacing={0}>
           <Flex align="center" justify="space-between" mb={4}>
             <HStack spacing={2}>
-              <Text fontSize="sm" fontWeight="600" color="gray.700">
+              <Text fontSize="sm" fontWeight="700" color="charcoal.800">
                 Professional references
               </Text>
 
               <Badge
-                colorScheme="purple"
-                variant="subtle"
-                borderRadius="full"
+                bg="cream.200"
+                color="brand.500"
+                borderRadius="2px"
                 px={2}
+                py="2px"
+                fontSize="10px"
+                fontWeight="700"
               >
                 {references.length}
               </Badge>
@@ -258,14 +296,14 @@ export default function ReferencesSection({
 
             <Text
               fontSize="xs"
-              color="gray.400"
+              color="taupe.500"
               display={{ base: "none", sm: "block" }}
             >
               Credibility & verification
             </Text>
           </Flex>
 
-          <Divider mb={4} />
+          <Divider borderColor="cream.300" mb={4} />
 
           <VStack align="stretch" spacing={3}>
             {references.map((reference) => (
@@ -287,11 +325,21 @@ export default function ReferencesSection({
         onClose={() => setDeleteTarget(null)}
       >
         <AlertDialogOverlay>
-          <AlertDialogContent borderRadius="2xl">
-            <AlertDialogHeader>Delete reference?</AlertDialogHeader>
+          <AlertDialogContent
+            borderRadius="6px"
+            border="1px solid"
+            borderColor="cream.300"
+          >
+            <AlertDialogHeader
+              fontFamily="heading"
+              fontWeight="500"
+              color="brand.500"
+            >
+              Delete reference?
+            </AlertDialogHeader>
 
             <AlertDialogBody>
-              <Text color="gray.600">
+              <Text color="charcoal.700" lineHeight="1.7">
                 {deleteTarget?.name
                   ? `"${deleteTarget.name}" will be removed from your profile.`
                   : "This reference will be removed from your profile."}
@@ -301,14 +349,14 @@ export default function ReferencesSection({
             <AlertDialogFooter gap={3}>
               <Button
                 ref={cancelRef}
-                variant="ghost"
+                variant="ghostBrand"
                 onClick={() => setDeleteTarget(null)}
               >
                 Cancel
               </Button>
 
               <Button
-                colorScheme="red"
+                variant="danger"
                 onClick={async () => {
                   const id = deleteTarget.id;
 

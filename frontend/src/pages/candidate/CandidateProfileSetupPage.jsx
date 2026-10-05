@@ -2,11 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   AlertIcon,
-  Badge,
   Box,
   Button,
-  Card,
-  CardBody,
   Container,
   Flex,
   HStack,
@@ -16,6 +13,7 @@ import {
   Spinner,
   Stack,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import {
   FiArrowRight,
@@ -54,6 +52,7 @@ const REQUIRED_KEYS = [
 
 const SECTION_META = {
   BASIC_INFORMATION: {
+    number: "01",
     title: "Basic Profile",
     description: "Your personal and contact information",
     weight: 20,
@@ -61,6 +60,7 @@ const SECTION_META = {
   },
 
   EXPERIENCE: {
+    number: "02",
     title: "Employment",
     description: "Your latest employment details only.",
     weight: 25,
@@ -68,6 +68,7 @@ const SECTION_META = {
   },
 
   EDUCATION: {
+    number: "03",
     title: "Education",
     description: "Your academic background",
     weight: 30,
@@ -75,6 +76,7 @@ const SECTION_META = {
   },
 
   CAREER_DIRECTION: {
+    number: "04",
     title: "Career direction",
     description: "Your career goals and direction",
     weight: 15,
@@ -82,6 +84,7 @@ const SECTION_META = {
   },
 
   PROFESSIONAL_SNAPSHOT: {
+    number: "05",
     title: "Professional snapshot",
     description: "How recruiters understand your professional profile",
     weight: 10,
@@ -91,6 +94,7 @@ const SECTION_META = {
 
 function CandidateProfileSetupPage({ onComplete }) {
   const navigate = useNavigate();
+
   const [profileStrength, setProfileStrength] = useState(null);
 
   const [loading, setLoading] = useState(true);
@@ -309,16 +313,41 @@ function CandidateProfileSetupPage({ onComplete }) {
       return;
     }
 
+    if (onComplete) {
+      onComplete();
+      return;
+    }
+
     navigate("/candidate", { replace: true });
   }
 
   if (loading) {
     return (
-      <Flex minH="100vh" align="center" justify="center" bg="gray.50" px={6}>
-        <Stack align="center" spacing={4}>
-          <Spinner size="lg" />
+      <Flex minH="100vh" align="center" justify="center" bg="cream.100" px={6}>
+        <Stack align="center" spacing={5}>
+          <Box
+            w="48px"
+            h="48px"
+            border="1px solid"
+            borderColor="cream.300"
+            bg="white"
+            borderRadius="4px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Spinner size="sm" thickness="2px" color="accent.500" />
+          </Box>
 
-          <Text color="gray.600">Preparing your profile setup…</Text>
+          <Stack spacing={1} textAlign="center">
+            <Text fontFamily="heading" fontSize="lg" color="brand.500">
+              Preparing your profile
+            </Text>
+
+            <Text fontSize="sm" color="taupe.500">
+              Just a moment while we load your profile setup.
+            </Text>
+          </Stack>
         </Stack>
       </Flex>
     );
@@ -326,105 +355,146 @@ function CandidateProfileSetupPage({ onComplete }) {
 
   return (
     <>
-      <Box minH="100vh" bg="gray.50" py={{ base: 8, md: 12 }}>
-        <Container maxW="1100px">
+      <Box minH="100vh" bg="cream.100" py={{ base: 8, md: 12 }}>
+        <Container maxW="1080px">
           <Stack spacing={{ base: 8, md: 10 }}>
-            {/* Header */}
+            {/* =====================================================
+                HEADER
+            ====================================================== */}
 
-            <Stack spacing={4} maxW="760px">
-              <Badge
-                alignSelf="flex-start"
-                px={3}
-                py={1}
-                borderRadius="full"
-                fontSize="xs"
-                fontWeight="700"
-                letterSpacing="0.04em"
-                textTransform="uppercase"
+            <Box maxW="780px">
+              <Text
+                fontSize="10px"
+                fontWeight="800"
+                letterSpacing="0.16em"
+                color="accent.600"
+                mb={3}
               >
-                Profile setup
-              </Badge>
+                PROFILE SETUP
+              </Text>
 
-              <Stack spacing={2}>
-                <Text
-                  fontSize={{ base: "3xl", md: "4xl" }}
-                  fontWeight="800"
-                  lineHeight="1.1"
-                  color="gray.900"
-                  letterSpacing="-0.02em"
-                >
-                  Let’s build your professional profile.
-                </Text>
+              <Text
+                fontFamily="heading"
+                fontSize={{ base: "3xl", md: "4xl" }}
+                fontWeight="500"
+                lineHeight="1.15"
+                color="brand.500"
+              >
+                Build your professional story.
+              </Text>
 
-                <Text
-                  fontSize={{ base: "md", md: "lg" }}
-                  color="gray.600"
-                  lineHeight="1.7"
-                >
-                  Before you enter your candidate workspace, complete these five
-                  essential sections.
-                </Text>
-              </Stack>
-            </Stack>
+              <Text
+                mt={3}
+                fontSize={{ base: "md", md: "lg" }}
+                color="taupe.600"
+                lineHeight="1.75"
+                maxW="720px"
+              >
+                Complete the essential pieces of your profile. Springboard uses
+                this information to understand your experience, direction and
+                professional potential.
+              </Text>
 
-            {/* Progress */}
+              <Box mt={5} h="2px" w="52px" bg="accent.500" />
+            </Box>
 
-            <Card
-              borderRadius="2xl"
-              border="1px solid"
-              borderColor="gray.200"
-              boxShadow="sm"
+            {/* =====================================================
+                PROFILE PROGRESS
+            ====================================================== */}
+
+            <Box
               bg="white"
+              border="1px solid"
+              borderColor="cream.300"
+              borderRadius="6px"
+              boxShadow="0 6px 24px rgba(46, 42, 40, 0.045)"
             >
-              <CardBody p={{ base: 5, md: 7 }}>
-                <Stack spacing={5}>
-                  <Flex
-                    direction={{ base: "column", sm: "row" }}
-                    align={{ base: "flex-start", sm: "center" }}
-                    justify="space-between"
-                    gap={4}
-                  >
-                    <Stack spacing={1}>
-                      <Text fontSize="sm" fontWeight="700" color="gray.900">
-                        Required profile progress
-                      </Text>
-
-                      <Text fontSize="sm" color="gray.500">
-                        {completedCount} of {REQUIRED_KEYS.length} required
-                        sections complete
-                      </Text>
-                    </Stack>
-
-                    <Text fontSize="2xl" fontWeight="800" color="gray.900">
-                      {requiredProgress}%
+              <Box p={{ base: 5, md: 7 }}>
+                <Flex
+                  direction={{ base: "column", sm: "row" }}
+                  align={{ base: "flex-start", sm: "center" }}
+                  justify="space-between"
+                  gap={5}
+                >
+                  <Stack spacing={1}>
+                    <Text
+                      fontSize="10px"
+                      fontWeight="800"
+                      letterSpacing="0.14em"
+                      color="accent.600"
+                    >
+                      PROFILE COMPLETION
                     </Text>
-                  </Flex>
 
+                    <Text
+                      fontFamily="heading"
+                      fontSize="xl"
+                      fontWeight="500"
+                      color="brand.500"
+                    >
+                      {completedCount} of {REQUIRED_KEYS.length} sections
+                      complete
+                    </Text>
+
+                    <Text fontSize="sm" color="taupe.500">
+                      Complete all five sections to unlock your Springboard
+                      workspace.
+                    </Text>
+                  </Stack>
+
+                  <Text
+                    fontFamily="heading"
+                    fontSize={{ base: "3xl", md: "4xl" }}
+                    fontWeight="500"
+                    color="brand.500"
+                    lineHeight="1"
+                  >
+                    {requiredProgress}%
+                  </Text>
+                </Flex>
+
+                <Box mt={6}>
                   <Progress
                     value={requiredProgress}
-                    size="sm"
-                    borderRadius="full"
-                    bg="gray.100"
+                    size="xs"
+                    borderRadius="0"
+                    bg="cream.200"
+                    sx={{
+                      "& > div": {
+                        background:
+                          "linear-gradient(90deg, #601230 0%, #C89732 100%)",
+                      },
+                    }}
                   />
+                </Box>
+              </Box>
+            </Box>
 
-                  <Text fontSize="sm" color="gray.500">
-                    Complete all five sections to unlock your Springboard
-                    workspace.
-                  </Text>
-                </Stack>
-              </CardBody>
-            </Card>
-
-            {/* Error */}
+            {/* =====================================================
+                ERROR
+            ====================================================== */}
 
             {error && (
-              <Alert status="error" borderRadius="xl" alignItems="flex-start">
-                <AlertIcon mt={1} />
+              <Alert
+                status="error"
+                borderRadius="5px"
+                alignItems="flex-start"
+                bg="error.50"
+                border="1px solid"
+                borderColor="error.200"
+                px={4}
+                py={3}
+              >
+                <AlertIcon mt={1} color="error.600" />
 
                 <Stack spacing={1} flex="1">
-                  <Text fontWeight="700">We couldn’t load your profile.</Text>
+                  <Text fontWeight="700" color="error.700" fontSize="sm">
+                    We couldn't load your profile.
+                  </Text>
 
-                  <Text fontSize="sm">{error}</Text>
+                  <Text fontSize="sm" color="error.600">
+                    {error}
+                  </Text>
                 </Stack>
 
                 <Button
@@ -432,200 +502,369 @@ function CandidateProfileSetupPage({ onComplete }) {
                   variant="outline"
                   leftIcon={<FiRefreshCw />}
                   onClick={() => loadProfileStrength()}
+                  borderRadius="4px"
+                  borderColor="error.300"
+                  color="error.700"
+                  bg="white"
+                  _hover={{
+                    bg: "error.50",
+                  }}
                 >
                   Retry
                 </Button>
               </Alert>
             )}
 
-            {/* Required sections */}
+            {/* =====================================================
+                REQUIRED SECTIONS
+            ====================================================== */}
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
-              {requiredSections.map((section) => {
-                const isComplete = section.completed;
-
-                return (
-                  <Card
-                    key={section.key}
-                    borderRadius="2xl"
-                    border="1px solid"
-                    borderColor={isComplete ? "green.200" : "gray.200"}
-                    bg="white"
-                    boxShadow="sm"
-                    transition="all 0.2s ease"
-                    _hover={{
-                      transform: "translateY(-2px)",
-                      boxShadow: "md",
-                    }}
+            <Stack spacing={4}>
+              <Flex
+                align={{ base: "flex-start", sm: "center" }}
+                justify="space-between"
+                direction={{ base: "column", sm: "row" }}
+                gap={2}
+              >
+                <Box>
+                  <Text
+                    fontFamily="heading"
+                    fontSize="2xl"
+                    fontWeight="500"
+                    color="brand.500"
                   >
-                    <CardBody p={{ base: 5, md: 6 }}>
-                      <Stack spacing={5}>
-                        <Flex justify="space-between" align="flex-start">
+                    Your professional profile
+                  </Text>
+
+                  <Text fontSize="sm" color="taupe.500" mt={1}>
+                    These five sections form the foundation of your Springboard
+                    profile.
+                  </Text>
+                </Box>
+
+                <Text
+                  fontSize="10px"
+                  fontWeight="800"
+                  letterSpacing="0.12em"
+                  color="taupe.500"
+                >
+                  REQUIRED
+                </Text>
+              </Flex>
+
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                {requiredSections.map((section) => {
+                  const isComplete = section.completed;
+
+                  return (
+                    <Box
+                      key={section.key}
+                      bg={isComplete ? "white" : "white"}
+                      border="1px solid"
+                      borderColor={isComplete ? "accent.200" : "cream.300"}
+                      borderRadius="5px"
+                      position="relative"
+                      overflow="hidden"
+                      transition="all 0.2s ease"
+                      _hover={{
+                        borderColor: isComplete ? "accent.300" : "brand.300",
+                        boxShadow: "0 8px 24px rgba(46, 42, 40, 0.07)",
+                        transform: "translateY(-1px)",
+                      }}
+                    >
+                      {/* Gold completion indicator */}
+
+                      {isComplete && (
+                        <Box
+                          position="absolute"
+                          top="0"
+                          left="0"
+                          right="0"
+                          h="3px"
+                          bg="accent.500"
+                        />
+                      )}
+
+                      <Box p={{ base: 5, md: 6 }}>
+                        <Stack spacing={5}>
+                          {/* Section heading */}
+
                           <Flex
-                            align="center"
-                            justify="center"
-                            w="48px"
-                            h="48px"
-                            borderRadius="xl"
-                            bg={isComplete ? "green.50" : "gray.50"}
+                            justify="space-between"
+                            align="flex-start"
+                            gap={4}
                           >
-                            <Icon
-                              as={isComplete ? FiCheck : section.icon}
-                              boxSize={5}
-                              color={isComplete ? "green.600" : "gray.700"}
-                            />
-                          </Flex>
-
-                          <Badge
-                            colorScheme={isComplete ? "green" : "gray"}
-                            borderRadius="full"
-                            px={3}
-                            py={1}
-                          >
-                            {section.weight}%
-                          </Badge>
-                        </Flex>
-
-                        <Stack spacing={1}>
-                          <Flex align="center" gap={2}>
-                            <Text
-                              fontSize="lg"
-                              fontWeight="750"
-                              color="gray.900"
-                            >
-                              {section.title}
-                            </Text>
-
-                            {isComplete && (
-                              <Badge
-                                colorScheme="green"
-                                variant="subtle"
-                                borderRadius="full"
-                                fontSize="xs"
+                            <HStack spacing={4} align="flex-start">
+                              <Box
+                                w="42px"
+                                h="42px"
+                                minW="42px"
+                                borderRadius="4px"
+                                bg={isComplete ? "accent.50" : "cream.100"}
+                                border="1px solid"
+                                borderColor={
+                                  isComplete ? "accent.200" : "cream.300"
+                                }
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="center"
                               >
-                                Complete
-                              </Badge>
-                            )}
+                                <Icon
+                                  as={isComplete ? FiCheck : section.icon}
+                                  boxSize="17px"
+                                  color={
+                                    isComplete ? "accent.600" : "brand.500"
+                                  }
+                                />
+                              </Box>
+
+                              <Box>
+                                <HStack spacing={2} align="center">
+                                  <Text
+                                    fontSize="10px"
+                                    fontWeight="800"
+                                    letterSpacing="0.12em"
+                                    color="taupe.400"
+                                  >
+                                    {section.number}
+                                  </Text>
+
+                                  {isComplete && (
+                                    <Text
+                                      fontSize="9px"
+                                      fontWeight="800"
+                                      letterSpacing="0.1em"
+                                      color="accent.600"
+                                      textTransform="uppercase"
+                                    >
+                                      Complete
+                                    </Text>
+                                  )}
+                                </HStack>
+
+                                <Text
+                                  fontFamily="heading"
+                                  fontSize="xl"
+                                  fontWeight="500"
+                                  color="brand.500"
+                                  mt={1}
+                                  lineHeight="1.25"
+                                >
+                                  {section.title}
+                                </Text>
+                              </Box>
+                            </HStack>
+
+                            <Text
+                              fontFamily="heading"
+                              fontSize="lg"
+                              fontWeight="500"
+                              color={isComplete ? "accent.600" : "taupe.400"}
+                              flexShrink={0}
+                            >
+                              {section.weight}%
+                            </Text>
                           </Flex>
 
-                          <Text fontSize="sm" color="gray.500" lineHeight="1.6">
+                          {/* Description */}
+
+                          <Text
+                            fontSize="sm"
+                            color="taupe.600"
+                            lineHeight="1.65"
+                            minH={{ base: "auto", md: "46px" }}
+                          >
                             {section.description}
                           </Text>
-                        </Stack>
 
-                        <Flex
-                          align={{
-                            base: "flex-start",
-                            sm: "center",
-                          }}
-                          justify="space-between"
-                          direction={{
-                            base: "column",
-                            sm: "row",
-                          }}
-                          gap={4}
-                        >
-                          <Text fontSize="xs" color="gray.400">
-                            {isComplete
-                              ? "This section is ready."
-                              : "This section still needs your attention."}
-                          </Text>
+                          {/* Divider */}
 
-                          <Button
-                            size="sm"
-                            variant={isComplete ? "outline" : "solid"}
-                            rightIcon={<FiArrowRight />}
-                            onClick={() => handleSectionAction(section.key)}
+                          <Box h="1px" bg="cream.200" />
+
+                          {/* Action */}
+
+                          <Flex
+                            align={{
+                              base: "flex-start",
+                              sm: "center",
+                            }}
+                            justify="space-between"
+                            direction={{
+                              base: "column",
+                              sm: "row",
+                            }}
+                            gap={3}
                           >
-                            {isComplete ? "Review" : "Complete"}
-                          </Button>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                  </Card>
-                );
-              })}
-            </SimpleGrid>
+                            <Text
+                              fontSize="xs"
+                              color={isComplete ? "accent.700" : "taupe.400"}
+                            >
+                              {isComplete
+                                ? "This section is ready."
+                                : "This section still needs your attention."}
+                            </Text>
 
-            {/* Completion */}
+                            <Button
+                              size="sm"
+                              variant={isComplete ? "outlineGold" : "solid"}
+                              rightIcon={<FiArrowRight />}
+                              onClick={() => handleSectionAction(section.key)}
+                              borderRadius="4px"
+                              flexShrink={0}
+                            >
+                              {isComplete ? "Review" : "Complete"}
+                            </Button>
+                          </Flex>
+                        </Stack>
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </SimpleGrid>
+            </Stack>
 
-            <Card
-              borderRadius="2xl"
+            {/* =====================================================
+                COMPLETION
+            ====================================================== */}
+
+            <Box
+              bg={requiredComplete ? "brand.500" : "white"}
+              color={requiredComplete ? "white" : "charcoal.800"}
               border="1px solid"
-              borderColor={requiredComplete ? "green.200" : "gray.200"}
-              bg={requiredComplete ? "green.50" : "white"}
-              boxShadow="sm"
+              borderColor={requiredComplete ? "brand.500" : "cream.300"}
+              borderRadius="6px"
+              overflow="hidden"
+              boxShadow={
+                requiredComplete
+                  ? "0 12px 30px rgba(96, 18, 48, 0.18)"
+                  : "0 6px 24px rgba(46, 42, 40, 0.04)"
+              }
             >
-              <CardBody p={{ base: 5, md: 7 }}>
-                <Flex
-                  direction={{
-                    base: "column",
-                    md: "row",
-                  }}
-                  align={{
-                    base: "flex-start",
-                    md: "center",
-                  }}
-                  justify="space-between"
-                  gap={6}
-                >
-                  <HStack align="flex-start" spacing={4}>
-                    <Flex
-                      align="center"
-                      justify="center"
-                      flexShrink={0}
-                      w="44px"
-                      h="44px"
-                      borderRadius="full"
-                      bg={requiredComplete ? "green.100" : "gray.100"}
-                    >
-                      <Icon
-                        as={requiredComplete ? FiCheck : FiTarget}
-                        boxSize={5}
-                        color={requiredComplete ? "green.600" : "gray.600"}
-                      />
-                    </Flex>
-
-                    <Stack spacing={1}>
-                      <Text fontSize="md" fontWeight="750" color="gray.900">
-                        {requiredComplete
-                          ? "Your profile is ready."
-                          : "Complete your required profile sections."}
-                      </Text>
-
-                      <Text fontSize="sm" color="gray.600" lineHeight="1.6">
-                        {requiredComplete
-                          ? "You’ve completed everything required to enter your candidate workspace."
-                          : "Finish the remaining sections above to unlock your candidate workspace."}
-                      </Text>
-                    </Stack>
-                  </HStack>
-
-                  <Button
-                    flexShrink={0}
-                    colorScheme={requiredComplete ? "green" : "gray"}
-                    rightIcon={<FiArrowRight />}
-                    onClick={handleContinue}
-                    isDisabled={!requiredComplete}
-                    size="md"
-                    px={6}
+              <Flex
+                direction={{
+                  base: "column",
+                  md: "row",
+                }}
+                align={{
+                  base: "flex-start",
+                  md: "center",
+                }}
+                justify="space-between"
+                gap={6}
+                p={{ base: 5, md: 7 }}
+              >
+                <HStack align="flex-start" spacing={4}>
+                  <Box
+                    w="44px"
+                    h="44px"
+                    minW="44px"
+                    borderRadius="4px"
+                    bg={requiredComplete ? "whiteAlpha.150" : "cream.100"}
+                    border="1px solid"
+                    borderColor={
+                      requiredComplete ? "whiteAlpha.300" : "cream.300"
+                    }
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
                   >
-                    Enter Springboard
-                  </Button>
-                </Flex>
-              </CardBody>
-            </Card>
+                    <Icon
+                      as={requiredComplete ? FiCheck : FiTarget}
+                      boxSize="18px"
+                      color={requiredComplete ? "accent.300" : "brand.500"}
+                    />
+                  </Box>
 
-            {/* Refresh */}
+                  <Stack spacing={1}>
+                    <Text
+                      fontSize="10px"
+                      fontWeight="800"
+                      letterSpacing="0.14em"
+                      color={requiredComplete ? "accent.300" : "accent.600"}
+                    >
+                      {requiredComplete ? "PROFILE READY" : "NEXT STEP"}
+                    </Text>
+
+                    <Text
+                      fontFamily="heading"
+                      fontSize="xl"
+                      fontWeight="500"
+                      color={requiredComplete ? "white" : "brand.500"}
+                    >
+                      {requiredComplete
+                        ? "Your professional profile is ready."
+                        : "Complete your required profile sections."}
+                    </Text>
+
+                    <Text
+                      fontSize="sm"
+                      color={requiredComplete ? "whiteAlpha.800" : "taupe.600"}
+                      lineHeight="1.65"
+                      maxW="620px"
+                    >
+                      {requiredComplete
+                        ? "You’ve completed everything required to enter your candidate workspace."
+                        : "Finish the remaining sections above to unlock your candidate workspace."}
+                    </Text>
+                  </Stack>
+                </HStack>
+
+                <Button
+                  flexShrink={0}
+                  size="md"
+                  px={6}
+                  rightIcon={<FiArrowRight />}
+                  onClick={handleContinue}
+                  isDisabled={!requiredComplete}
+                  borderRadius="4px"
+                  bg={requiredComplete ? "accent.500" : "cream.200"}
+                  color={requiredComplete ? "white" : "taupe.500"}
+                  border="1px solid"
+                  borderColor={requiredComplete ? "accent.500" : "cream.300"}
+                  _hover={
+                    requiredComplete
+                      ? {
+                          bg: "accent.600",
+                          transform: "translateY(-1px)",
+                          boxShadow: "0 8px 20px rgba(200, 151, 50, 0.22)",
+                        }
+                      : {}
+                  }
+                  _active={
+                    requiredComplete
+                      ? {
+                          transform: "translateY(0)",
+                        }
+                      : {}
+                  }
+                  transition="all 0.2s ease"
+                >
+                  Enter Springboard
+                </Button>
+              </Flex>
+            </Box>
+
+            {/* =====================================================
+                REFRESH
+            ====================================================== */}
 
             <Flex justify="center">
               <Button
                 variant="ghost"
                 size="sm"
                 leftIcon={refreshing ? <Spinner size="xs" /> : <FiRefreshCw />}
-                onClick={() => loadProfileStrength({ silent: true })}
+                onClick={() =>
+                  loadProfileStrength({
+                    silent: true,
+                  })
+                }
                 isDisabled={refreshing}
-                color="gray.500"
+                color="taupe.500"
+                borderRadius="4px"
+                _hover={{
+                  bg: "cream.200",
+                  color: "brand.500",
+                }}
               >
                 Refresh profile status
               </Button>
@@ -634,7 +873,9 @@ function CandidateProfileSetupPage({ onComplete }) {
         </Container>
       </Box>
 
-      {/* Existing drawers */}
+      {/* =========================================================
+          EXISTING DRAWERS
+      ========================================================== */}
 
       <BasicProfileDrawer
         isOpen={basicProfileDrawerOpen}

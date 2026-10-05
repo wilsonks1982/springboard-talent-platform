@@ -15,74 +15,74 @@ export default function Progress({ current }) {
 
   return (
     <Box w="100%">
-      {/* Progress Bar */}
-      <Box mb={6}>
-        <HStack spacing={2} w="100%" align="start">
+      {/* =====================================================
+          PROGRESS STEPS
+      ===================================================== */}
+      <Box mb={5}>
+        <HStack spacing={{ base: 1, sm: 2 }} w="100%" align="start">
           {steps.map(([key, label], index) => {
             const isCompleted = index < currentIndex;
             const isCurrent = index === currentIndex;
-            const isUpcoming = index > currentIndex;
 
             return (
               <Box key={key} flex={1}>
-                <VStack spacing={2.5} w="100%">
-                  {/* Step + Connector */}
-                  <HStack w="100%" spacing={2} align="center">
-                    {/* Step Circle */}
+                <VStack spacing={2} w="100%">
+                  {/* =================================================
+                      STEP MARKER + CONNECTOR
+                  ================================================= */}
+                  <HStack w="100%" spacing={{ base: 1, sm: 2 }} align="center">
+                    {/* Step marker */}
                     <Box
                       w={{ base: 7, md: 8 }}
                       h={{ base: 7, md: 8 }}
-                      borderRadius="full"
+                      minW={{ base: 7, md: 8 }}
+                      minH={{ base: 7, md: 8 }}
+                      borderRadius="4px"
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
                       flexShrink={0}
-                      bg={
-                        isCompleted
-                          ? "purple.600"
-                          : isCurrent
-                            ? "purple.700"
-                            : "purple.50"
-                      }
-                      color={isCompleted || isCurrent ? "white" : "purple.400"}
-                      border="2px solid"
+                      bg={isCompleted || isCurrent ? "brand.500" : "cream.200"}
+                      color="white"
+                      border="1px solid"
                       borderColor={
-                        isCompleted || isCurrent ? "purple.600" : "purple.200"
+                        isCompleted || isCurrent ? "brand.500" : "cream.400"
                       }
                       fontSize="xs"
-                      fontWeight="800"
+                      fontWeight="700"
                       boxShadow={
                         isCurrent
-                          ? "0 0 0 4px rgba(128, 90, 213, 0.12), 0 5px 14px rgba(128, 90, 213, 0.18)"
-                          : isCompleted
-                            ? "0 4px 10px rgba(128, 90, 213, 0.16)"
-                            : "none"
+                          ? "0 0 0 3px rgba(200, 151, 50, 0.18)"
+                          : "none"
                       }
-                      transition="all 0.3s ease"
+                      transition="all 0.2s ease"
                     >
                       {isCompleted ? (
-                        <Icon as={CheckCircle2} w={5} h={5} />
+                        <Icon
+                          as={CheckCircle2}
+                          w={4}
+                          h={4}
+                          color="accent.300"
+                        />
                       ) : (
-                        <Text lineHeight="1">{index + 1}</Text>
+                        <Text
+                          lineHeight="1"
+                          color={isCurrent ? "white" : "taupe.700"}
+                          fontWeight="700"
+                        >
+                          {index + 1}
+                        </Text>
                       )}
                     </Box>
 
-                    {/* Connector Line */}
+                    {/* Connector */}
                     {index < steps.length - 1 && (
                       <Box
                         flex={1}
-                        h="2px"
-                        borderRadius="full"
-                        bg={
-                          isCompleted
-                            ? "purple.500"
-                            : isCurrent
-                              ? "purple.200"
-                              : "gray.200"
-                        }
+                        h="1px"
+                        bg={isCompleted ? "accent.500" : "cream.300"}
                         position="relative"
                         overflow="hidden"
-                        transition="all 0.3s ease"
                       >
                         {isCurrent && (
                           <Box
@@ -91,31 +91,26 @@ export default function Progress({ current }) {
                             top={0}
                             bottom={0}
                             w="45%"
-                            bgGradient="linear(to-r, purple.600, purple.400)"
-                            borderRadius="full"
+                            bg="accent.500"
                           />
                         )}
                       </Box>
                     )}
                   </HStack>
 
-                  {/* Step Label */}
+                  {/* =================================================
+                      STEP LABEL
+                  ================================================= */}
                   <Text
                     fontSize={{
                       base: "9px",
-                      sm: "xs",
+                      sm: "10px",
                     }}
                     fontWeight={isCurrent || isCompleted ? "700" : "500"}
-                    color={
-                      isCompleted
-                        ? "purple.600"
-                        : isCurrent
-                          ? "purple.700"
-                          : "gray.500"
-                    }
+                    color={isCompleted || isCurrent ? "brand.500" : "taupe.500"}
                     textAlign="center"
                     whiteSpace="nowrap"
-                    transition="all 0.3s ease"
+                    transition="all 0.2s ease"
                   >
                     {label}
                   </Text>
@@ -126,18 +121,25 @@ export default function Progress({ current }) {
         </HStack>
       </Box>
 
-      {/* Step Counter */}
-      <HStack justify="center" spacing={2}>
+      {/* =====================================================
+          STEP COUNTER
+      ===================================================== */}
+      <HStack justify="center">
         <Box
           px={3}
           py={1}
-          borderRadius="full"
-          bg="purple.50"
+          borderRadius="2px"
+          bg="accent.50"
           border="1px solid"
-          borderColor="purple.100"
+          borderColor="accent.200"
         >
-          <Text fontSize="xs" color="purple.700" fontWeight="700">
-            Step {currentIndex + 1} of {steps.length}
+          <Text
+            fontSize="10px"
+            color="accent.700"
+            fontWeight="700"
+            letterSpacing="0.08em"
+          >
+            STEP {currentIndex + 1} OF {steps.length}
           </Text>
         </Box>
       </HStack>

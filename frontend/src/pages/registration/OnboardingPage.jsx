@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import {
   Alert,
   AlertIcon,
-  Badge,
   Box,
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
+  HStack,
+  Icon,
   Input,
   Radio,
   RadioGroup,
@@ -15,22 +16,19 @@ import {
   Stack,
   Text,
   VStack,
-  HStack,
-  Icon,
-  Divider,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
+  ArrowRight,
+  BriefcaseBusiness,
   Lock,
   Mail,
-  Phone,
   MapPin,
-  User,
-  BriefcaseBusiness,
   ShieldCheck,
-  ArrowRight,
+  User,
 } from "lucide-react";
+
 import RegistrationLayout from "../../components/RegistrationLayout";
 import {
   updateAccount,
@@ -43,6 +41,33 @@ import { normalizePhone, validateAccount } from "../../utils/validation";
 import { setAuth } from "../../store/authSlice";
 import { authApi } from "../../api/authApi";
 
+const EMPLOYMENT_OPTIONS = [
+  {
+    value: "CURRENTLY_EMPLOYED",
+    icon: BriefcaseBusiness,
+    title: "Currently Employed",
+    description: "I'm working and looking to advance my career.",
+  },
+  {
+    value: "RECENTLY_IMPACTED",
+    icon: Mail,
+    title: "Recently Impacted",
+    description: "I've recently been laid off or furloughed.",
+  },
+  {
+    value: "CAREER_BREAK",
+    icon: MapPin,
+    title: "On a Career Break",
+    description: "I'm taking time away and planning my next move.",
+  },
+  {
+    value: "RETURNING_TO_WORKFORCE",
+    icon: User,
+    title: "Returning to the Workforce",
+    description: "I'm ready to return and take my next step.",
+  },
+];
+
 export default function OnboardingPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -54,18 +79,47 @@ export default function OnboardingPage() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  /* =========================================================
+     FORM HANDLING
+  ========================================================= */
+
   const handleFieldChange = (field, value) => {
     dispatch(updateAccount({ [field]: value }));
+
+    if (errors[field]) {
+      setErrors((current) => ({
+        ...current,
+        [field]: undefined,
+      }));
+    }
+
+    if (error) {
+      dispatch(setError(null));
+    }
+  };
+
+  const handleSituationChange = (value) => {
+    dispatch(setSituation(value));
+
+    if (error) {
+      dispatch(setError(null));
+    }
   };
 
   const submit = async () => {
     const validation = validateAccount(account);
+
     setErrors(validation);
 
     if (Object.keys(validation).length || !employmentSituation) {
       if (!employmentSituation) {
-        dispatch(setError("Please select your employment situation."));
+        dispatch(
+          setError(
+            "Please select the employment situation that best describes you.",
+          ),
+        );
       }
+
       return;
     }
 
@@ -110,104 +164,143 @@ export default function OnboardingPage() {
     }
   };
 
+  /* =========================================================
+     SHARED INPUT STYLE
+  ========================================================= */
+
   const inputProps = {
-    borderRadius: "xl",
+    borderRadius: "4px",
     border: "1px solid",
-    borderColor: "gray.200",
+    borderColor: "cream.400",
     bg: "white",
-    _focus: {
-      borderColor: "purple.500",
-      boxShadow: "0 0 0 3px rgba(128, 90, 213, 0.12)",
-    },
-    _hover: {
-      borderColor: "purple.200",
-    },
+    color: "charcoal.800",
     fontSize: "sm",
     height: "46px",
+
+    _placeholder: {
+      color: "taupe.400",
+    },
+
+    _hover: {
+      borderColor: "taupe.400",
+    },
+
+    _focus: {
+      borderColor: "brand.500",
+      boxShadow: "0 0 0 3px rgba(96, 18, 48, 0.08)",
+    },
   };
 
-  const sectionIcon = (icon) => (
-    <Box
-      w="38px"
-      h="38px"
-      borderRadius="xl"
-      bg="purple.50"
-      border="1px solid"
-      borderColor="purple.100"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      flexShrink={0}
-    >
-      <Icon as={icon} w={18} h={18} color="purple.600" />
-    </Box>
-  );
+  /* =========================================================
+     SECTION HEADER
+  ========================================================= */
 
-  const sectionHeading = (icon, title, description) => (
-    <HStack align="center" spacing={3} mb={6}>
-      {sectionIcon(icon)}
+  const sectionHeading = (icon, eyebrow, title, description) => (
+    <HStack align="start" spacing={4} mb={6}>
+      <Box
+        w="38px"
+        h="38px"
+        borderRadius="4px"
+        bg="accent.50"
+        border="1px solid"
+        borderColor="accent.200"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        flexShrink={0}
+      >
+        <Icon as={icon} boxSize="17px" color="accent.600" />
+      </Box>
 
       <Box>
         <Text
-          fontSize="md"
+          fontSize="9px"
           fontWeight="800"
-          color="gray.800"
-          letterSpacing="-0.01em"
+          letterSpacing="0.14em"
+          color="accent.600"
+          mb={1}
+        >
+          {eyebrow}
+        </Text>
+
+        <Text
+          fontFamily="heading"
+          fontSize="xl"
+          fontWeight="500"
+          color="brand.500"
+          lineHeight="1.2"
         >
           {title}
         </Text>
 
-        <Text fontSize="xs" color="gray.500" mt={0.5}>
+        <Text fontSize="xs" color="taupe.500" mt={1} lineHeight="1.6">
           {description}
         </Text>
       </Box>
     </HStack>
   );
 
+  /* =========================================================
+     EMPLOYMENT OPTION
+  ========================================================= */
+
   const situationCard = ({ value, icon, title, description }) => {
     const selected = employmentSituation === value;
 
     return (
       <Box
-        p={5}
-        borderRadius="xl"
-        border="1.5px solid"
-        borderColor={selected ? "purple.400" : "gray.200"}
-        bg={selected ? "purple.50" : "white"}
+        p={{ base: 4, md: 5 }}
+        borderRadius="4px"
+        border="1px solid"
+        borderColor={selected ? "brand.500" : "cream.400"}
+        bg={selected ? "brand.50" : "white"}
         cursor="pointer"
         transition="all 0.2s ease"
-        boxShadow={
-          selected
-            ? "0 6px 18px rgba(128, 90, 213, 0.10)"
-            : "0 2px 8px rgba(15, 23, 42, 0.03)"
-        }
+        position="relative"
         _hover={{
-          borderColor: selected ? "purple.400" : "purple.300",
-          bg: selected ? "purple.50" : "purple.50",
+          borderColor: selected ? "brand.500" : "accent.400",
           transform: "translateY(-1px)",
+          boxShadow: "0 6px 18px rgba(46, 42, 40, 0.06)",
         }}
       >
-        <Radio value={value} width="100%">
+        {selected && (
+          <Box
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            h="2px"
+            bg="accent.500"
+          />
+        )}
+
+        <Radio value={value} width="100%" colorScheme="brand">
           <HStack align="center" spacing={3} ml={2}>
             <Box
-              w="34px"
-              h="34px"
-              borderRadius="lg"
-              bg={selected ? "white" : "purple.50"}
+              w="36px"
+              h="36px"
+              borderRadius="4px"
+              bg={selected ? "white" : "cream.100"}
+              border="1px solid"
+              borderColor={selected ? "accent.200" : "cream.300"}
               display="flex"
               alignItems="center"
               justifyContent="center"
               flexShrink={0}
             >
-              <Icon as={icon} w={17} h={17} color="purple.600" />
+              <Icon
+                as={icon}
+                boxSize="17px"
+                color={selected ? "brand.500" : "taupe.500"}
+              />
             </Box>
 
-            <VStack align="start" spacing={0}>
-              <Text fontSize="sm" fontWeight="700" color="gray.800">
+            <VStack align="start" spacing={0.5}>
+              <Text fontSize="sm" fontWeight="700" color="charcoal.800">
                 {title}
               </Text>
 
-              <Text fontSize="xs" color="gray.500" mt={0.5} lineHeight="1.5">
+              <Text fontSize="xs" color="taupe.500" lineHeight="1.5">
                 {description}
               </Text>
             </VStack>
@@ -219,68 +312,42 @@ export default function OnboardingPage() {
 
   return (
     <RegistrationLayout>
-      <VStack align="stretch" spacing={7}>
-        {/* Intro */}
-        <Box px={{ base: 1, md: 2 }} pt={1} pb={2}>
-          <HStack spacing={2} mb={3}>
-            <Badge
-              colorScheme="purple"
-              bg="purple.50"
-              color="purple.700"
-              border="1px solid"
-              borderColor="purple.100"
-              borderRadius="full"
-              px={3}
-              py={1}
-              fontSize="10px"
-              fontWeight="800"
-              letterSpacing="0.04em"
-              textTransform="uppercase"
-            >
-              Step 1 · Account
-            </Badge>
-          </HStack>
-
-          <Text
-            fontSize={{ base: "2xl", md: "3xl" }}
-            fontWeight="800"
-            color="gray.900"
-            letterSpacing="-0.035em"
-            lineHeight="1.15"
-          >
-            Let’s get to know you
-          </Text>
-
-          <Text
-            fontSize="sm"
-            color="gray.500"
-            mt={2}
-            maxW="620px"
-            lineHeight="1.7"
-          >
-            Create your account and tell us a little about your current
-            situation. This helps us personalize your Springboard experience.
-          </Text>
-        </Box>
-
-        {/* Personal Information */}
+      <VStack align="stretch" spacing={{ base: 7, md: 9 }}>
+        {/* =====================================================
+            PERSONAL INFORMATION
+        ===================================================== */}
         <Box
-          p={{ base: 5, md: 6 }}
+          p={{ base: 5, md: 7 }}
           bg="white"
           border="1px solid"
-          borderColor="gray.100"
-          borderRadius="2xl"
-          boxShadow="0 8px 28px rgba(88, 28, 135, 0.06)"
+          borderColor="cream.300"
+          borderRadius="6px"
         >
           {sectionHeading(
             User,
+            "YOUR DETAILS",
             "Personal Information",
-            "Your basic contact details",
+            "The basic information we need to create your profile.",
           )}
 
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+          <SimpleGrid
+            columns={{
+              base: 1,
+              md: 2,
+            }}
+            spacing={{
+              base: 5,
+              md: 6,
+            }}
+          >
+            {/* Full Name */}
             <FormControl isInvalid={!!errors.fullName}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 Full Name
               </FormLabel>
 
@@ -298,8 +365,14 @@ export default function OnboardingPage() {
               )}
             </FormControl>
 
+            {/* Email */}
             <FormControl isInvalid={!!errors.email}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 Email Address
               </FormLabel>
 
@@ -318,13 +391,19 @@ export default function OnboardingPage() {
               )}
             </FormControl>
 
+            {/* Phone */}
             <FormControl isInvalid={!!errors.phone}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 Phone Number
               </FormLabel>
 
               <Input
-                placeholder="+1 (555) 123-4567"
+                placeholder="+91 98765 43210"
                 value={account.phone}
                 onChange={(e) => handleFieldChange("phone", e.target.value)}
                 {...inputProps}
@@ -337,13 +416,19 @@ export default function OnboardingPage() {
               )}
             </FormControl>
 
+            {/* City */}
             <FormControl isInvalid={!!errors.city}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 City
               </FormLabel>
 
               <Input
-                placeholder="New York"
+                placeholder="Bengaluru"
                 value={account.city}
                 onChange={(e) => handleFieldChange("city", e.target.value)}
                 {...inputProps}
@@ -356,30 +441,47 @@ export default function OnboardingPage() {
           </SimpleGrid>
         </Box>
 
-        {/* Security */}
+        {/* =====================================================
+            ACCOUNT SECURITY
+        ===================================================== */}
         <Box
-          p={{ base: 5, md: 6 }}
+          p={{ base: 5, md: 7 }}
           bg="white"
           border="1px solid"
-          borderColor="gray.100"
-          borderRadius="2xl"
-          boxShadow="0 8px 28px rgba(88, 28, 135, 0.06)"
+          borderColor="cream.300"
+          borderRadius="6px"
         >
           {sectionHeading(
             Lock,
+            "ACCOUNT SECURITY",
             "Secure Your Account",
-            "Choose a strong password for your account",
+            "Choose a password that keeps your account protected.",
           )}
 
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+          <SimpleGrid
+            columns={{
+              base: 1,
+              md: 2,
+            }}
+            spacing={{
+              base: 5,
+              md: 6,
+            }}
+          >
+            {/* Password */}
             <FormControl isInvalid={!!errors.password}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 Password
               </FormLabel>
 
               <Input
                 type="password"
-                placeholder="Minimum 8 characters with at least one number"
+                placeholder="Minimum 8 characters"
                 value={account.password}
                 onChange={(e) => handleFieldChange("password", e.target.value)}
                 {...inputProps}
@@ -392,8 +494,14 @@ export default function OnboardingPage() {
               )}
             </FormControl>
 
+            {/* Confirm Password */}
             <FormControl isInvalid={!!errors.confirmPassword}>
-              <FormLabel fontSize="xs" fontWeight="700" color="gray.700" mb={2}>
+              <FormLabel
+                fontSize="xs"
+                fontWeight="700"
+                color="charcoal.700"
+                mb={2}
+              >
                 Confirm Password
               </FormLabel>
 
@@ -415,129 +523,121 @@ export default function OnboardingPage() {
             </FormControl>
           </SimpleGrid>
 
+          {/* Security note */}
           <HStack
             mt={5}
             px={4}
             py={3}
-            borderRadius="xl"
-            bg="purple.50"
+            borderRadius="4px"
+            bg="cream.100"
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="cream.300"
             spacing={3}
           >
-            <Icon as={ShieldCheck} w={17} h={17} color="purple.600" />
+            <Icon
+              as={ShieldCheck}
+              boxSize="17px"
+              color="accent.600"
+              flexShrink={0}
+            />
 
-            <Text fontSize="xs" color="purple.700" lineHeight="1.5">
+            <Text fontSize="xs" color="taupe.600" lineHeight="1.5">
               Your account credentials are securely protected.
             </Text>
           </HStack>
         </Box>
 
-        {/* Employment Situation */}
+        {/* =====================================================
+            EMPLOYMENT SITUATION
+        ===================================================== */}
         <Box
-          p={{ base: 5, md: 6 }}
+          p={{ base: 5, md: 7 }}
           bg="white"
           border="1px solid"
-          borderColor="gray.100"
-          borderRadius="2xl"
-          boxShadow="0 8px 28px rgba(88, 28, 135, 0.06)"
+          borderColor="cream.300"
+          borderRadius="6px"
         >
           {sectionHeading(
             BriefcaseBusiness,
+            "WHERE YOU ARE TODAY",
             "Employment Status",
-            "Help us understand where you are today",
+            "There is no right answer. We simply want to understand your starting point.",
           )}
 
           <FormControl>
-            <FormLabel fontSize="sm" fontWeight="700" color="gray.800" mb={4}>
+            <FormLabel
+              fontSize="sm"
+              fontWeight="700"
+              color="charcoal.800"
+              mb={4}
+            >
               Which situation best describes you right now?
             </FormLabel>
 
             <RadioGroup
               value={employmentSituation}
-              onChange={(value) => dispatch(setSituation(value))}
+              onChange={handleSituationChange}
             >
               <Stack spacing={3}>
-                {situationCard({
-                  value: "CURRENTLY_EMPLOYED",
-                  icon: BriefcaseBusiness,
-                  title: "Currently Employed",
-                  description: "I'm working and looking to advance my career",
-                })}
-
-                {situationCard({
-                  value: "RECENTLY_IMPACTED",
-                  icon: Mail,
-                  title: "Recently Impacted",
-                  description: "I've been recently laid off or furloughed",
-                })}
-
-                {situationCard({
-                  value: "CAREER_BREAK",
-                  icon: MapPin,
-                  title: "On a Career Break",
-                  description: "I'm taking time off and planning my next move",
-                })}
-
-                {situationCard({
-                  value: "RETURNING_TO_WORKFORCE",
-                  icon: User,
-                  title: "Returning to the Workforce",
-                  description: "I'm ready to jump back into work",
-                })}
+                {EMPLOYMENT_OPTIONS.map((option) => situationCard(option))}
               </Stack>
             </RadioGroup>
           </FormControl>
         </Box>
 
-        {/* Error */}
+        {/* =====================================================
+            ERROR
+        ===================================================== */}
         {error && (
           <Alert
             status="error"
-            borderRadius="xl"
-            bg="red.50"
+            borderRadius="4px"
+            bg="error.50"
             border="1px solid"
-            borderColor="red.100"
+            borderColor="error.200"
             px={4}
             py={3}
           >
-            <AlertIcon color="red.500" />
+            <AlertIcon boxSize="18px" color="error.600" />
 
             <Box>
-              <Text fontWeight="700" color="red.700" fontSize="sm">
+              <Text fontWeight="700" color="error.700" fontSize="sm">
                 Something needs attention
               </Text>
 
-              <Text color="red.600" fontSize="xs" mt={0.5}>
+              <Text color="error.600" fontSize="xs" mt={0.5}>
                 {error}
               </Text>
             </Box>
           </Alert>
         )}
 
-        {/* Continue */}
+        {/* =====================================================
+            CONTINUE
+        ===================================================== */}
         <Box pt={1}>
           <Button
             width="100%"
             size="lg"
+            height="54px"
             onClick={submit}
             isDisabled={isLoading}
             isLoading={isLoading}
             loadingText="Creating Account..."
-            fontWeight="800"
-            borderRadius="xl"
-            height="54px"
+            fontWeight="700"
+            letterSpacing="0.01em"
             color="white"
-            bgGradient="linear(to-r, purple.700, purple.600)"
-            boxShadow="0 10px 28px rgba(128, 90, 213, 0.22)"
+            bg="brand.500"
+            borderRadius="4px"
             rightIcon={<ArrowRight size={18} />}
+            boxShadow="0 8px 22px rgba(96, 18, 48, 0.18)"
             _hover={{
-              bgGradient: "linear(to-r, purple.800, purple.700)",
-              boxShadow: "0 14px 32px rgba(128, 90, 213, 0.28)",
+              bg: "brand.600",
+              boxShadow: "0 11px 28px rgba(96, 18, 48, 0.24)",
               transform: "translateY(-1px)",
             }}
             _active={{
-              transform: "scale(0.985)",
+              transform: "translateY(0)",
             }}
             transition="all 0.2s ease"
           >
@@ -546,7 +646,7 @@ export default function OnboardingPage() {
 
           <Text
             fontSize="xs"
-            color="gray.500"
+            color="taupe.500"
             textAlign="center"
             mt={4}
             lineHeight="1.6"

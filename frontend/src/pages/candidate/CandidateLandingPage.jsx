@@ -1,40 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   AlertIcon,
-  Badge,
   Box,
   Button,
-  Divider,
   Flex,
-  Grid,
-  GridItem,
-  Heading,
   HStack,
   Icon,
-  Progress,
-  SimpleGrid,
   Spinner,
   Stack,
   Text,
-  Tag,
-  VStack,
 } from "@chakra-ui/react";
-import {
-  FiGrid,
-  FiUser,
-  FiBriefcase,
-  FiBookOpen,
-  FiAward,
-  FiStar,
-  FiUsers,
-  FiFileText,
-  FiTarget,
-  FiDollarSign,
-  FiShield,
-  FiCheckCircle,
-  FiSettings,
-} from "react-icons/fi";
 
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -44,9 +20,13 @@ import { candidateApi } from "../../api/candidateApi";
 import { clearAuth } from "../../store/authSlice";
 import { profileStrengthApi } from "../../api/candidateProfileStrengthApi";
 
-import CandidateHeader from "../../components/candidate/candidateHeader";
+import Sidebar from "../../components/candidate/Sidebar";
+import CandidateHeader from "../../components/candidate/CandidateHeader";
+import CandidateHero from "../../components/candidate/CandidateHero";
 
-import ExperienceInsights from "../../components/candidate/ExperienceInsights";
+import ProfessionalSnapshotSection from "../../components/candidate/sections/ProfessionalSnapshotSection";
+import ProfessionalSnapshotDrawer from "../../components/candidate/drawers/ProfessionalSnapshotDrawer";
+
 import ExperienceSection from "../../components/candidate/sections/ExperienceSection";
 import ExperienceDrawer from "../../components/candidate/drawers/ExperienceDrawer";
 import { candidateExperienceApi } from "../../api/candidateExperienceApi";
@@ -54,8 +34,6 @@ import { candidateExperienceApi } from "../../api/candidateExperienceApi";
 import EducationSection from "../../components/candidate/sections/EducationSection";
 import EducationDrawer from "../../components/candidate/drawers/EducationDrawer";
 import { candidateEducationApi } from "../../api/candidateEducationApi";
-
-import ProfileStrengthCard from "../../components/candidate/sections/ProfileStrengthCard";
 
 import ResumeSection from "../../components/candidate/sections/ResumeSection";
 import ResumeUploadDrawer from "../../components/candidate/drawers/ResumeUploadDrawer";
@@ -73,10 +51,10 @@ import ReferencesSection from "../../components/candidate/sections/ReferencesSec
 import ReferenceDrawer from "../../components/candidate/drawers/ReferenceDrawer";
 import { candidateReferenceApi } from "../../api/candidateReferenceApi";
 
+import CareerPreferencesCard from "../../components/candidate/sections/CareerPreferencesCard";
 import CareerPreferencesDrawer from "../../components/candidate/drawers/CareerPreferencesDrawer";
 import { candidateCareerPreferencesApi } from "../../api/candidateCareerPreferencesApi";
 
-import BasicProfileCard from "../../components/candidate/sections/BasicProfileCard";
 import BasicProfileDrawer from "../../components/candidate/drawers/BasicProfileDrawer";
 import { candidateBasicProfileApi } from "../../api/candidateBasicProfileApi";
 
@@ -85,21 +63,13 @@ import CandidateCompensationDrawer from "../../components/candidate/drawers/Cand
 import { candidateCompensationApi } from "../../api/candidateCompensationApi";
 
 import EmploymentVerificationCard from "../../components/candidate/sections/EmploymentVerificationCard";
-
 import EmploymentVerificationDrawer from "../../components/candidate/drawers/EmploymentVerificationDrawer";
-
 import { candidateEmploymentVerificationApi } from "../../api/candidateEmploymentVerificationApi";
-
 import { candidateEmploymentVerificationDocumentApi } from "../../api/candidateEmploymentVerificationDocumentApi";
 
 import { candidateCareerSummaryApi } from "../../api/candidateCareerSummaryApi";
 import { candidateIndustryApi } from "../../api/candidateIndustryApi";
 import { candidateSkillApi } from "../../api/candidateSkillApi";
-
-import ProfessionalSnapshotSection from "../../components/candidate/sections/ProfessionalSnapshotSection";
-import ProfessionalSnapshotDrawer from "../../components/candidate/drawers/ProfessionalSnapshotDrawer";
-
-import CandidateHero from "../../components/candidate/CandidateHero";
 
 export default function CandidateLandingPage() {
   const dispatch = useDispatch();
@@ -112,6 +82,7 @@ export default function CandidateLandingPage() {
   const [experiences, setExperiences] = useState([]);
   const [experienceDrawerOpen, setExperienceDrawerOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState(null);
+
   const [employmentAnalysis, setEmploymentAnalysis] = useState({
     yearsExperience: 0,
     currentTitle: null,
@@ -150,7 +121,6 @@ export default function CandidateLandingPage() {
   const [isCompensationOpen, setIsCompensationOpen] = useState(false);
 
   const [employmentVerification, setEmploymentVerification] = useState(null);
-
   const [
     employmentVerificationDrawerOpen,
     setEmploymentVerificationDrawerOpen,
@@ -163,6 +133,7 @@ export default function CandidateLandingPage() {
 
   const [skills, setSkills] = useState([]);
   const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+
   const [professionalSnapshotOpen, setProfessionalSnapshotOpen] =
     useState(false);
 
@@ -224,6 +195,7 @@ export default function CandidateLandingPage() {
       );
 
       setSkills(availableSkills || []);
+
       setSelectedSkillIds(
         (selectedSkills || []).map((item) => item.skillTagId),
       );
@@ -251,19 +223,51 @@ export default function CandidateLandingPage() {
 
   if (loading) {
     return (
-      <Flex minH="100vh" align="center" justify="center">
-        <Spinner size="xl" />
+      <Flex minH="100vh" align="center" justify="center" bg="cream.100">
+        <Stack align="center" spacing={5}>
+          <Box
+            w="48px"
+            h="48px"
+            bg="white"
+            border="1px solid"
+            borderColor="cream.300"
+            borderRadius="4px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Spinner size="sm" thickness="2px" color="accent.500" />
+          </Box>
+
+          <Stack spacing={1} textAlign="center">
+            <Text fontFamily="heading" fontSize="lg" color="brand.500">
+              Preparing your workspace
+            </Text>
+
+            <Text fontSize="sm" color="taupe.500">
+              Loading your professional profile.
+            </Text>
+          </Stack>
+        </Stack>
       </Flex>
     );
   }
 
   if (error) {
     return (
-      <Box p={8}>
-        <Alert status="error" borderRadius="lg">
-          <AlertIcon />
-          {error}
-        </Alert>
+      <Box minH="100vh" bg="cream.100" p={{ base: 6, md: 10 }}>
+        <Box maxW="760px" mx="auto">
+          <Alert
+            status="error"
+            borderRadius="5px"
+            bg="error.50"
+            border="1px solid"
+            borderColor="error.200"
+          >
+            <AlertIcon color="error.600" />
+            <Text color="error.700">{error}</Text>
+          </Alert>
+        </Box>
       </Box>
     );
   }
@@ -273,8 +277,6 @@ export default function CandidateLandingPage() {
   }
 
   const completion = calculateProfileCompletion(candidate);
-
-  const firstName = candidate.user?.fullName?.split(" ")[0] || "there";
 
   function handleAddExperience() {
     setEditingExperience(null);
@@ -361,33 +363,6 @@ export default function CandidateLandingPage() {
     await refreshProfileStrength();
   }
 
-  function handleProfileSectionAction(sectionKey) {
-    switch (sectionKey) {
-      case "BASIC_INFORMATION":
-        setIsBasicProfileOpen(true);
-        break;
-
-      case "EXPERIENCE":
-        handleAddExperience();
-        break;
-
-      case "EDUCATION":
-        handleAddEducation();
-        break;
-
-      case "CAREER_DIRECTION":
-        setCareerPreferencesDrawerOpen(true);
-        break;
-
-      case "PROFESSIONAL_PRESENCE":
-        setIsBasicProfileOpen(true);
-        break;
-
-      default:
-        break;
-    }
-  }
-
   async function refreshProfileStrength() {
     try {
       const data = await profileStrengthApi.get();
@@ -461,6 +436,7 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
+
       certifications: editingCertification
         ? current.certifications.map((item) =>
             item.id === saved.id ? saved : item,
@@ -476,6 +452,7 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
+
       certifications: current.certifications.filter((item) => item.id !== id),
     }));
 
@@ -503,6 +480,7 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
+
       achievements: editingAchievement
         ? current.achievements.map((item) =>
             item.id === saved.id ? saved : item,
@@ -518,6 +496,7 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
+
       achievements: current.achievements.filter((item) => item.id !== id),
     }));
 
@@ -561,6 +540,7 @@ export default function CandidateLandingPage() {
 
     setCandidate((current) => ({
       ...current,
+
       references: current.references.filter((item) => item.id !== id),
     }));
 
@@ -618,6 +598,7 @@ export default function CandidateLandingPage() {
 
       setEmploymentVerification((current) => ({
         ...current,
+
         ...(documentType === "LAST_INCREMENT_LETTER"
           ? {
               lastIncrementLetter: uploaded,
@@ -630,6 +611,7 @@ export default function CandidateLandingPage() {
       await refreshProfileStrength();
     } catch (error) {
       console.error("Failed to upload employment document", error);
+
       throw error;
     }
   }
@@ -655,6 +637,7 @@ export default function CandidateLandingPage() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Failed to download employment document", error);
+
       throw error;
     }
   }
@@ -665,6 +648,7 @@ export default function CandidateLandingPage() {
 
       setEmploymentVerification((current) => ({
         ...current,
+
         ...(documentType === "LAST_INCREMENT_LETTER"
           ? {
               lastIncrementLetter: null,
@@ -677,6 +661,7 @@ export default function CandidateLandingPage() {
       await refreshProfileStrength();
     } catch (error) {
       console.error("Failed to delete employment document", error);
+
       throw error;
     }
   }
@@ -708,8 +693,11 @@ export default function CandidateLandingPage() {
   }
 
   return (
-    <Flex minH="100vh" bg="#F7F8FC">
-      {/* Sidebar */}
+    <Flex minH="100vh" bg="cream.100">
+      {/* =========================================================
+          SIDEBAR
+      ========================================================== */}
+
       <Sidebar
         navigate={navigate}
         onOpenBasicProfile={() => setIsBasicProfileOpen(true)}
@@ -724,46 +712,90 @@ export default function CandidateLandingPage() {
         onOpenEmploymentVerification={() =>
           setEmploymentVerificationDrawerOpen(true)
         }
+        onLogout={logout}
       />
 
-      {/* Main */}
-      <Box flex="1" minW="0">
-        {/* Top bar */}
+      {/* =========================================================
+          MAIN
+      ========================================================== */}
 
-        <CandidateHeader candidate={candidate} />
+      <Box flex="1" minW="0" bg="cream.100">
+        {/* <CandidateHeader candidate={candidate} /> */}
 
-        {/* Content */}
         <Box
           maxW="1500px"
           mx="auto"
-          px={{ base: 5, md: 8, xl: 10 }}
-          py={{ base: 6, md: 8 }}
+          px={{
+            base: 5,
+            md: 8,
+            xl: 10,
+          }}
+          py={{
+            base: 6,
+            md: 8,
+          }}
         >
-          {/* Hero */}
-          <CandidateHero
-            candidate={candidate}
-            profileStrength={profileStrength}
-            completion={completion}
-            basicProfile={basicProfile}
-            onEditProfile={() => navigate("/candidate/profile")}
-            onEditBasicProfile={() => setIsBasicProfileOpen(true)}
-          />
+          {/* =====================================================
+              WORKSPACE
+          ====================================================== */}
 
-          {/* Main content */}
-          <Grid
-            templateColumns={{
-              base: "1fr",
-              xl: "minmax(0, 2fr) minmax(300px, 1fr)",
-            }}
-            gap={5}
-            mt={6}
-          >
-            <GridItem>
+          <Box mt={8}>
+            <Flex
+              align={{
+                base: "flex-start",
+                md: "center",
+              }}
+              justify="space-between"
+              direction={{
+                base: "column",
+                md: "row",
+              }}
+              gap={2}
+              mb={5}
+            >
+              <Box>
+                <Text
+                  fontSize="10px"
+                  fontWeight="800"
+                  letterSpacing="0.16em"
+                  color="accent.600"
+                >
+                  YOUR PROFESSIONAL STORY
+                </Text>
+
+                <Text
+                  fontFamily="heading"
+                  fontSize="2xl"
+                  fontWeight="500"
+                  color="brand.500"
+                  mt={1}
+                >
+                  Your career, thoughtfully presented.
+                </Text>
+              </Box>
+            </Flex>
+
+            <Box
+              display={{
+                base: "block",
+                xl: "grid",
+              }}
+              gridTemplateColumns="minmax(0, 2fr) minmax(300px, 1fr)"
+              gap={5}
+            >
+              {/* =================================================
+                  LEFT COLUMN
+              ================================================== */}
+
               <Stack spacing={5}>
-                {/* <ProfileStrengthCard
+                <CandidateHero
+                  candidate={candidate}
                   profileStrength={profileStrength}
-                  onSectionAction={handleProfileSectionAction}
-                /> */}
+                  completion={completion}
+                  basicProfile={basicProfile}
+                  onEditProfile={() => navigate("/candidate/profile")}
+                  onEditBasicProfile={() => setIsBasicProfileOpen(true)}
+                />
 
                 <ProfessionalSnapshotSection
                   careerSummary={careerSummary}
@@ -809,9 +841,11 @@ export default function CandidateLandingPage() {
                   onDelete={handleDeleteCertification}
                 />
               </Stack>
-            </GridItem>
 
-            <GridItem>
+              {/* =================================================
+                  RIGHT COLUMN
+              ================================================== */}
+
               <Stack spacing={5}>
                 <CareerPreferencesCard
                   candidate={candidate}
@@ -822,6 +856,7 @@ export default function CandidateLandingPage() {
                   compensation={compensation}
                   onEdit={() => setIsCompensationOpen(true)}
                 />
+
                 <ResumeSection
                   resume={resume}
                   onUpload={handleUploadResume}
@@ -835,9 +870,14 @@ export default function CandidateLandingPage() {
                   onEdit={() => setEmploymentVerificationDrawerOpen(true)}
                 />
               </Stack>
-            </GridItem>
-          </Grid>
+            </Box>
+          </Box>
         </Box>
+
+        {/* =======================================================
+            DRAWERS
+        ======================================================== */}
+
         <ExperienceDrawer
           isOpen={experienceDrawerOpen}
           onClose={() => {
@@ -847,6 +887,7 @@ export default function CandidateLandingPage() {
           experience={editingExperience}
           onSave={handleSaveExperience}
         />
+
         <EducationDrawer
           isOpen={educationDrawerOpen}
           onClose={() => {
@@ -865,21 +906,30 @@ export default function CandidateLandingPage() {
 
         <CertificationDrawer
           isOpen={certificationDrawerOpen}
-          onClose={() => setCertificationDrawerOpen(false)}
+          onClose={() => {
+            setCertificationDrawerOpen(false);
+            setEditingCertification(null);
+          }}
           certification={editingCertification}
           onSave={handleSaveCertification}
         />
 
         <AchievementDrawer
           isOpen={achievementDrawerOpen}
-          onClose={() => setAchievementDrawerOpen(false)}
+          onClose={() => {
+            setAchievementDrawerOpen(false);
+            setEditingAchievement(null);
+          }}
           achievement={editingAchievement}
           onSave={handleSaveAchievement}
         />
 
         <ReferenceDrawer
           isOpen={referenceDrawerOpen}
-          onClose={() => setReferenceDrawerOpen(false)}
+          onClose={() => {
+            setReferenceDrawerOpen(false);
+            setEditingReference(null);
+          }}
           reference={editingReference}
           onSave={handleSaveReference}
         />
@@ -890,12 +940,14 @@ export default function CandidateLandingPage() {
           preferences={candidate.careerPreferences}
           onSave={handleSaveCareerPreferences}
         />
+
         <BasicProfileDrawer
           isOpen={isBasicProfileOpen}
           onClose={() => setIsBasicProfileOpen(false)}
           profile={basicProfile}
           onSave={handleSaveBasicProfile}
         />
+
         <CandidateCompensationDrawer
           isOpen={isCompensationOpen}
           onClose={() => setIsCompensationOpen(false)}
@@ -930,807 +982,6 @@ export default function CandidateLandingPage() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Sidebar */
-/* ------------------------------------------------------------------ */
-function Sidebar({
-  navigate,
-  onOpenBasicProfile,
-  onOpenExperience,
-  onOpenEducation,
-  onOpenCertification,
-  onOpenAchievement,
-  onOpenReference,
-  onOpenCareerPreferences,
-  onOpenResume,
-  onOpenCompensation,
-  onOpenEmploymentVerification,
-}) {
-  return (
-    <Box
-      display={{ base: "none", lg: "block" }}
-      w="245px"
-      flexShrink={0}
-      bg="white"
-      borderRight="1px solid"
-      borderColor="gray.200"
-      position="sticky"
-      top="0"
-      h="100vh"
-    >
-      {/* =========================================================
-          SPRINGBOARD HEADER — FIXED
-          ========================================================= */}
-      <Box px={5} py={5} borderBottom="1px solid" borderColor="gray.100">
-        <HStack spacing={3}>
-          <Box
-            w="34px"
-            h="34px"
-            borderRadius="10px"
-            bg="purple.600"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <Text color="white" fontSize="sm" fontWeight="800">
-              S
-            </Text>
-          </Box>
-
-          <Box>
-            <Text
-              fontSize="md"
-              fontWeight="800"
-              color="gray.800"
-              lineHeight="1.1"
-            >
-              Springboard
-            </Text>
-
-            <Text fontSize="xs" color="gray.400" mt={0.5}>
-              Candidate Workspace
-            </Text>
-          </Box>
-        </HStack>
-      </Box>
-
-      {/* =========================================================
-          SCROLLABLE NAVIGATION
-          ========================================================= */}
-      <Box
-        h="calc(100vh - 82px)"
-        overflowY="auto"
-        px={4}
-        py={6}
-        pb="190px"
-        sx={{
-          "&::-webkit-scrollbar": {
-            width: "5px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "transparent",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#CBD5E0",
-            borderRadius: "10px",
-          },
-          scrollbarWidth: "thin",
-        }}
-      >
-        <Stack spacing={1}>
-          {/* WORKSPACE */}
-          <SidebarSection title="WORKSPACE">
-            <SidebarItem icon={FiGrid} label="Overview" active />
-          </SidebarSection>
-
-          {/* MY CAREER */}
-          <SidebarSection title="MY CAREER">
-            <SidebarItem
-              icon={FiUser}
-              label="Profile"
-              onClick={onOpenBasicProfile}
-            />
-
-            <SidebarItem
-              icon={FiBriefcase}
-              label="Experience"
-              onClick={onOpenExperience}
-            />
-
-            <SidebarItem
-              icon={FiBookOpen}
-              label="Education"
-              onClick={onOpenEducation}
-            />
-
-            <SidebarItem
-              icon={FiAward}
-              label="Certifications"
-              onClick={onOpenCertification}
-            />
-
-            <SidebarItem
-              icon={FiStar}
-              label="Achievements"
-              onClick={onOpenAchievement}
-            />
-
-            <SidebarItem
-              icon={FiUsers}
-              label="References"
-              onClick={onOpenReference}
-            />
-
-            <SidebarItem
-              icon={FiFileText}
-              label="Resume"
-              onClick={onOpenResume}
-            />
-          </SidebarSection>
-
-          {/* CAREER MANAGEMENT */}
-          <SidebarSection title="CAREER MANAGEMENT">
-            <SidebarItem
-              icon={FiTarget}
-              label="Career Preferences"
-              onClick={onOpenCareerPreferences}
-            />
-
-            <SidebarItem
-              icon={FiDollarSign}
-              label="Compensation"
-              onClick={onOpenCompensation}
-            />
-
-            <SidebarItem
-              icon={FiShield}
-              label="Employment Verification"
-              onClick={onOpenEmploymentVerification}
-            />
-          </SidebarSection>
-
-          {/* OPPORTUNITIES */}
-          <SidebarSection title="OPPORTUNITIES">
-            <SidebarItem icon={FiBriefcase} label="Opportunities" muted />
-
-            <SidebarItem
-              icon={FiCheckCircle}
-              label="Assessments"
-              onClick={() => navigate("/candidate/assessments")}
-            />
-          </SidebarSection>
-
-          {/* ACCOUNT */}
-          <SidebarSection title="ACCOUNT">
-            <SidebarItem icon={FiSettings} label="Settings" muted />
-          </SidebarSection>
-        </Stack>
-      </Box>
-
-      {/* =========================================================
-          PROFILE TIP — FIXED
-          ========================================================= */}
-      <Box
-        position="absolute"
-        left={4}
-        right={4}
-        bottom={5}
-        bg="purple.50"
-        border="1px solid"
-        borderColor="purple.100"
-        borderRadius="xl"
-        p={4}
-        boxShadow="sm"
-      >
-        <Text fontSize="xs" fontWeight="700" color="purple.700" mb={1}>
-          Complete your profile
-        </Text>
-
-        <Text fontSize="xs" lineHeight="1.5" color="gray.600">
-          A complete profile helps recruiters discover and evaluate you faster.
-        </Text>
-      </Box>
-    </Box>
-  );
-}
-function SidebarSection({ title, children }) {
-  return (
-    <Box mb={5}>
-      <Text
-        px={3}
-        mb={2}
-        fontSize="10px"
-        fontWeight="700"
-        letterSpacing="0.08em"
-        color="gray.400"
-      >
-        {title}
-      </Text>
-
-      <Stack spacing={1}>{children}</Stack>
-    </Box>
-  );
-}
-
-function SidebarItem({ icon, label, active, onClick, muted }) {
-  return (
-    <Flex
-      px={3}
-      py={2.5}
-      borderRadius="lg"
-      align="center"
-      gap={3}
-      cursor={muted ? "default" : "pointer"}
-      bg={active ? "purple.50" : "transparent"}
-      color={active ? "purple.600" : muted ? "gray.400" : "gray.600"}
-      _hover={
-        muted
-          ? {}
-          : {
-              bg: active ? "purple.50" : "gray.50",
-            }
-      }
-      onClick={onClick}
-    >
-      <Icon as={icon} boxSize={4} />
-
-      <Text fontSize="sm" fontWeight={active ? "600" : "500"}>
-        {label}
-      </Text>
-    </Flex>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Top cards */
-/* ------------------------------------------------------------------ */
-
-function Card({ children, ...props }) {
-  return (
-    <Box
-      bg="white"
-      border="1px solid"
-      borderColor="gray.200"
-      borderRadius="2xl"
-      p={6}
-      boxShadow="0 2px 8px rgba(15, 23, 42, 0.03)"
-      {...props}
-    >
-      {children}
-    </Box>
-  );
-}
-
-function ResumeCard({ resume, onUpload }) {
-  return (
-    <Card>
-      <HStack justify="space-between">
-        <Text
-          fontSize="xs"
-          fontWeight="700"
-          color="gray.500"
-          letterSpacing="0.04em"
-        >
-          RESUME
-        </Text>
-
-        {resume ? (
-          <Badge colorScheme="green" borderRadius="full">
-            Uploaded
-          </Badge>
-        ) : (
-          <Badge colorScheme="orange" borderRadius="full">
-            Missing
-          </Badge>
-        )}
-      </HStack>
-
-      <HStack mt={6} spacing={4}>
-        <Box
-          w="48px"
-          h="58px"
-          borderRadius="lg"
-          bg="purple.50"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Icon as={FiFileText} boxSize={6} color="purple.600" />
-        </Box>
-
-        <Box>
-          <Text fontWeight="700">
-            {resume?.originalFileName || "Resume.pdf"}
-          </Text>
-
-          <Text mt={1} fontSize="sm" color="gray.500">
-            {resume ? "Your resume is ready." : "Upload your latest resume."}
-          </Text>
-        </Box>
-      </HStack>
-
-      <HStack mt={6}>
-        <Button
-          size="sm"
-          variant={resume ? "outline" : "solid"}
-          colorScheme="purple"
-          onClick={onUpload}
-        >
-          {resume ? "Manage Resume" : "Upload Resume"}
-        </Button>
-      </HStack>
-    </Card>
-  );
-}
-
-function QuickActions({ candidate, navigate }) {
-  const actions = [
-    {
-      label: "Add Experience",
-      description: "Tell us about your work history",
-      icon: FiBriefcase,
-    },
-    {
-      label: "Add Education",
-      description: "Add your academic background",
-      icon: FiBookOpen,
-    },
-    {
-      label: "Add Certification",
-      description: "Showcase your certifications",
-      icon: FiAward,
-    },
-  ];
-
-  return (
-    <Card>
-      <Text
-        fontSize="xs"
-        fontWeight="700"
-        color="gray.500"
-        letterSpacing="0.04em"
-      >
-        QUICK ACTIONS
-      </Text>
-
-      <Stack mt={4} spacing={1}>
-        {actions.map((action) => (
-          <Flex
-            key={action.label}
-            py={3}
-            align="center"
-            justify="space-between"
-            cursor="pointer"
-            borderRadius="lg"
-            _hover={{ bg: "gray.50" }}
-            onClick={() => navigate("/candidate/profile")}
-          >
-            <HStack spacing={3}>
-              <Box
-                w="36px"
-                h="36px"
-                borderRadius="lg"
-                bg="gray.50"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Icon as={action.icon} color="purple.600" />
-              </Box>
-
-              <Box>
-                <Text fontSize="sm" fontWeight="600">
-                  {action.label}
-                </Text>
-
-                <Text fontSize="xs" color="gray.500">
-                  {action.description}
-                </Text>
-              </Box>
-            </HStack>
-
-            <Icon as={FiChevronRight} color="gray.400" />
-          </Flex>
-        ))}
-      </Stack>
-    </Card>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Completion */
-/* ------------------------------------------------------------------ */
-
-function CompletionCard({ candidate, completion, navigate }) {
-  const steps = [
-    {
-      label: "Personal info",
-      complete: Boolean(candidate.user?.fullName),
-    },
-    {
-      label: "Contact info",
-      complete:
-        Boolean(candidate.user?.email) && Boolean(candidate.user?.phone),
-    },
-    {
-      label: "Employment",
-      complete: Boolean(candidate.user?.employmentSituation),
-    },
-    {
-      label: "Experience",
-      complete: candidate.experiences.length > 0,
-    },
-    {
-      label: "Education",
-      complete: candidate.education.length > 0,
-    },
-    {
-      label: "Certifications",
-      complete: candidate.certifications.length > 0,
-    },
-    {
-      label: "Achievements",
-      complete: candidate.achievements.length > 0,
-    },
-    {
-      label: "Resume",
-      complete: Boolean(candidate.resume),
-    },
-    {
-      label: "Professional pitch",
-      complete: Boolean(candidate.plainLanguagePitch),
-    },
-    {
-      label: "Career preferences",
-      complete:
-        Boolean(candidate.workModePreference) ||
-        Boolean(candidate.relocationPreference),
-    },
-  ];
-
-  return (
-    <Card>
-      <Flex
-        justify="space-between"
-        align={{ base: "flex-start", md: "center" }}
-        direction={{ base: "column", md: "row" }}
-        gap={3}
-      >
-        <Box>
-          <Heading size="sm">Complete your profile</Heading>
-
-          <Text mt={1} fontSize="sm" color="gray.500">
-            Build a richer profile so Springboard can understand your career
-            journey.
-          </Text>
-        </Box>
-
-        <Text fontSize="sm" fontWeight="700" color="purple.600">
-          {steps.filter((s) => s.complete).length} of {steps.length} completed
-        </Text>
-      </Flex>
-
-      <Progress
-        mt={5}
-        value={completion}
-        colorScheme="purple"
-        borderRadius="full"
-        size="sm"
-      />
-
-      <Flex mt={6} overflowX="auto" pb={2} gap={4}>
-        {steps.map((step, index) => (
-          <Box
-            key={step.label}
-            minW="95px"
-            textAlign="center"
-            cursor="pointer"
-            onClick={() => navigate("/candidate/profile")}
-          >
-            <Box
-              mx="auto"
-              w="30px"
-              h="30px"
-              borderRadius="full"
-              bg={step.complete ? "green.100" : "gray.100"}
-              color={step.complete ? "green.600" : "gray.500"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-            >
-              {step.complete ? (
-                <Icon as={FiCheckCircle} />
-              ) : (
-                <Text fontSize="xs">{index + 1}</Text>
-              )}
-            </Box>
-
-            <Text mt={2} fontSize="xs" fontWeight="600" color="gray.600">
-              {step.label}
-            </Text>
-          </Box>
-        ))}
-      </Flex>
-    </Card>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Career sections */
-/* ------------------------------------------------------------------ */
-
-function SectionHeader({ title, action, onAction }) {
-  return (
-    <Flex justify="space-between" align="center" mb={5}>
-      <Heading size="sm">{title}</Heading>
-
-      <Button size="sm" variant="ghost" colorScheme="purple" onClick={onAction}>
-        + {action}
-      </Button>
-    </Flex>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Right column */
-/* ------------------------------------------------------------------ */
-
-function ProfileSummaryCard({ candidate, navigate }) {
-  return (
-    <Card>
-      <Flex justify="space-between">
-        <Heading size="sm">Profile Summary</Heading>
-
-        <Text
-          fontSize="sm"
-          color="purple.600"
-          cursor="pointer"
-          onClick={() => navigate("/candidate/profile")}
-        >
-          Edit
-        </Text>
-      </Flex>
-
-      <Text mt={5} fontSize="sm" lineHeight="1.7" color="gray.600">
-        {candidate.plainLanguagePitch ||
-          "Add a short professional summary that tells recruiters who you are and what you do."}
-      </Text>
-
-      {!candidate.plainLanguagePitch && (
-        <Button
-          mt={5}
-          size="sm"
-          variant="outline"
-          colorScheme="purple"
-          onClick={() => navigate("/candidate/profile")}
-        >
-          Add Summary
-        </Button>
-      )}
-    </Card>
-  );
-}
-
-function CareerPreferencesCard({ candidate, onEdit }) {
-  const preferences = candidate.careerPreferences;
-
-  const industries = preferences?.desiredIndustries || [];
-  const locations = preferences?.desiredLocations || [];
-  const languages = preferences?.languages || [];
-
-  const hasPreferences =
-    Boolean(preferences?.desiredTitle) ||
-    locations.length > 0 ||
-    industries.length > 0 ||
-    languages.length > 0 ||
-    Boolean(preferences?.openToRemote) ||
-    preferences?.noticePeriod != null ||
-    Boolean(preferences?.workAuthorization);
-
-  return (
-    <Card>
-      <Flex justify="space-between" align="center">
-        <Box>
-          <Heading size="sm">Career Preferences</Heading>
-
-          <Text mt={1} fontSize="xs" color="gray.500">
-            What you're looking for next
-          </Text>
-        </Box>
-
-        <Button size="sm" variant="ghost" colorScheme="purple" onClick={onEdit}>
-          Edit
-        </Button>
-      </Flex>
-
-      {!hasPreferences ? (
-        <Box
-          mt={5}
-          p={5}
-          border="1px dashed"
-          borderColor="gray.300"
-          borderRadius="xl"
-        >
-          <Text fontWeight="600" color="gray.700">
-            Tell us what you're looking for next.
-          </Text>
-
-          <Text mt={1} fontSize="sm" color="gray.500">
-            Add your target role, locations and work preferences.
-          </Text>
-
-          <Button mt={4} size="sm" colorScheme="purple" onClick={onEdit}>
-            Add preferences
-          </Button>
-        </Box>
-      ) : (
-        <Stack mt={5} spacing={5}>
-          <Preference label="Looking for" value={preferences?.desiredTitle} />
-
-          {industries.length > 0 && (
-            <PreferenceTags label="Industries" values={industries} />
-          )}
-
-          {locations.length > 0 && (
-            <PreferenceTags label="Locations" values={locations} />
-          )}
-
-          <Preference
-            label="Work preference"
-            value={formatCareerPreference(preferences?.openToRemote)}
-          />
-
-          <Preference
-            label="Notice period"
-            value={
-              preferences?.noticePeriod != null
-                ? `${preferences.noticePeriod} days`
-                : "Not specified"
-            }
-          />
-
-          <Preference
-            label="Work authorization"
-            value={formatCareerPreference(preferences?.workAuthorization)}
-          />
-
-          {languages.length > 0 && (
-            <PreferenceTags label="Languages" values={languages} />
-          )}
-        </Stack>
-      )}
-    </Card>
-  );
-}
-
-function Preference({ label, value }) {
-  return (
-    <Flex justify="space-between" gap={4}>
-      <Text fontSize="sm" color="gray.500">
-        {label}
-      </Text>
-
-      <Text fontSize="sm" fontWeight="600" textAlign="right">
-        {value || "Not specified"}
-      </Text>
-    </Flex>
-  );
-}
-
-function OpportunityCard({ navigate }) {
-  return (
-    <Box
-      borderRadius="2xl"
-      p={6}
-      bgGradient="linear(to-br, purple.600, purple.500)"
-      color="white"
-      overflow="hidden"
-      position="relative"
-    >
-      <Text fontSize="xs" fontWeight="700" letterSpacing="0.04em" opacity={0.8}>
-        WHAT'S NEXT?
-      </Text>
-
-      <Heading mt={3} size="md">
-        Your next opportunity could start here.
-      </Heading>
-
-      <Text mt={3} fontSize="sm" opacity={0.9}>
-        Complete your profile first. We'll use your career story and preferences
-        to help identify relevant opportunities.
-      </Text>
-
-      <Button
-        mt={5}
-        bg="white"
-        color="purple.600"
-        _hover={{ bg: "gray.100" }}
-        onClick={() => navigate("/candidate/profile")}
-      >
-        Complete Profile
-        <Icon as={FiChevronRight} ml={2} />
-      </Button>
-    </Box>
-  );
-}
-
-function EmptyState({ icon, title, text, action, onClick }) {
-  return (
-    <Box
-      py={8}
-      textAlign="center"
-      border="1px dashed"
-      borderColor="gray.200"
-      borderRadius="xl"
-    >
-      <Box
-        mx="auto"
-        w="48px"
-        h="48px"
-        borderRadius="xl"
-        bg="gray.50"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Icon as={icon} color="gray.400" boxSize={5} />
-      </Box>
-
-      <Text mt={4} fontWeight="600">
-        {title}
-      </Text>
-
-      <Text mt={1} fontSize="sm" color="gray.500" maxW="420px" mx="auto">
-        {text}
-      </Text>
-
-      <Button
-        mt={4}
-        size="sm"
-        variant="outline"
-        colorScheme="purple"
-        onClick={onClick}
-      >
-        {action}
-      </Button>
-    </Box>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Helpers */
-/* ------------------------------------------------------------------ */
-
-function PreferenceTags({ label, values }) {
-  return (
-    <Box>
-      <Text fontSize="xs" fontWeight="600" color="gray.500" mb={2}>
-        {label}
-      </Text>
-
-      <Flex gap={2} flexWrap="wrap">
-        {values.map((value) => (
-          <Tag key={value} size="sm" borderRadius="full" colorScheme="purple">
-            {value}
-          </Tag>
-        ))}
-      </Flex>
-    </Box>
-  );
-}
-
-function formatCareerPreference(value) {
-  if (!value) {
-    return "Not specified";
-  }
-
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 function calculateProfileCompletion(candidate) {
   const checks = [
     Boolean(candidate.user?.fullName),
@@ -1750,28 +1001,4 @@ function calculateProfileCompletion(candidate) {
   const completed = checks.filter(Boolean).length;
 
   return Math.round((completed / checks.length) * 100);
-}
-
-function formatValue(value) {
-  if (!value) {
-    return "";
-  }
-
-  return value
-    .toLowerCase()
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function formatDate(value) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  return date.toLocaleDateString("en-IN", {
-    month: "short",
-    year: "numeric",
-  });
 }

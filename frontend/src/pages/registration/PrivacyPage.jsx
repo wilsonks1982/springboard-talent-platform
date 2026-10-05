@@ -1,26 +1,28 @@
 import React from "react";
 import {
-  Button,
-  VStack,
   Alert,
   AlertIcon,
-  Text,
   Box,
+  Button,
   HStack,
   Icon,
-  Badge,
+  Text,
+  VStack,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Shield, CheckCircle2, ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, ShieldCheck } from "lucide-react";
+
 import ScrollGate from "../../components/ScrollGate";
 import RegistrationLayout from "../../components/RegistrationLayout";
+
 import {
   acceptPrivacy,
   setPrivacyScrolledToEnd,
   setStep,
   setError,
 } from "../../store/registrationSlice";
+
 import { consentApi } from "../../api/authApi";
 
 export default function PrivacyPage() {
@@ -32,6 +34,10 @@ export default function PrivacyPage() {
   );
 
   const [isLoading, setIsLoading] = React.useState(false);
+
+  /* =========================================================
+     CONTINUE
+  ========================================================= */
 
   const next = async () => {
     if (!privacyAccepted) return;
@@ -66,71 +72,24 @@ export default function PrivacyPage() {
 
   return (
     <RegistrationLayout>
-      <VStack align="stretch" spacing={7}>
-        {/* Header */}
-        <Box>
-          <HStack spacing={2} mb={3}>
-            <Badge
-              colorScheme="purple"
-              bg="purple.50"
-              color="purple.700"
-              border="1px solid"
-              borderColor="purple.100"
-              borderRadius="full"
-              px={3}
-              py={1}
-              fontSize="10px"
-              fontWeight="800"
-              letterSpacing="0.04em"
-              textTransform="uppercase"
-            >
-              Step 3 · Privacy
-            </Badge>
-          </HStack>
-
-          <HStack spacing={3} align="center" mb={3}>
-            <Box
-              w="42px"
-              h="42px"
-              borderRadius="xl"
-              bg="purple.50"
-              border="1px solid"
-              borderColor="purple.100"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              flexShrink={0}
-            >
-              <Icon as={Shield} w={18} h={18} color="purple.600" />
-            </Box>
-
-            <Text
-              fontSize={{ base: "xl", md: "2xl" }}
-              fontWeight="800"
-              color="gray.900"
-              letterSpacing="-0.025em"
-              lineHeight="1.2"
-            >
-              Review Privacy & Data Policy
-            </Text>
-          </HStack>
-
-          <Text fontSize="sm" color="gray.500" lineHeight="1.7" maxW="650px">
-            We take your privacy seriously. Please review how your personal data
-            is collected, protected, and used.
-          </Text>
-        </Box>
-
-        {/* Privacy Document */}
+      <VStack align="stretch" spacing={{ base: 7, md: 9 }}>
+        {/* =====================================================
+            PRIVACY DOCUMENT
+        ===================================================== */}
         <Box
           bg="white"
           border="1px solid"
-          borderColor="gray.100"
-          borderRadius="2xl"
+          borderColor="cream.300"
+          borderRadius="6px"
           p={{ base: 2, md: 3 }}
-          boxShadow="0 10px 30px rgba(88, 28, 135, 0.07)"
         >
-          <Box bg="gray.50" borderRadius="xl" p={1}>
+          <Box
+            bg="cream.100"
+            border="1px solid"
+            borderColor="cream.300"
+            borderRadius="4px"
+            p={1}
+          >
             <ScrollGate
               title="Privacy & Data Policy"
               accepted={privacyAccepted}
@@ -140,99 +99,109 @@ export default function PrivacyPage() {
           </Box>
         </Box>
 
-        {/* Scroll Guidance */}
+        {/* =====================================================
+            SCROLL GUIDANCE
+        ===================================================== */}
         {!privacyScrolledToEnd && (
           <Alert
             status="info"
-            borderRadius="xl"
-            bg="purple.50"
+            borderRadius="4px"
+            bg="cream.100"
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="cream.300"
             px={4}
             py={3}
           >
             <Box
               w="32px"
               h="32px"
-              borderRadius="lg"
+              borderRadius="4px"
               bg="white"
+              border="1px solid"
+              borderColor="cream.300"
               display="flex"
               alignItems="center"
               justifyContent="center"
               mr={3}
               flexShrink={0}
             >
-              <Icon as={Shield} w={16} h={16} color="purple.600" />
+              <Icon as={Shield} boxSize="16px" color="accent.600" />
             </Box>
 
             <Box>
-              <Text fontWeight="700" color="purple.800" fontSize="sm">
+              <Text fontWeight="700" color="charcoal.800" fontSize="sm">
                 Review the complete policy
               </Text>
 
-              <Text color="purple.700" fontSize="xs" mt={0.5} lineHeight="1.5">
+              <Text color="taupe.600" fontSize="xs" mt={0.5} lineHeight="1.5">
                 Scroll to the bottom of the document to enable acceptance.
               </Text>
             </Box>
           </Alert>
         )}
 
-        {/* Ready to Accept */}
+        {/* =====================================================
+            READY TO ACCEPT
+        ===================================================== */}
         {privacyScrolledToEnd && !privacyAccepted && (
           <Alert
             status="warning"
-            borderRadius="xl"
-            bg="orange.50"
+            borderRadius="4px"
+            bg="accent.50"
             border="1px solid"
-            borderColor="orange.100"
+            borderColor="accent.200"
             px={4}
             py={3}
           >
-            <AlertIcon color="orange.500" />
+            <AlertIcon color="accent.600" boxSize="18px" />
 
             <Box>
-              <Text fontWeight="700" color="orange.800" fontSize="sm">
+              <Text fontWeight="700" color="charcoal.800" fontSize="sm">
                 Ready for acceptance
               </Text>
 
-              <Text color="orange.700" fontSize="xs" mt={0.5}>
+              <Text color="taupe.600" fontSize="xs" mt={0.5} lineHeight="1.5">
                 Please check the acceptance box in the policy before continuing.
               </Text>
             </Box>
           </Alert>
         )}
 
-        {/* Accepted */}
+        {/* =====================================================
+            ACCEPTED
+        ===================================================== */}
         {privacyAccepted && (
           <Alert
             status="success"
-            borderRadius="xl"
-            bg="purple.50"
+            borderRadius="4px"
+            bg="success.50"
             border="1px solid"
-            borderColor="purple.100"
+            borderColor="success.200"
             px={4}
             py={3}
           >
             <Box
               w="32px"
               h="32px"
-              borderRadius="lg"
+              borderRadius="4px"
               bg="white"
+              border="1px solid"
+              borderColor="success.200"
               display="flex"
               alignItems="center"
               justifyContent="center"
               mr={3}
               flexShrink={0}
             >
-              <Icon as={CheckCircle2} w={16} h={16} color="purple.600" />
+              <Icon as={CheckCircle2} boxSize="17px" color="success.600" />
             </Box>
 
             <Box>
-              <Text fontWeight="700" color="purple.800" fontSize="sm">
+              <Text fontWeight="700" color="success.700" fontSize="sm">
                 Privacy Policy accepted
               </Text>
 
-              <Text color="purple.700" fontSize="xs" mt={0.5}>
+              <Text color="success.600" fontSize="xs" mt={0.5} lineHeight="1.5">
                 Your privacy consent has been recorded. You can now complete
                 your registration.
               </Text>
@@ -240,32 +209,36 @@ export default function PrivacyPage() {
           </Alert>
         )}
 
-        {/* Error */}
+        {/* =====================================================
+            ERROR
+        ===================================================== */}
         {error && (
           <Alert
             status="error"
-            borderRadius="xl"
-            bg="red.50"
+            borderRadius="4px"
+            bg="error.50"
             border="1px solid"
-            borderColor="red.100"
+            borderColor="error.200"
             px={4}
             py={3}
           >
-            <AlertIcon color="red.500" />
+            <AlertIcon boxSize="18px" color="error.600" />
 
             <Box>
-              <Text fontWeight="700" color="red.700" fontSize="sm">
+              <Text fontWeight="700" color="error.700" fontSize="sm">
                 Something needs attention
               </Text>
 
-              <Text color="red.600" fontSize="xs" mt={0.5}>
+              <Text color="error.600" fontSize="xs" mt={0.5} lineHeight="1.5">
                 {error}
               </Text>
             </Box>
           </Alert>
         )}
 
-        {/* Continue */}
+        {/* =====================================================
+            CONTINUE
+        ===================================================== */}
         <Box pt={1}>
           <Button
             width="100%"
@@ -275,19 +248,20 @@ export default function PrivacyPage() {
             isLoading={isLoading}
             loadingText="Accepting Policy..."
             onClick={next}
-            borderRadius="xl"
-            fontWeight="800"
+            borderRadius="4px"
+            fontWeight="700"
+            letterSpacing="0.01em"
             color="white"
-            bgGradient="linear(to-r, purple.700, purple.600)"
-            boxShadow="0 10px 28px rgba(128, 90, 213, 0.22)"
-            rightIcon={<ArrowRight size={16} />}
+            bg="brand.500"
+            boxShadow="0 8px 22px rgba(96, 18, 48, 0.18)"
+            rightIcon={<ArrowRight size={18} />}
             _hover={{
-              bgGradient: "linear(to-r, purple.800, purple.700)",
-              boxShadow: "0 14px 32px rgba(128, 90, 213, 0.28)",
+              bg: "brand.600",
+              boxShadow: "0 11px 28px rgba(96, 18, 48, 0.24)",
               transform: "translateY(-1px)",
             }}
             _active={{
-              transform: "scale(0.985)",
+              transform: "translateY(0)",
             }}
             transition="all 0.2s ease"
           >
@@ -295,18 +269,20 @@ export default function PrivacyPage() {
           </Button>
 
           <HStack justify="center" spacing={2} mt={4}>
-            <Icon as={ShieldCheck} w={14} h={14} color="purple.500" />
+            <Icon as={ShieldCheck} boxSize="14px" color="accent.600" />
 
-            <Text fontSize="xs" color="gray.500" textAlign="center">
+            <Text fontSize="xs" color="taupe.500" textAlign="center">
               Your privacy choices are securely recorded.
             </Text>
           </HStack>
         </Box>
 
-        {/* Privacy Note */}
+        {/* =====================================================
+            PRIVACY NOTE
+        ===================================================== */}
         <Text
           fontSize="xs"
-          color="gray.400"
+          color="taupe.400"
           textAlign="center"
           lineHeight="1.6"
           maxW="620px"

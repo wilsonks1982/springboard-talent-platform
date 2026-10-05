@@ -12,28 +12,32 @@ import {
 } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Zap, Users, Target, Sparkles, Check } from "lucide-react";
+import { ArrowRight, Target, Users, Zap, Check } from "lucide-react";
+
 import { setStep } from "../../store/registrationSlice";
 import RegistrationLayout from "../../components/RegistrationLayout";
 
 const features = [
   {
     icon: Target,
-    title: "Personalized Growth Path",
+    eyebrow: "PERSONALIZED DIRECTION",
+    title: "A clearer path forward",
     description:
-      "Get matched with expert coaches tailored to your specific career goals and challenges.",
+      "Build a career direction around your strengths, ambitions, and the opportunities that matter to you.",
   },
   {
     icon: Users,
-    title: "Expert Guidance",
+    eyebrow: "EXPERT PERSPECTIVE",
+    title: "Guidance that understands you",
     description:
-      "Access industry professionals with years of experience ready to support your journey.",
+      "Gain access to a talent platform designed around your experience, potential, and next career move.",
   },
   {
     icon: Zap,
-    title: "Comprehensive Assessments",
+    eyebrow: "CAREER INTELLIGENCE",
+    title: "Know where you stand",
     description:
-      "Evaluate your skills with industry-standard assessments designed by experts.",
+      "Understand your professional strengths and create a stronger foundation for what comes next.",
   },
 ];
 
@@ -48,133 +52,120 @@ export default function WelcomePage() {
 
   return (
     <RegistrationLayout>
-      <VStack align="stretch" spacing={{ base: 7, md: 9 }} position="relative">
+      <VStack align="stretch" spacing={{ base: 8, md: 10 }}>
         {/* =====================================================
-            HERO
+            INTRODUCTION
         ===================================================== */}
-        <VStack spacing={4} textAlign="center" maxW="720px" mx="auto">
+        <VStack
+          align="center"
+          textAlign="center"
+          spacing={4}
+          maxW="760px"
+          mx="auto"
+          pt={{ base: 1, md: 3 }}
+        >
           <Badge
             display="inline-flex"
             alignItems="center"
-            gap={2}
             px={3}
             py={1.5}
-            borderRadius="full"
-            bg="purple.50"
-            color="purple.700"
+            borderRadius="2px"
+            bg="accent.50"
+            color="accent.700"
             border="1px solid"
-            borderColor="purple.100"
-            fontSize="xs"
+            borderColor="accent.200"
+            fontSize="10px"
             fontWeight="800"
-            letterSpacing="0.08em"
+            letterSpacing="0.16em"
           >
-            <Icon as={Sparkles} boxSize={3.5} />
-            SPRINGBOARD TALENT
+            BEGIN YOUR JOURNEY
           </Badge>
 
           <Heading
+            fontFamily="heading"
             fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}
-            fontWeight="800"
+            fontWeight="500"
             lineHeight="1.08"
-            letterSpacing="-0.035em"
-            color="gray.900"
+            letterSpacing="-0.025em"
+            color="brand.500"
           >
-            Welcome to your
-            <Text as="span" display="block" color="purple.700">
-              career transformation.
+            Your Potential.
+            <Text as="span" display="block">
+              Your Platform.
             </Text>
           </Heading>
 
           <Text
-            fontSize={{ base: "md", md: "lg" }}
-            color="gray.500"
-            maxW="620px"
-            lineHeight="1.75"
+            fontFamily="heading"
+            fontSize={{ base: "xl", md: "2xl" }}
+            fontStyle="italic"
+            fontWeight="400"
+            color="accent.600"
           >
-            Join professionals accelerating their careers through expert
-            coaching, personalized assessments, and intelligent career matching.
+            Find Your Gold Standard.
+          </Text>
+
+          <Text
+            fontSize={{ base: "sm", md: "md" }}
+            color="taupe.600"
+            maxW="640px"
+            lineHeight="1.8"
+          >
+            Springboard helps you understand where you are, clarify where you
+            want to go, and build the next chapter of your career with purpose.
           </Text>
         </VStack>
 
         {/* =====================================================
-            FEATURES
+            WHAT SPRINGBOARD OFFERS
         ===================================================== */}
-        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
-          {features.map((feature) => (
-            <Box
-              key={feature.title}
-              p={{ base: 5, md: 6 }}
-              bg="white"
-              border="1px solid"
-              borderColor="purple.100"
-              borderRadius="2xl"
-              boxShadow="0 8px 25px rgba(88, 28, 135, 0.05)"
-              transition="all 0.2s ease"
-              _hover={{
-                transform: "translateY(-3px)",
-                boxShadow: "0 14px 35px rgba(88, 28, 135, 0.09)",
-                borderColor: "purple.200",
-              }}
+        <Box>
+          <HStack spacing={3} justify="center" mb={{ base: 5, md: 6 }}>
+            <Box h="1px" w="32px" bg="accent.500" />
+
+            <Text
+              fontSize="10px"
+              fontWeight="800"
+              letterSpacing="0.16em"
+              color="taupe.500"
             >
-              <VStack align="start" spacing={4}>
-                <Box
-                  w="46px"
-                  h="46px"
-                  borderRadius="xl"
-                  bg="purple.50"
-                  border="1px solid"
-                  borderColor="purple.100"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Icon as={feature.icon} boxSize={5} color="purple.600" />
-                </Box>
+              THE SPRINGBOARD APPROACH
+            </Text>
 
-                <Box>
-                  <Text
-                    fontWeight="750"
-                    fontSize="md"
-                    color="gray.800"
-                    mb={1.5}
-                  >
-                    {feature.title}
-                  </Text>
+            <Box h="1px" w="32px" bg="accent.500" />
+          </HStack>
 
-                  <Text fontSize="sm" color="gray.500" lineHeight="1.65">
-                    {feature.description}
-                  </Text>
-                </Box>
-              </VStack>
-            </Box>
-          ))}
-        </SimpleGrid>
+          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={{ base: 4, md: 5 }}>
+            {features.map((feature) => (
+              <FeatureCard key={feature.title} feature={feature} />
+            ))}
+          </SimpleGrid>
+        </Box>
 
         {/* =====================================================
-            TIME ESTIMATE
+            TIME EXPECTATION
         ===================================================== */}
         <Box
-          bg="linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%)"
-          border="1px solid"
-          borderColor="purple.100"
-          borderRadius="2xl"
-          px={{ base: 5, md: 6 }}
+          px={{ base: 4, md: 6 }}
           py={4}
+          bg="cream.100"
+          border="1px solid"
+          borderColor="cream.300"
         >
-          <HStack justify="center" spacing={3}>
+          <HStack justify="center" spacing={3} flexWrap="wrap">
             <Box
-              w="9px"
-              h="9px"
+              w="7px"
+              h="7px"
               borderRadius="full"
-              bg="purple.500"
-              boxShadow="0 0 0 4px rgba(128, 90, 213, 0.10)"
+              bg="accent.500"
+              flexShrink={0}
             />
 
-            <Text fontSize="sm" color="gray.600" textAlign="center">
-              <Text as="span" fontWeight="750" color="gray.800">
-                Takes about 5 minutes
+            <Text fontSize="sm" color="taupe.600" textAlign="center">
+              <Text as="span" fontWeight="700" color="charcoal.800">
+                About 5 minutes
               </Text>{" "}
-              to complete your profile
+              to create your account and get started.
             </Text>
           </HStack>
         </Box>
@@ -187,27 +178,27 @@ export default function WelcomePage() {
             width="full"
             size="lg"
             onClick={begin}
-            fontWeight="800"
-            borderRadius="xl"
-            py={7}
+            height="56px"
+            fontWeight="700"
+            letterSpacing="0.01em"
             color="white"
-            bgGradient="linear(to-r, purple.700, purple.600)"
-            rightIcon={<ArrowRight size={19} />}
-            boxShadow="0 10px 28px rgba(128, 90, 213, 0.22)"
+            bg="brand.500"
+            borderRadius="4px"
+            rightIcon={<ArrowRight size={18} />}
+            boxShadow="0 8px 22px rgba(96, 18, 48, 0.18)"
             _hover={{
-              bgGradient: "linear(to-r, purple.800, purple.700)",
-              boxShadow: "0 14px 34px rgba(128, 90, 213, 0.30)",
+              bg: "brand.600",
+              boxShadow: "0 11px 28px rgba(96, 18, 48, 0.24)",
               transform: "translateY(-1px)",
             }}
             _active={{
-              transform: "scale(0.985)",
+              transform: "translateY(0)",
             }}
             transition="all 0.2s ease"
           >
-            Get Started
+            Begin Your Journey
           </Button>
 
-          {/* Trust points */}
           <HStack
             spacing={{ base: 3, md: 5 }}
             justify="center"
@@ -216,24 +207,102 @@ export default function WelcomePage() {
           >
             <TrustPoint text="Free to join" />
             <TrustPoint text="No credit card" />
-            <TrustPoint text="5–10 minutes" />
+            <TrustPoint text="Your information stays protected" />
           </HStack>
         </VStack>
 
         {/* =====================================================
-            FOOTER MESSAGE
+            PHILOSOPHY
         ===================================================== */}
-        <Text
-          fontSize="xs"
-          color="gray.400"
-          textAlign="center"
-          lineHeight="1.6"
-        >
-          Your journey starts with understanding where you are today and where
-          you want to go next.
-        </Text>
+        <VStack spacing={2} pt={{ base: 1, md: 2 }}>
+          <Text
+            fontFamily="heading"
+            fontSize={{ base: "xl", md: "2xl" }}
+            fontStyle="italic"
+            color="brand.500"
+          >
+            Grow. Outgrow.
+          </Text>
+
+          <Text
+            fontSize="xs"
+            color="taupe.500"
+            textAlign="center"
+            maxW="560px"
+            lineHeight="1.7"
+          >
+            Your career is not a fixed destination. It is a journey of becoming,
+            growing, and moving toward what comes next.
+          </Text>
+        </VStack>
       </VStack>
     </RegistrationLayout>
+  );
+}
+
+/* =============================================================
+   FEATURE CARD
+============================================================= */
+
+function FeatureCard({ feature }) {
+  return (
+    <Box
+      p={{ base: 5, md: 6 }}
+      bg="white"
+      border="1px solid"
+      borderColor="cream.300"
+      borderRadius="6px"
+      transition="all 0.2s ease"
+      _hover={{
+        borderColor: "accent.300",
+        transform: "translateY(-2px)",
+        boxShadow: "0 10px 28px rgba(46, 42, 40, 0.07)",
+      }}
+    >
+      <VStack align="start" spacing={4}>
+        <HStack justify="space-between" width="full" align="start">
+          <Box
+            w="42px"
+            h="42px"
+            border="1px solid"
+            borderColor="accent.300"
+            bg="accent.50"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius="4px"
+          >
+            <Icon as={feature.icon} boxSize={18} color="accent.600" />
+          </Box>
+
+          <Text
+            fontSize="9px"
+            fontWeight="800"
+            letterSpacing="0.12em"
+            color="taupe.500"
+            textAlign="right"
+          >
+            {feature.eyebrow}
+          </Text>
+        </HStack>
+
+        <Box>
+          <Text
+            fontFamily="heading"
+            fontSize="lg"
+            fontWeight="500"
+            color="brand.500"
+            mb={2}
+          >
+            {feature.title}
+          </Text>
+
+          <Text fontSize="sm" color="taupe.600" lineHeight="1.7">
+            {feature.description}
+          </Text>
+        </Box>
+      </VStack>
+    </Box>
   );
 }
 
@@ -244,9 +313,9 @@ export default function WelcomePage() {
 function TrustPoint({ text }) {
   return (
     <HStack spacing={1.5}>
-      <Icon as={Check} boxSize={3.5} color="purple.500" />
+      <Icon as={Check} boxSize={13} color="accent.600" />
 
-      <Text fontSize="xs" color="gray.500" fontWeight="500">
+      <Text fontSize="xs" color="taupe.600" fontWeight="500">
         {text}
       </Text>
     </HStack>

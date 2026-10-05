@@ -6,13 +6,9 @@ import org.wilsonks.backend.domain.NotableAchievement;
 import java.util.List;
 import java.util.UUID;
 
-public interface NotableAchievementRepository
-        extends JpaRepository<NotableAchievement, UUID> {
+public interface NotableAchievementRepository extends JpaRepository<NotableAchievement, UUID> {
 
-    List<NotableAchievement>
-    findAllByCandidateUserIdOrderByDisplayOrderAsc(
-            UUID userId
-    );
+    List<NotableAchievement> findAllByCandidateUserIdOrderByDisplayOrderAsc(UUID userId);
 
     void deleteAllByCandidateUserId(UUID userId);
 }

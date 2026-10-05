@@ -55,7 +55,6 @@ public class AuthService {
         }
 
         // 3. Create User
-
         User user=new User();
         user.setFullName(registerRequest.fullName().trim());
         user.setEmail(email);
@@ -72,22 +71,18 @@ public class AuthService {
         Candidate candidate=new Candidate();
         candidate.setUserId(user.getUserId()); // Set the user ID for the candidate
         candidate.setUser(user); // Set the user for the candidate
-        candidatesRepo.save(candidate);
 
         // Initialize candidate profile from registration data
         candidate.setFullName(user.getFullName());
         candidate.setPhone(user.getPhone());
         candidate.setCity(user.getLocation());
 
+        candidatesRepo.save(candidate);
+
         log.info("User and candidate registered successfully with ID: {}", user.getUserId());
 
-        // 5. Continue existing registration flow
-
-        verification.createEmail(user);
-
         String token=jwt.generate(user.getUserId(),user.getRole().name());
-
-
+        
         return RegisterResponse.of(user, token, jwt.expires(), "VERIFICATION_PENDING");
 
     }

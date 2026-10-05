@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import {
   Alert,
   AlertIcon,
-  Badge,
   Box,
   Button,
   Container,
   Divider,
+  Flex,
   FormControl,
   FormLabel,
   Heading,
@@ -14,25 +14,54 @@ import {
   Icon,
   Input,
   InputGroup,
+  InputLeftElement,
   InputRightElement,
   Link,
+  SimpleGrid,
   Text,
   VStack,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
 import {
-  Mail,
-  Lock,
+  ArrowRight,
+  CheckCircle2,
   Eye,
   EyeOff,
-  ArrowRight,
-  CheckCircle,
+  Lock,
+  Mail,
   Sparkles,
 } from "lucide-react";
+
 import { authApi } from "../api/authApi";
 import { setAuth } from "../store/authSlice";
+import BrandMark from "../components/brand/BrandMark";
+import BrandWordmark from "../components/brand/BrandWordmark";
+
+function Benefit({ children }) {
+  return (
+    <HStack spacing={3} align="start">
+      <Flex
+        mt="2px"
+        w="20px"
+        h="20px"
+        align="center"
+        justify="center"
+        borderRadius="full"
+        bg="accent.50"
+        color="accent.600"
+        flexShrink={0}
+      >
+        <Icon as={CheckCircle2} boxSize="13px" />
+      </Flex>
+
+      <Text fontSize="14px" lineHeight="1.6" color="taupe.600">
+        {children}
+      </Text>
+    </HStack>
+  );
+}
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -44,21 +73,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isMobile = useBreakpointValue({ base: true, md: false });
-
   const submit = async () => {
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       setError("Please enter both email and password.");
       return;
     }
 
     setIsLoading(true);
+    setError("");
 
     try {
-      setError("");
-
       const response = await authApi.login({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -77,629 +103,449 @@ export default function LoginPage() {
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
       submit();
     }
   };
 
   return (
-    <Box
-      minH="100vh"
-      bg="linear-gradient(180deg, #faf9ff 0%, #ffffff 55%, #faf9ff 100%)"
-      color="gray.800"
-    >
+    <Box minH="100vh" bg="cream.100" color="charcoal.800">
       {/* =========================================================
           HEADER
       ========================================================= */}
       <Box
-        bg="rgba(255,255,255,0.92)"
+        bg="rgba(255,255,255,0.94)"
         backdropFilter="blur(12px)"
         borderBottom="1px solid"
-        borderColor="purple.100"
-        py={4}
-        px={{ base: 5, md: 10 }}
+        borderColor="cream.400"
         position="relative"
         zIndex={2}
       >
-        <Container maxW="1200px" mx="auto">
-          <HStack justify="space-between">
-            <HStack spacing={2} cursor="pointer" onClick={() => navigate("/")}>
-              <FlexBrandMark />
-
-              <Heading
-                size="md"
-                color="purple.700"
-                letterSpacing="-0.02em"
-                _hover={{ color: "purple.800" }}
-              >
-                Springboard Talent
-              </Heading>
+        <Container maxW="1280px" py={4} px={{ base: 5, md: 8 }}>
+          <Flex align="center" justify="space-between">
+            {/* Brand */}
+            <HStack spacing={3} cursor="pointer" onClick={() => navigate("/")}>
+              <BrandMark />
+              <BrandWordmark />
             </HStack>
 
-            <Text fontSize="sm" color="gray.600">
-              Don't have an account?{" "}
-              <Link
-                as="span"
-                color="purple.700"
-                fontWeight="700"
-                cursor="pointer"
-                _hover={{
-                  textDecoration: "underline",
-                  color: "purple.800",
-                }}
+            {/* Registration */}
+            <HStack spacing={{ base: 2, md: 4 }}>
+              <Text
+                display={{ base: "none", sm: "block" }}
+                fontSize="13px"
+                color="taupe.600"
+              >
+                New to Springboard?
+              </Text>
+
+              <Button
+                variant="outlineGold"
+                size="sm"
                 onClick={() => navigate("/register/welcome")}
               >
-                Sign up
-              </Link>
-            </Text>
-          </HStack>
+                Create account
+              </Button>
+            </HStack>
+          </Flex>
         </Container>
       </Box>
 
       {/* =========================================================
           MAIN
       ========================================================= */}
-      <Box
-        position="relative"
-        overflow="hidden"
-        py={{ base: 8, md: 16 }}
-        px={{ base: 4, md: 8 }}
+      <Container
+        maxW="1280px"
+        minH={{
+          base: "calc(100vh - 77px)",
+          lg: "calc(100vh - 77px)",
+        }}
+        px={{ base: 5, md: 8 }}
+        py={{ base: 8, md: 12, lg: 16 }}
       >
-        {/* Ambient purple glow */}
-        <Box
-          position="absolute"
-          top="-180px"
-          left="-160px"
-          w="420px"
-          h="420px"
-          borderRadius="full"
-          bg="purple.100"
-          opacity={0.45}
-          filter="blur(80px)"
-          pointerEvents="none"
-        />
-
-        <Box
-          position="absolute"
-          bottom="-180px"
-          right="-140px"
-          w="420px"
-          h="420px"
-          borderRadius="full"
-          bg="purple.100"
-          opacity={0.35}
-          filter="blur(90px)"
-          pointerEvents="none"
-        />
-
-        <Container maxW="1200px" mx="auto" position="relative">
-          <Box
-            display="grid"
-            gridTemplateColumns={{
-              base: "1fr",
-              md: "1fr 1fr",
-            }}
-            gap={{ base: 8, md: 14 }}
-            alignItems="center"
-          >
-            {/* =====================================================
-                LEFT SIDE
-            ===================================================== */}
-            {!isMobile && (
+        <SimpleGrid
+          columns={{ base: 1, lg: 2 }}
+          gap={{ base: 10, lg: 20 }}
+          alignItems="center"
+          minH={{ lg: "calc(100vh - 205px)" }}
+        >
+          {/* =====================================================
+              LEFT — BRAND STORY
+          ===================================================== */}
+          <Box display={{ base: "none", lg: "block" }} pr={8}>
+            <VStack align="start" spacing={8}>
               <Box>
-                <VStack align="start" spacing={8}>
-                  <Box>
-                    <Badge
-                      display="inline-flex"
-                      alignItems="center"
-                      gap={2}
-                      px={3}
-                      py={1.5}
-                      borderRadius="full"
-                      bg="purple.50"
-                      color="purple.700"
-                      border="1px solid"
-                      borderColor="purple.100"
-                      fontSize="xs"
-                      fontWeight="800"
-                      letterSpacing="0.08em"
-                    >
-                      <Icon as={Sparkles} boxSize={3.5} />
-                      WELCOME BACK
-                    </Badge>
+                <HStack spacing={3} mb={5}>
+                  <Box w="28px" h="1px" bg="accent.500" />
 
-                    <Heading
-                      mt={5}
-                      fontSize={{ md: "4xl", lg: "5xl" }}
-                      fontWeight="800"
-                      lineHeight="1.08"
-                      letterSpacing="-0.035em"
-                      color="gray.900"
-                    >
-                      Continue your
-                      <Text as="span" display="block" color="purple.700">
-                        career journey.
-                      </Text>
-                    </Heading>
+                  <Text textStyle="overline" color="taupe.500">
+                    Candidate Platform
+                  </Text>
+                </HStack>
 
-                    <Text
-                      mt={5}
-                      fontSize="lg"
-                      color="gray.600"
-                      lineHeight={1.8}
-                      maxW="540px"
-                    >
-                      Access your personalized workspace, connect with the right
-                      coaches, track your progress, and move your career
-                      forward.
-                    </Text>
+                <Heading
+                  fontFamily="heading"
+                  fontSize={{ lg: "48px", xl: "56px" }}
+                  lineHeight="1.08"
+                  fontWeight="500"
+                  color="brand.500"
+                  letterSpacing="-0.025em"
+                  maxW="620px"
+                >
+                  Your Potential.
+                  <br />
+                  <Box as="span" color="charcoal.800">
+                    Your Platform.
                   </Box>
+                </Heading>
 
-                  {/* Benefits */}
-                  <VStack align="start" spacing={5}>
-                    <Benefit
-                      title="Personalized Coaching"
-                      description="Get matched with coaches who understand your goals"
-                    />
-
-                    <Benefit
-                      title="Skill Assessments"
-                      description="Evaluate and strengthen your professional capabilities"
-                    />
-
-                    <Benefit
-                      title="Career Growth"
-                      description="Build a clearer path toward your next opportunity"
-                    />
-                  </VStack>
-
-                  {/* Stats */}
-                  <Box
-                    pt={5}
-                    w="full"
-                    maxW="520px"
-                    borderTop="1px solid"
-                    borderColor="purple.100"
-                  >
-                    <HStack spacing={0} justify="space-between">
-                      <Stat value="5K+" label="Active Candidates" />
-
-                      <Divider
-                        orientation="vertical"
-                        h="38px"
-                        borderColor="purple.100"
-                      />
-
-                      <Stat value="500+" label="Expert Coaches" />
-
-                      <Divider
-                        orientation="vertical"
-                        h="38px"
-                        borderColor="purple.100"
-                      />
-
-                      <Stat value="95%" label="Success Rate" />
-                    </HStack>
-                  </Box>
-                </VStack>
+                <Text
+                  mt={7}
+                  maxW="540px"
+                  fontSize="17px"
+                  lineHeight="1.8"
+                  color="taupe.600"
+                >
+                  Your career is more than a job search. Build a profile that
+                  reflects your experience, direction and potential — and let
+                  the right opportunities find you.
+                </Text>
               </Box>
-            )}
 
-            {/* =====================================================
-                LOGIN CARD
-            ===================================================== */}
-            <Box position="relative">
-              {/* Purple glow behind card */}
-              <Box
-                position="absolute"
-                inset="-12px"
-                borderRadius="3xl"
-                bg="purple.200"
-                opacity={0.22}
-                filter="blur(30px)"
-                pointerEvents="none"
-              />
-
+              {/* Gold statement */}
               <Box
                 position="relative"
-                bg="rgba(255,255,255,0.96)"
-                p={{ base: 6, md: 9 }}
-                borderRadius="3xl"
-                boxShadow="0 24px 70px rgba(88, 28, 135, 0.10)"
-                border="1px solid"
-                borderColor="purple.100"
+                pl={6}
+                py={2}
+                borderLeft="2px solid"
+                borderColor="accent.500"
               >
-                <VStack align="stretch" spacing={6}>
-                  {/* Form Header */}
-                  <Box textAlign="center">
-                    <Box
-                      mx="auto"
-                      mb={4}
-                      w="52px"
-                      h="52px"
-                      borderRadius="2xl"
-                      bg="purple.50"
-                      border="1px solid"
-                      borderColor="purple.100"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <Icon as={Lock} boxSize={5} color="purple.700" />
-                    </Box>
+                <Text
+                  fontFamily="heading"
+                  fontSize="30px"
+                  lineHeight="1.25"
+                  fontStyle="italic"
+                  fontWeight="500"
+                  color="brand.500"
+                >
+                  Find Your Gold Standard.
+                </Text>
 
-                    <Heading
-                      fontSize="2xl"
-                      fontWeight="800"
-                      color="gray.900"
-                      letterSpacing="-0.02em"
-                    >
-                      Sign in
-                    </Heading>
+                <Text mt={2} fontSize="13px" color="taupe.500">
+                  Grow. Outgrow.
+                </Text>
+              </Box>
 
-                    <Text mt={2} fontSize="sm" color="gray.500">
-                      Access your Springboard Talent account
-                    </Text>
-                  </Box>
+              {/* Benefits */}
+              <VStack align="stretch" spacing={4} w="full" maxW="500px">
+                <Benefit>Build a compelling professional profile.</Benefit>
 
-                  {/* Error */}
-                  {error && (
-                    <Alert
-                      status="error"
-                      borderRadius="xl"
-                      bg="red.50"
-                      border="1px solid"
-                      borderColor="red.100"
-                      alignItems="flex-start"
-                    >
-                      <AlertIcon mt={1} />
+                <Benefit>Define where you want your career to go.</Benefit>
 
-                      <Box>
-                        <Text fontWeight="700" color="red.700" fontSize="sm">
-                          Login failed
-                        </Text>
+                <Benefit>
+                  Connect with opportunities aligned to your potential.
+                </Benefit>
+              </VStack>
 
-                        <Text color="red.600" fontSize="sm" mt={0.5}>
-                          {error}
-                        </Text>
-                      </Box>
-                    </Alert>
-                  )}
+              <HStack pt={2} spacing={3} color="taupe.500">
+                <Icon as={Sparkles} boxSize="15px" color="accent.500" />
 
+                <Text
+                  fontSize="11px"
+                  fontWeight="700"
+                  letterSpacing="0.12em"
+                  textTransform="uppercase"
+                >
+                  Progress. Elevate.
+                </Text>
+              </HStack>
+            </VStack>
+          </Box>
+
+          {/* =====================================================
+              RIGHT — LOGIN PANEL
+          ===================================================== */}
+          <Flex justify={{ base: "center", lg: "flex-end" }}>
+            <Box
+              w="full"
+              maxW="500px"
+              bg="white"
+              border="1px solid"
+              borderColor="cream.400"
+              borderRadius="8px"
+              boxShadow="0 18px 55px rgba(46, 42, 40, 0.08)"
+              px={{ base: 6, md: 10 }}
+              py={{ base: 8, md: 10 }}
+            >
+              <VStack align="stretch" spacing={7}>
+                {/* Panel heading */}
+                <Box>
+                  <Text textStyle="overline" color="accent.600" mb={3}>
+                    Candidate Access
+                  </Text>
+
+                  <Heading
+                    fontFamily="heading"
+                    fontSize={{ base: "30px", md: "34px" }}
+                    fontWeight="500"
+                    lineHeight="1.15"
+                    color="brand.500"
+                  >
+                    Welcome back.
+                  </Heading>
+
+                  <Text
+                    mt={3}
+                    fontSize="14px"
+                    lineHeight="1.7"
+                    color="taupe.600"
+                  >
+                    Sign in to continue building your professional journey.
+                  </Text>
+                </Box>
+
+                {/* Error */}
+                {error && (
+                  <Alert
+                    status="error"
+                    variant="subtle"
+                    borderRadius="5px"
+                    border="1px solid"
+                    borderColor="error.200"
+                  >
+                    <AlertIcon />
+                    <Text fontSize="13px">{error}</Text>
+                  </Alert>
+                )}
+
+                {/* Form */}
+                <VStack
+                  as="form"
+                  align="stretch"
+                  spacing={5}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    submit();
+                  }}
+                >
                   {/* Email */}
                   <FormControl>
-                    <FormLabel
-                      fontSize="sm"
-                      fontWeight="700"
-                      color="gray.700"
-                      mb={2}
-                    >
-                      Email address
-                    </FormLabel>
+                    <FormLabel>Email address</FormLabel>
 
                     <InputGroup>
+                      <InputLeftElement pointerEvents="none">
+                        <Icon as={Mail} boxSize="17px" color="taupe.400" />
+                      </InputLeftElement>
+
                       <Input
                         type="email"
-                        placeholder="you@example.com"
                         value={email}
-                        onChange={(e) => {
-                          setEmail(e.target.value);
-                          setError("");
+                        onChange={(event) => {
+                          setEmail(event.target.value);
+                          if (error) setError("");
                         }}
-                        onKeyPress={handleKeyPress}
-                        borderRadius="xl"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        pl={11}
-                        py={6}
-                        fontSize="sm"
-                        bg="gray.50"
-                        _focus={{
-                          bg: "white",
-                          borderColor: "purple.500",
-                          boxShadow: "0 0 0 3px rgba(128, 90, 213, 0.12)",
-                        }}
-                        _hover={{
-                          borderColor: "purple.200",
-                        }}
-                        _placeholder={{
-                          color: "gray.400",
-                        }}
+                        onKeyDown={handleKeyDown}
+                        placeholder="you@example.com"
+                        autoComplete="email"
+                        autoFocus
+                        pl="42px"
                       />
-
-                      <InputRightElement pt={2} left={1}>
-                        <Icon as={Mail} boxSize={4.5} color="gray.400" />
-                      </InputRightElement>
                     </InputGroup>
                   </FormControl>
 
                   {/* Password */}
                   <FormControl>
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      mb={2}
-                    >
-                      <FormLabel
-                        fontSize="sm"
-                        fontWeight="700"
-                        color="gray.700"
-                        mb={0}
-                      >
-                        Password
-                      </FormLabel>
+                    <Flex justify="space-between" align="center">
+                      <FormLabel mb={2}>Password</FormLabel>
 
                       <Link
-                        fontSize="xs"
-                        color="purple.700"
+                        as="button"
+                        type="button"
+                        fontSize="12px"
+                        color="brand.500"
                         fontWeight="700"
-                        _hover={{
-                          textDecoration: "underline",
-                          color: "purple.800",
+                        mb={2}
+                        onClick={() => {
+                          // Keep this visually available without
+                          // introducing a route that does not exist yet.
                         }}
                       >
                         Forgot password?
                       </Link>
-                    </Box>
+                    </Flex>
 
                     <InputGroup>
+                      <InputLeftElement pointerEvents="none">
+                        <Icon as={Lock} boxSize="17px" color="taupe.400" />
+                      </InputLeftElement>
+
                       <Input
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
                         value={password}
-                        onChange={(e) => {
-                          setPassword(e.target.value);
-                          setError("");
+                        onChange={(event) => {
+                          setPassword(event.target.value);
+                          if (error) setError("");
                         }}
-                        onKeyPress={handleKeyPress}
-                        borderRadius="xl"
-                        border="1px solid"
-                        borderColor="gray.200"
-                        pl={11}
-                        py={6}
-                        fontSize="sm"
-                        bg="gray.50"
-                        _focus={{
-                          bg: "white",
-                          borderColor: "purple.500",
-                          boxShadow: "0 0 0 3px rgba(128, 90, 213, 0.12)",
-                        }}
-                        _hover={{
-                          borderColor: "purple.200",
-                        }}
-                        _placeholder={{
-                          color: "gray.400",
-                        }}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Enter your password"
+                        autoComplete="current-password"
+                        pl="42px"
+                        pr="48px"
                       />
 
-                      <InputRightElement
-                        cursor="pointer"
-                        pt={2}
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        <Icon
-                          as={showPassword ? EyeOff : Eye}
-                          boxSize={4.5}
-                          color="gray.400"
+                      <InputRightElement>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          minW="auto"
+                          px={2}
+                          color="taupe.500"
                           _hover={{
-                            color: "purple.600",
+                            color: "brand.500",
+                            bg: "transparent",
                           }}
-                        />
+                          onClick={() => setShowPassword((current) => !current)}
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
+                        >
+                          <Icon
+                            as={showPassword ? EyeOff : Eye}
+                            boxSize="17px"
+                          />
+                        </Button>
                       </InputRightElement>
                     </InputGroup>
                   </FormControl>
 
-                  {/* Remember */}
-                  <HStack justify="flex-start" fontSize="sm">
-                    <Input
-                      type="checkbox"
-                      id="remember"
-                      w={4}
-                      h={4}
-                      cursor="pointer"
-                      borderRadius="md"
-                      borderColor="gray.300"
-                      accentColor="#805AD5"
-                    />
-
-                    <FormLabel
-                      htmlFor="remember"
-                      cursor="pointer"
-                      mb={0}
-                      color="gray.600"
-                      fontSize="sm"
-                      fontWeight="500"
-                    >
-                      Keep me signed in
-                    </FormLabel>
-                  </HStack>
-
-                  {/* Sign In */}
+                  {/* Submit */}
                   <Button
+                    type="submit"
+                    variant="solid"
                     size="lg"
-                    onClick={submit}
+                    w="full"
+                    mt={1}
                     isLoading={isLoading}
-                    loadingText="Signing in..."
-                    fontWeight="800"
-                    borderRadius="xl"
-                    py={6}
-                    color="white"
-                    bgGradient="linear(to-r, purple.700, purple.600)"
-                    rightIcon={<ArrowRight size={18} />}
-                    boxShadow="0 10px 25px rgba(128, 90, 213, 0.22)"
-                    _hover={{
-                      bgGradient: "linear(to-r, purple.800, purple.700)",
-                      boxShadow: "0 14px 30px rgba(128, 90, 213, 0.28)",
-                      transform: "translateY(-1px)",
-                    }}
-                    _active={{
-                      transform: "scale(0.985)",
-                    }}
-                    transition="all 0.2s ease"
+                    loadingText="Signing in"
+                    rightIcon={
+                      !isLoading ? <ArrowRight size={17} /> : undefined
+                    }
                   >
-                    Sign in
+                    Sign in to Springboard
                   </Button>
-
-                  {/* Sign Up */}
-                  <Box
-                    textAlign="center"
-                    pt={5}
-                    borderTop="1px solid"
-                    borderColor="gray.100"
-                  >
-                    <Text fontSize="sm" color="gray.500">
-                      New to Springboard Talent?{" "}
-                      <Link
-                        as="span"
-                        color="purple.700"
-                        fontWeight="700"
-                        cursor="pointer"
-                        _hover={{
-                          textDecoration: "underline",
-                          color: "purple.800",
-                        }}
-                        onClick={() => navigate("/register/welcome")}
-                      >
-                        Create an account
-                      </Link>
-                    </Text>
-                  </Box>
                 </VStack>
 
-                {/* Footer Info */}
-                <Box
-                  mt={7}
-                  pt={5}
-                  borderTop="1px solid"
-                  borderColor="gray.100"
-                  textAlign="center"
-                >
-                  <Text fontSize="xs" color="gray.400" mb={2}>
-                    Secure login • We never share your data
+                {/* Divider */}
+                <HStack spacing={4}>
+                  <Divider borderColor="cream.400" />
+
+                  <Text
+                    fontSize="10px"
+                    fontWeight="800"
+                    letterSpacing="0.12em"
+                    textTransform="uppercase"
+                    color="taupe.400"
+                    whiteSpace="nowrap"
+                  >
+                    New candidate
                   </Text>
 
-                  <HStack justify="center" spacing={3} fontSize="xs">
-                    <Link color="gray.400" _hover={{ color: "purple.600" }}>
-                      Privacy Policy
-                    </Link>
+                  <Divider borderColor="cream.400" />
+                </HStack>
 
-                    <Text color="gray.200">•</Text>
+                {/* Registration CTA */}
+                <Box
+                  p={4}
+                  bg="cream.100"
+                  border="1px solid"
+                  borderColor="cream.400"
+                  borderRadius="5px"
+                >
+                  <Flex
+                    direction={{ base: "column", sm: "row" }}
+                    align={{ base: "stretch", sm: "center" }}
+                    justify="space-between"
+                    gap={4}
+                  >
+                    <Box>
+                      <Text
+                        fontSize="13px"
+                        fontWeight="700"
+                        color="charcoal.800"
+                      >
+                        Start your journey
+                      </Text>
 
-                    <Link color="gray.400" _hover={{ color: "purple.600" }}>
-                      Terms of Service
-                    </Link>
+                      <Text mt={1} fontSize="12px" color="taupe.600">
+                        Create your candidate profile.
+                      </Text>
+                    </Box>
 
-                    <Text color="gray.200">•</Text>
-
-                    <Link color="gray.400" _hover={{ color: "purple.600" }}>
-                      Contact Support
-                    </Link>
-                  </HStack>
+                    <Button
+                      variant="outlineGold"
+                      size="sm"
+                      flexShrink={0}
+                      onClick={() => navigate("/register/welcome")}
+                    >
+                      Create account
+                    </Button>
+                  </Flex>
                 </Box>
-              </Box>
+
+                {/* Employer path */}
+                <Box textAlign="center" pt={1}>
+                  <Text fontSize="12px" color="taupe.500">
+                    Are you an employer?{" "}
+                    <Link
+                      as="button"
+                      type="button"
+                      color="brand.500"
+                      fontWeight="700"
+                      onClick={() => navigate("/employer/login")}
+                    >
+                      Employer sign in
+                    </Link>
+                  </Text>
+                </Box>
+              </VStack>
             </Box>
-          </Box>
-        </Container>
-      </Box>
+          </Flex>
+        </SimpleGrid>
+      </Container>
 
       {/* =========================================================
           FOOTER
       ========================================================= */}
-      <Box
-        bg="white"
-        borderTop="1px solid"
-        borderColor="purple.50"
-        py={6}
-        px={{ base: 5, md: 10 }}
-      >
-        <Container maxW="1200px" mx="auto">
-          <Text fontSize="xs" color="gray.400" textAlign="center">
-            &copy; 2024 Springboard Talent. All rights reserved. Helping you
-            accelerate your career journey.
-          </Text>
+      <Box borderTop="1px solid" borderColor="cream.400" bg="white">
+        <Container maxW="1280px" px={{ base: 5, md: 8 }} py={5}>
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            align={{ base: "start", sm: "center" }}
+            justify="space-between"
+            gap={3}
+          >
+            <Text fontSize="11px" color="taupe.500">
+              © 2026 Springboard Talent Partners
+            </Text>
+
+            <HStack spacing={2}>
+              <Box w="4px" h="4px" bg="accent.500" />
+
+              <Text
+                fontSize="10px"
+                fontWeight="800"
+                letterSpacing="0.14em"
+                textTransform="uppercase"
+                color="taupe.500"
+              >
+                Grow. Outgrow.
+              </Text>
+            </HStack>
+          </Flex>
         </Container>
       </Box>
-    </Box>
-  );
-}
-
-/* =============================================================
-   BRAND MARK
-============================================================= */
-
-function FlexBrandMark() {
-  return (
-    <Box
-      w="30px"
-      h="30px"
-      borderRadius="lg"
-      bgGradient="linear(to-br, purple.700, purple.500)"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      boxShadow="0 5px 12px rgba(128, 90, 213, 0.22)"
-    >
-      <Box w="11px" h="11px" borderRadius="full" bg="white" />
-    </Box>
-  );
-}
-
-/* =============================================================
-   BENEFIT
-============================================================= */
-
-function Benefit({ title, description }) {
-  return (
-    <HStack align="flex-start" spacing={4}>
-      <Box
-        w={11}
-        h={11}
-        borderRadius="xl"
-        bg="purple.50"
-        border="1px solid"
-        borderColor="purple.100"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        flexShrink={0}
-      >
-        <Icon as={CheckCircle} w={5} h={5} color="purple.600" />
-      </Box>
-
-      <Box>
-        <Text fontWeight="700" color="gray.800" fontSize="sm">
-          {title}
-        </Text>
-
-        <Text fontSize="sm" color="gray.500" mt={0.5} lineHeight="1.6">
-          {description}
-        </Text>
-      </Box>
-    </HStack>
-  );
-}
-
-/* =============================================================
-   STAT
-============================================================= */
-
-function Stat({ value, label }) {
-  return (
-    <Box>
-      <Text
-        fontSize="xl"
-        fontWeight="800"
-        color="purple.700"
-        letterSpacing="-0.02em"
-      >
-        {value}
-      </Text>
-
-      <Text fontSize="xs" color="gray.500" mt={0.5}>
-        {label}
-      </Text>
     </Box>
   );
 }

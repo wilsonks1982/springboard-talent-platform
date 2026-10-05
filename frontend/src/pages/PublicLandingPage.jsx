@@ -8,647 +8,728 @@ import {
   VStack,
   HStack,
   SimpleGrid,
-  Icon,
   Divider,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import {
-  CheckCircle,
-  Zap,
-  Users,
-  Award,
   ArrowRight,
+  ArrowUpRight,
+  BriefcaseBusiness,
+  Check,
+  ChevronRight,
   Sparkles,
-  ShieldCheck,
+  UserRound,
 } from "lucide-react";
+
+import BrandMark from "../components/brand/BrandMark";
+import BrandWordmark from "../components/brand/BrandWordmark";
 
 export default function PublicLandingPage() {
   const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: Users,
-      title: "Expert Coaches",
-      description:
-        "Connect with industry experts who understand your career goals and challenges.",
-    },
-    {
-      icon: Award,
-      title: "Skill Assessments",
-      description:
-        "Comprehensive assessments designed by industry professionals to evaluate your capabilities.",
-    },
-    {
-      icon: Zap,
-      title: "Smart Matching",
-      description:
-        "AI-powered coach matching based on your profile, skills, and career objectives.",
-    },
-    {
-      icon: CheckCircle,
-      title: "Personalized Growth",
-      description:
-        "Tailored learning paths and actionable feedback to accelerate your development.",
-    },
-  ];
-
-  const howItWorks = [
-    {
-      num: "1",
-      title: "Create Account",
-      desc: "Sign up and complete your profile in minutes",
-    },
-    {
-      num: "2",
-      title: "Take Assessments",
-      desc: "Evaluate your skills with our comprehensive tests",
-    },
-    {
-      num: "3",
-      title: "Get Matched",
-      desc: "Connect with the perfect coach for your goals",
-    },
-    {
-      num: "4",
-      title: "Grow & Succeed",
-      desc: "Achieve your career objectives with expert guidance",
-    },
-  ];
-
   return (
-    <Box minH="100vh" bg="white" color="gray.800" overflow="hidden">
-      {/* ==================== HEADER ==================== */}
+    <Box minH="100vh" bg="cream.100" color="charcoal.800" overflow="hidden">
+      {/* =========================================================
+          HEADER
+      ========================================================= */}
       <Box
-        bg="rgba(255, 255, 255, 0.94)"
-        backdropFilter="blur(14px)"
-        borderBottom="1px solid"
-        borderColor="purple.100"
-        py={4}
-        px={{ base: 5, md: 10 }}
         position="sticky"
         top={0}
-        zIndex={20}
+        zIndex={30}
+        bg="rgba(255,255,255,0.96)"
+        backdropFilter="blur(14px)"
+        borderBottom="1px solid"
+        borderColor="gray.200"
       >
-        <Container maxW="1200px" mx="auto">
-          <HStack justify="space-between" spacing={4}>
+        <Container maxW="1280px" py={4} px={{ base: 5, md: 8 }}>
+          <HStack justify="space-between">
             {/* Brand */}
-            <HStack spacing={3}>
-              <Box
-                w="40px"
-                h="40px"
-                borderRadius="xl"
-                bgGradient="linear(to-br, purple.700, purple.500)"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                boxShadow="0 7px 18px rgba(128, 90, 213, 0.25)"
-              >
-                <Sparkles size={19} color="white" strokeWidth={2} />
-              </Box>
-
-              <VStack
-                align="start"
-                spacing={0}
-                display={{ base: "none", sm: "flex" }}
-              >
-                <Heading
-                  size="md"
-                  color="purple.700"
-                  fontWeight="800"
-                  letterSpacing="-0.3px"
-                >
-                  Springboard Talent
-                </Heading>
-
-                <Text
-                  fontSize="9px"
-                  color="gray.500"
-                  fontWeight="700"
-                  textTransform="uppercase"
-                  letterSpacing="0.7px"
-                >
-                  Career Transformation
-                </Text>
-              </VStack>
+            <HStack
+              spacing={3}
+              cursor="pointer"
+              userSelect="none"
+              onClick={() => navigate("/")}
+            >
+              <BrandMark />
+              <BrandWordmark />
             </HStack>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              color="gray.600"
-              fontWeight="700"
-              borderRadius="lg"
-              _hover={{
-                bg: "purple.50",
-                color: "purple.700",
-              }}
-              onClick={() => navigate("/login")}
-            >
-              Candidate Login
-            </Button>
+            {/* Navigation */}
+            <HStack spacing={{ base: 1, md: 3 }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                color="charcoal.600"
+                fontWeight="600"
+                borderRadius="0"
+                onClick={() => navigate("/login")}
+                _hover={{
+                  bg: "brand.50",
+                  color: "brand.500",
+                }}
+              >
+                Candidate Login
+              </Button>
+
+              <Button
+                variant="ghostBrand"
+                size="sm"
+                fontWeight="700"
+                borderRadius="0"
+                onClick={() => navigate("/employer/login")}
+              >
+                Employer Login
+              </Button>
+            </HStack>
           </HStack>
         </Container>
       </Box>
 
-      {/* ==================== HERO ==================== */}
+      {/* =========================================================
+          HERO
+      ========================================================= */}
       <Box
         position="relative"
         overflow="hidden"
-        bgGradient="linear(to-br, purple.800, purple.700, purple.600)"
-        color="white"
-        py={{ base: 16, md: 24 }}
-        px={{ base: 5, md: 10 }}
+        bg="cream.100"
+        borderBottom="1px solid"
+        borderColor="gray.200"
       >
-        {/* Background decoration */}
+        {/* Decorative vertical line */}
         <Box
           position="absolute"
-          top="-180px"
-          right="-120px"
-          w="420px"
-          h="420px"
-          borderRadius="full"
-          bg="purple.400"
-          opacity={0.18}
-          filter="blur(70px)"
-          pointerEvents="none"
+          left={{ base: "20px", lg: "7%" }}
+          top={0}
+          bottom={0}
+          w="1px"
+          bg="gray.200"
+          opacity={0.7}
         />
 
-        <Box
-          position="absolute"
-          bottom="-220px"
-          left="-140px"
-          w="420px"
-          h="420px"
-          borderRadius="full"
-          bg="purple.300"
-          opacity={0.12}
-          filter="blur(80px)"
-          pointerEvents="none"
-        />
-
-        <Container maxW="1000px" mx="auto" position="relative" zIndex={1}>
-          <VStack
-            align="center"
-            spacing={{ base: 6, md: 8 }}
-            textAlign="center"
+        <Container
+          maxW="1280px"
+          px={{ base: 8, md: 14, lg: 20 }}
+          py={{ base: 20, md: 28, lg: 32 }}
+          position="relative"
+        >
+          <SimpleGrid
+            columns={{ base: 1, lg: 12 }}
+            gap={{ base: 12, lg: 16 }}
+            alignItems="center"
           >
-            {/* Eyebrow */}
-            <HStack
-              px={4}
-              py={2}
-              borderRadius="full"
-              bg="whiteAlpha.150"
-              border="1px solid"
-              borderColor="whiteAlpha.300"
-              spacing={2}
-            >
-              <Sparkles size={15} />
+            {/* Hero copy */}
+            <Box gridColumn={{ lg: "span 7" }}>
+              <Text textStyle="overline" mb={6}>
+                Positioning
+              </Text>
+
+              <Heading
+                as="h1"
+                fontSize={{
+                  base: "4xl",
+                  sm: "5xl",
+                  md: "6xl",
+                  lg: "7xl",
+                }}
+                lineHeight={{ base: 1.05, md: 1 }}
+                fontWeight="500"
+                fontStyle="italic"
+                letterSpacing="-0.045em"
+                color="brand.500"
+                maxW="850px"
+                fontFamily="heading"
+              >
+                Your Potential.
+                <Box as="span" display="block">
+                  Your Platform.
+                </Box>
+              </Heading>
+
+              <Box mt={7} w="70px" h="3px" bg="accent.500" />
 
               <Text
-                color="white"
-                fontSize="xs"
-                fontWeight="700"
-                letterSpacing="0.7px"
-                textTransform="uppercase"
+                mt={7}
+                fontSize={{ base: "md", md: "lg" }}
+                lineHeight="1.9"
+                color="taupe.600"
+                maxW="650px"
               >
-                Build Your Next Career
+                A talent platform designed for professionals who want to grow,
+                and organizations that want to find and develop their gold
+                standard.
               </Text>
-            </HStack>
 
-            <Heading
-              fontSize={{ base: "36px", sm: "46px", md: "58px" }}
-              lineHeight="1.08"
-              fontWeight="800"
-              letterSpacing="-1.5px"
-              maxW="850px"
-            >
-              Accelerate Your Career with{" "}
-              <Box as="span" color="purple.200">
-                Springboard Talent
-              </Box>
-            </Heading>
+              <HStack mt={9} spacing={4} flexWrap="wrap">
+                <Button
+                  h="50px"
+                  px={7}
+                  borderRadius="0"
+                  rightIcon={<ArrowRight size={17} />}
+                  onClick={() => navigate("/register/welcome")}
+                >
+                  Start as a Candidate
+                </Button>
 
-            <Text
-              fontSize={{ base: "md", md: "xl" }}
-              lineHeight="1.7"
-              maxW="720px"
-              color="whiteAlpha.900"
+                <Button
+                  h="50px"
+                  px={7}
+                  variant="outlineGold"
+                  borderRadius="0"
+                  rightIcon={<ArrowUpRight size={17} />}
+                  onClick={() => navigate("/employer/register")}
+                >
+                  Find Talent
+                </Button>
+              </HStack>
+            </Box>
+
+            {/* Brand statements */}
+            <Box
+              gridColumn={{ lg: "span 5" }}
+              borderLeft={{ base: "none", lg: "1px solid" }}
+              borderColor="gray.300"
+              pl={{ base: 0, lg: 12 }}
             >
-              Connect with expert coaches, take assessments, and unlock your
-              potential. All in one integrated platform.
+              <VStack align="stretch" spacing={10}>
+                <BrandStatement
+                  label="Brand Promise"
+                  title="Find Your Gold Standard."
+                  description="Discover the people, opportunities, and capabilities that move careers and organizations forward."
+                />
+
+                <BrandStatement
+                  label="Philosophy"
+                  title="Grow. Outgrow."
+                  description="Growth is not a destination. It is the ability to continuously become more capable, more confident, and more valuable."
+                />
+              </VStack>
+            </Box>
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* =========================================================
+          ROLE SELECTION
+      ========================================================= */}
+      <Box bg="white" py={{ base: 16, md: 24 }} px={{ base: 5, md: 8 }}>
+        <Container maxW="1120px">
+          <VStack spacing={4} textAlign="center" mb={12}>
+            <Text textStyle="overline" color="accent.600">
+              Choose Your Journey
             </Text>
 
-            {/* CTA */}
-            <HStack
-              justify="center"
-              spacing={{ base: 3, md: 4 }}
-              pt={3}
-              flexWrap="wrap"
+            <Heading
+              fontSize={{ base: "3xl", md: "5xl" }}
+              fontWeight="500"
+              color="brand.500"
+              letterSpacing="-0.035em"
             >
-              <Button
-                size="lg"
-                px={7}
-                h="52px"
-                bg="white"
-                color="purple.700"
-                fontWeight="800"
-                borderRadius="xl"
-                boxShadow="0 10px 28px rgba(0, 0, 0, 0.16)"
-                rightIcon={<ArrowRight size={17} />}
-                _hover={{
-                  bg: "purple.50",
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 14px 32px rgba(0, 0, 0, 0.20)",
-                }}
-                transition="all 0.2s ease"
-                onClick={() => navigate("/register/welcome")}
-              >
-                Get Started as Candidate
-              </Button>
+              One platform. Two perspectives.
+            </Heading>
 
-              <Button
-                size="lg"
-                px={7}
-                h="52px"
-                variant="outline"
-                borderColor="whiteAlpha.600"
+            <Text color="taupe.600" maxW="650px" lineHeight="1.8">
+              Whether you're advancing your career or building your team,
+              Springboard gives you the tools and relationships to move forward.
+            </Text>
+          </VStack>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+            {/* Candidate */}
+            <RoleCard
+              eyebrow="For Candidates"
+              icon={<UserRound size={22} />}
+              title="Build your potential."
+              description="Create a powerful professional profile, understand your strengths, develop your capabilities, and connect with opportunities aligned to your goals."
+              items={[
+                "Professional profile",
+                "Skills & assessments",
+                "Career development",
+                "Talent opportunities",
+              ]}
+              primaryLabel="Create Candidate Account"
+              secondaryLabel="Candidate Login"
+              onPrimary={() => navigate("/register/welcome")}
+              onSecondary={() => navigate("/login")}
+            />
+
+            {/* Employer */}
+            <RoleCard
+              employer
+              eyebrow="For Employers"
+              icon={<BriefcaseBusiness size={22} />}
+              title="Find your gold standard."
+              description="Discover qualified talent, define your hiring needs, manage your recruitment workflow, and build teams around the people who fit."
+              items={[
+                "Talent search",
+                "Role creation",
+                "Candidate screening",
+                "Hiring workflow",
+              ]}
+              primaryLabel="Create Employer Account"
+              secondaryLabel="Employer Login"
+              onPrimary={() => navigate("/employer/register")}
+              onSecondary={() => navigate("/employer/login")}
+            />
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* =========================================================
+          BRAND PROMISE
+      ========================================================= */}
+      <Box
+        bg="brand.500"
+        color="white"
+        py={{ base: 18, md: 26 }}
+        px={{ base: 5, md: 8 }}
+      >
+        <Container maxW="1050px">
+          <SimpleGrid
+            columns={{ base: 1, md: 2 }}
+            gap={{ base: 10, md: 16 }}
+            alignItems="center"
+          >
+            <Box>
+              <Text textStyle="overline" color="accent.300" mb={5}>
+                Brand Promise
+              </Text>
+
+              <Heading
+                fontSize={{ base: "4xl", md: "5xl" }}
+                fontWeight="500"
+                fontStyle="italic"
+                lineHeight="1.1"
                 color="white"
-                fontWeight="700"
-                borderRadius="xl"
-                _hover={{
-                  bg: "whiteAlpha.150",
-                  borderColor: "white",
-                }}
-                onClick={() => navigate("/login")}
               >
-                Sign In
-              </Button>
-            </HStack>
-
-            {/* Trust points */}
-            <HStack
-              pt={3}
-              spacing={{ base: 4, md: 7 }}
-              color="whiteAlpha.800"
-              flexWrap="wrap"
-              justify="center"
-            >
-              <HStack spacing={2}>
-                <ShieldCheck size={15} />
-                <Text color="white" fontSize="xs">
-                  Secure &amp; Private
-                </Text>
-              </HStack>
-
-              <HStack spacing={2}>
-                <CheckCircle size={15} />
-                <Text color="white" fontSize="xs">
-                  Personalized Experience
-                </Text>
-              </HStack>
-            </HStack>
-          </VStack>
-        </Container>
-      </Box>
-
-      {/* ==================== FEATURES ==================== */}
-      <Box
-        py={{ base: 16, md: 20 }}
-        px={{ base: 5, md: 10 }}
-        bg="linear-gradient(180deg, #faf9ff 0%, #ffffff 100%)"
-      >
-        <Container maxW="1200px" mx="auto">
-          <VStack spacing={12} align="stretch">
-            <VStack textAlign="center" spacing={3}>
-              <Text
-                fontSize="xs"
-                fontWeight="800"
-                color="purple.600"
-                textTransform="uppercase"
-                letterSpacing="1px"
-              >
-                Everything You Need
-              </Text>
-
-              <Heading size="xl" fontWeight="800" letterSpacing="-0.6px">
-                Why Choose Springboard Talent?
-              </Heading>
-
-              <Text fontSize="lg" color="gray.600" maxW="650px">
-                Everything you need to succeed in your career journey.
-              </Text>
-            </VStack>
-
-            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
-              {features.map((feature) => (
-                <Box
-                  key={feature.title}
-                  bg="white"
-                  p={{ base: 6, md: 7 }}
-                  borderRadius="2xl"
-                  border="1px solid"
-                  borderColor="purple.100"
-                  boxShadow="0 8px 24px rgba(88, 28, 135, 0.06)"
-                  textAlign="center"
-                  transition="all 0.25s ease"
-                  _hover={{
-                    transform: "translateY(-5px)",
-                    boxShadow: "0 14px 30px rgba(88, 28, 135, 0.11)",
-                    borderColor: "purple.200",
-                  }}
-                >
-                  <Box
-                    w="54px"
-                    h="54px"
-                    mx="auto"
-                    mb={5}
-                    borderRadius="xl"
-                    bg="purple.50"
-                    border="1px solid"
-                    borderColor="purple.100"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Icon as={feature.icon} w={7} h={7} color="purple.600" />
-                  </Box>
-
-                  <Heading size="md" mb={3} fontWeight="800">
-                    {feature.title}
-                  </Heading>
-
-                  <Text color="gray.600" fontSize="sm" lineHeight="1.7">
-                    {feature.description}
-                  </Text>
+                Find Your
+                <Box as="span" display="block">
+                  Gold Standard.
                 </Box>
-              ))}
-            </SimpleGrid>
-          </VStack>
-        </Container>
-      </Box>
-
-      {/* ==================== HOW IT WORKS ==================== */}
-      <Box py={{ base: 16, md: 20 }} px={{ base: 5, md: 10 }} bg="white">
-        <Container maxW="1200px" mx="auto">
-          <VStack spacing={12} align="stretch">
-            <VStack textAlign="center" spacing={3}>
-              <Text
-                fontSize="xs"
-                fontWeight="800"
-                color="purple.600"
-                textTransform="uppercase"
-                letterSpacing="1px"
-              >
-                Simple Process
-              </Text>
-
-              <Heading size="xl" fontWeight="800" letterSpacing="-0.6px">
-                How It Works
               </Heading>
+            </Box>
 
-              <Text fontSize="lg" color="gray.600">
-                Get started in 4 simple steps.
+            <Box>
+              <Text
+                color="whiteAlpha.800"
+                fontSize={{ base: "md", md: "lg" }}
+                lineHeight="1.9"
+              >
+                The right opportunity can change a career. The right person can
+                change an organization. Springboard Talent brings both sides
+                together through a platform designed around capability,
+                potential, and meaningful progress.
               </Text>
-            </VStack>
-
-            <SimpleGrid columns={{ base: 1, md: 4 }} spacing={6}>
-              {howItWorks.map((step) => (
-                <VStack
-                  key={step.num}
-                  bg="purple.50"
-                  p={{ base: 6, md: 7 }}
-                  borderRadius="2xl"
-                  border="1px solid"
-                  borderColor="purple.100"
-                  spacing={4}
-                  align="start"
-                  position="relative"
-                  overflow="hidden"
-                >
-                  <Box
-                    w="48px"
-                    h="48px"
-                    bgGradient="linear(to-br, purple.700, purple.500)"
-                    color="white"
-                    borderRadius="full"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    fontSize="lg"
-                    fontWeight="800"
-                    boxShadow="0 7px 16px rgba(128, 90, 213, 0.22)"
-                  >
-                    {step.num}
-                  </Box>
-
-                  <Heading size="sm" fontWeight="800" color="gray.800">
-                    {step.title}
-                  </Heading>
-
-                  <Text color="gray.600" fontSize="sm" lineHeight="1.65">
-                    {step.desc}
-                  </Text>
-                </VStack>
-              ))}
-            </SimpleGrid>
-          </VStack>
+            </Box>
+          </SimpleGrid>
         </Container>
       </Box>
 
-      {/* ==================== CTA ==================== */}
-      <Box
-        position="relative"
-        overflow="hidden"
-        bg="purple.50"
-        py={{ base: 14, md: 18 }}
-        px={{ base: 5, md: 10 }}
-        borderTop="1px solid"
-        borderBottom="1px solid"
-        borderColor="purple.100"
-      >
-        <Box
-          position="absolute"
-          top="-120px"
-          right="-80px"
-          w="300px"
-          h="300px"
-          borderRadius="full"
-          bg="purple.200"
-          opacity={0.25}
-          filter="blur(60px)"
-        />
+      {/* =========================================================
+          WHAT WE DELIVER
+      ========================================================= */}
+      <Box bg="cream.100" py={{ base: 16, md: 22 }} px={{ base: 5, md: 8 }}>
+        <Container maxW="1120px">
+          <VStack spacing={4} textAlign="center" mb={12}>
+            <Text textStyle="overline">What We Deliver</Text>
 
-        <Container maxW="800px" mx="auto" position="relative">
-          <VStack spacing={7} textAlign="center">
+            <Heading
+              fontSize={{ base: "3xl", md: "5xl" }}
+              fontWeight="500"
+              color="brand.500"
+            >
+              Progress with purpose.
+            </Heading>
+          </VStack>
+
+          <SimpleGrid
+            columns={{ base: 1, md: 2, lg: 4 }}
+            spacing={0}
+            borderTop="1px solid"
+            borderColor="gray.300"
+          >
+            <DeliveryItem
+              number="01"
+              title="Discover"
+              description="Understand potential, capability, and opportunity."
+            />
+
+            <DeliveryItem
+              number="02"
+              title="Develop"
+              description="Build stronger skills, profiles, and career direction."
+            />
+
+            <DeliveryItem
+              number="03"
+              title="Connect"
+              description="Create meaningful connections between talent and organizations."
+            />
+
+            <DeliveryItem
+              number="04"
+              title="Elevate"
+              description="Turn progress into meaningful professional outcomes."
+            />
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      {/* =========================================================
+          PHILOSOPHY CTA
+      ========================================================= */}
+      <Box bg="white" py={{ base: 18, md: 26 }} px={{ base: 5, md: 8 }}>
+        <Container maxW="850px">
+          <VStack textAlign="center" spacing={7}>
             <Box
-              w="52px"
-              h="52px"
-              borderRadius="xl"
-              bg="white"
+              w="54px"
+              h="54px"
               border="1px solid"
-              borderColor="purple.100"
+              borderColor="accent.500"
               display="flex"
               alignItems="center"
               justifyContent="center"
-              boxShadow="0 7px 18px rgba(128, 90, 213, 0.10)"
+              color="accent.500"
             >
-              <Sparkles size={22} color="#805AD5" />
+              <Sparkles size={21} />
             </Box>
 
-            <VStack spacing={3}>
-              <Heading size="lg" fontWeight="800" letterSpacing="-0.4px">
-                Ready to Transform Your Career?
-              </Heading>
+            <Text textStyle="overline">Philosophy</Text>
 
-              <Text fontSize="md" color="gray.600" maxW="600px">
-                Join thousands of candidates who are already growing with
-                Springboard Talent.
-              </Text>
-            </VStack>
-
-            <Button
-              size="lg"
-              h="50px"
-              px={7}
-              bgGradient="linear(to-r, purple.700, purple.600)"
-              color="white"
-              fontWeight="800"
-              borderRadius="xl"
-              boxShadow="0 10px 24px rgba(128, 90, 213, 0.25)"
-              rightIcon={<ArrowRight size={17} />}
-              _hover={{
-                bgGradient: "linear(to-r, purple.800, purple.700)",
-                transform: "translateY(-2px)",
-                boxShadow: "0 14px 30px rgba(128, 90, 213, 0.30)",
-              }}
-              transition="all 0.2s ease"
-              onClick={() => navigate("/register/welcome")}
+            <Heading
+              fontSize={{ base: "4xl", md: "6xl" }}
+              fontWeight="500"
+              fontStyle="italic"
+              color="brand.500"
+              letterSpacing="-0.04em"
             >
-              Get Started Now
-            </Button>
+              Grow. Outgrow.
+            </Heading>
+
+            <Text
+              color="taupe.600"
+              fontSize={{ base: "md", md: "lg" }}
+              lineHeight="1.9"
+              maxW="650px"
+            >
+              Don't simply prepare for what's next. Build the capability to
+              create what's next.
+            </Text>
+
+            <HStack spacing={4} pt={3} flexWrap="wrap" justify="center">
+              <Button
+                h="50px"
+                px={7}
+                rightIcon={<ArrowRight size={17} />}
+                onClick={() => navigate("/register/welcome")}
+              >
+                Begin Your Journey
+              </Button>
+
+              <Button
+                h="50px"
+                px={7}
+                variant="outlineGold"
+                onClick={() => navigate("/employer/register")}
+              >
+                Partner With Us
+              </Button>
+            </HStack>
           </VStack>
         </Container>
       </Box>
 
-      {/* ==================== FOOTER ==================== */}
-      <Box bg="gray.950" color="gray.300" py={10} px={{ base: 5, md: 10 }}>
-        <Container maxW="1200px" mx="auto" w="100%">
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={9} mb={9}>
+      {/* =========================================================
+          FOOTER
+      ========================================================= */}
+      <Box bg="charcoal.800" color="white" py={10} px={{ base: 5, md: 8 }}>
+        <Container maxW="1200px">
+          <SimpleGrid columns={{ base: 1, md: 4 }} spacing={10} mb={10}>
             {/* Brand */}
-            <VStack align="start" spacing={4}>
-              <HStack spacing={2.5}>
-                <Box
-                  w="30px"
-                  h="30px"
-                  borderRadius="lg"
-                  bgGradient="linear(to-br, purple.700, purple.500)"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Sparkles size={15} color="white" />
-                </Box>
+            <HStack spacing={3} mb={4}>
+              <BrandMark dark />
 
-                <Heading size="sm" color="white">
-                  Springboard Talent
-                </Heading>
-              </HStack>
+              <BrandWordmark dark />
+            </HStack>
 
-              <Text fontSize="sm" color="gray.400" lineHeight="1.7">
-                Accelerating careers through expert coaching and skill
-                development.
-              </Text>
-            </VStack>
+            {/* Candidates */}
+            <FooterColumn
+              title="Candidates"
+              links={[
+                ["Login", () => navigate("/login")],
+                ["Create Account", () => navigate("/register/welcome")],
+              ]}
+            />
 
-            {/* Product */}
-            <VStack align="start" spacing={3}>
-              <Heading size="sm" color="white">
-                Product
-              </Heading>
-
-              {["Assessments", "Coach Matching", "Learning Paths"].map(
-                (item) => (
-                  <Text
-                    key={item}
-                    fontSize="sm"
-                    color="gray.400"
-                    _hover={{
-                      color: "purple.300",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {item}
-                  </Text>
-                ),
-              )}
-            </VStack>
+            {/* Employers */}
+            <FooterColumn
+              title="Employers"
+              links={[
+                ["Login", () => navigate("/employer/login")],
+                ["Create Account", () => navigate("/employer/register")],
+              ]}
+            />
 
             {/* Company */}
-            <VStack align="start" spacing={3}>
-              <Heading size="sm" color="white">
-                Company
-              </Heading>
-
-              {["About Us", "Blog", "Careers"].map((item) => (
-                <Text
-                  key={item}
-                  fontSize="sm"
-                  color="gray.400"
-                  _hover={{
-                    color: "purple.300",
-                    cursor: "pointer",
-                  }}
-                >
-                  {item}
-                </Text>
-              ))}
-            </VStack>
-
-            {/* Legal */}
-            <VStack align="start" spacing={3}>
-              <Heading size="sm" color="white">
-                Legal
-              </Heading>
-
-              {["Privacy Policy", "Terms of Service", "Contact"].map((item) => (
-                <Text
-                  key={item}
-                  fontSize="sm"
-                  color="gray.400"
-                  _hover={{
-                    color: "purple.300",
-                    cursor: "pointer",
-                  }}
-                >
-                  {item}
-                </Text>
-              ))}
-            </VStack>
+            <FooterColumn
+              title="Company"
+              links={[
+                ["About Us", null],
+                ["Contact", null],
+                ["Privacy", null],
+                ["Terms", null],
+              ]}
+            />
           </SimpleGrid>
 
-          <Divider borderColor="gray.800" />
+          <Divider borderColor="whiteAlpha.200" />
 
           <HStack justify="space-between" flexWrap="wrap" gap={4} pt={6}>
-            <Text fontSize="sm" color="gray.500">
-              &copy; 2024 Springboard Talent. All rights reserved.
+            <Text fontSize="xs" color="whiteAlpha.500">
+              © 2026 Springboard Talent Partners. All rights reserved.
             </Text>
 
-            <HStack spacing={6} fontSize="sm" color="gray.500">
-              {["Twitter", "LinkedIn", "Facebook"].map((item) => (
-                <Text
-                  key={item}
-                  _hover={{
-                    color: "purple.300",
-                    cursor: "pointer",
-                  }}
-                >
-                  {item}
-                </Text>
-              ))}
-            </HStack>
+            <Text
+              fontFamily="heading"
+              fontStyle="italic"
+              fontSize="sm"
+              color="accent.300"
+            >
+              Grow. Outgrow.
+            </Text>
           </HStack>
         </Container>
       </Box>
     </Box>
+  );
+}
+
+/* =============================================================
+   BRAND STATEMENT
+============================================================= */
+
+function BrandStatement({ label, title, description }) {
+  return (
+    <Box>
+      <Text textStyle="overline" mb={4}>
+        {label}
+      </Text>
+
+      <Heading
+        fontSize={{ base: "3xl", md: "4xl" }}
+        fontWeight="500"
+        fontStyle="italic"
+        color="brand.500"
+        lineHeight="1.15"
+      >
+        {title}
+      </Heading>
+
+      <Text
+        mt={4}
+        color="taupe.600"
+        fontSize="sm"
+        lineHeight="1.8"
+        maxW="440px"
+      >
+        {description}
+      </Text>
+    </Box>
+  );
+}
+
+/* =============================================================
+   ROLE CARD
+============================================================= */
+
+function RoleCard({
+  employer = false,
+  eyebrow,
+  icon,
+  title,
+  description,
+  items,
+  primaryLabel,
+  secondaryLabel,
+  onPrimary,
+  onSecondary,
+}) {
+  return (
+    <Box
+      border="1px solid"
+      borderColor={employer ? "accent.300" : "gray.300"}
+      bg={employer ? "cream.100" : "white"}
+      p={{ base: 7, md: 9 }}
+      position="relative"
+      transition="all 0.25s ease"
+      _hover={{
+        transform: "translateY(-4px)",
+        boxShadow: "0 18px 45px rgba(46, 42, 40, 0.10)",
+      }}
+    >
+      <HStack justify="space-between" align="start" mb={7}>
+        <Box
+          w="52px"
+          h="52px"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          border="1px solid"
+          borderColor={employer ? "accent.500" : "brand.500"}
+          color={employer ? "accent.600" : "brand.500"}
+        >
+          {icon}
+        </Box>
+
+        <Text
+          fontSize="9px"
+          fontWeight="800"
+          letterSpacing="0.17em"
+          color={employer ? "accent.600" : "taupe.500"}
+          textTransform="uppercase"
+        >
+          {eyebrow}
+        </Text>
+      </HStack>
+
+      <Heading
+        fontSize={{ base: "3xl", md: "4xl" }}
+        fontWeight="500"
+        color="brand.500"
+        lineHeight="1.1"
+      >
+        {title}
+      </Heading>
+
+      <Text
+        mt={5}
+        color="taupe.600"
+        lineHeight="1.8"
+        fontSize="sm"
+        minH={{ md: "88px" }}
+      >
+        {description}
+      </Text>
+
+      <VStack align="stretch" spacing={3} mt={7} mb={8}>
+        {items.map((item) => (
+          <HStack key={item} spacing={3}>
+            <Check
+              size={15}
+              color={
+                employer
+                  ? "var(--chakra-colors-accent-500)"
+                  : "var(--chakra-colors-brand-500)"
+              }
+            />
+
+            <Text fontSize="sm" color="charcoal.800">
+              {item}
+            </Text>
+          </HStack>
+        ))}
+      </VStack>
+
+      <Divider borderColor="gray.300" mb={6} />
+
+      <HStack spacing={3}>
+        <Button
+          flex={1}
+          h="46px"
+          borderRadius="0"
+          rightIcon={<ArrowRight size={16} />}
+          onClick={onPrimary}
+        >
+          {primaryLabel}
+        </Button>
+
+        <Button
+          h="46px"
+          variant="outline"
+          borderRadius="0"
+          onClick={onSecondary}
+        >
+          {secondaryLabel}
+        </Button>
+      </HStack>
+    </Box>
+  );
+}
+
+/* =============================================================
+   DELIVERY ITEM
+============================================================= */
+
+function DeliveryItem({ number, title, description }) {
+  return (
+    <Box
+      p={{ base: 6, md: 8 }}
+      borderBottom="1px solid"
+      borderRight={{
+        base: "none",
+        md: "1px solid",
+      }}
+      borderColor="gray.300"
+      _last={{
+        borderRight: "none",
+      }}
+    >
+      <Text
+        fontSize="xs"
+        fontWeight="800"
+        letterSpacing="0.15em"
+        color="accent.600"
+        mb={6}
+      >
+        {number}
+      </Text>
+
+      <Heading fontSize="2xl" fontWeight="500" color="brand.500">
+        {title}
+      </Heading>
+
+      <Text mt={4} fontSize="sm" lineHeight="1.8" color="taupe.600">
+        {description}
+      </Text>
+    </Box>
+  );
+}
+
+/* =============================================================
+   FOOTER COLUMN
+============================================================= */
+
+function FooterColumn({ title, links }) {
+  return (
+    <VStack align="start" spacing={3}>
+      <Text
+        fontSize="xs"
+        fontWeight="800"
+        letterSpacing="0.15em"
+        color="accent.300"
+        mb={2}
+        textTransform="uppercase"
+      >
+        {title}
+      </Text>
+
+      {links.map(([label, action]) => (
+        <Text
+          key={label}
+          fontSize="sm"
+          color="whiteAlpha.600"
+          cursor={action ? "pointer" : "default"}
+          onClick={action || undefined}
+          _hover={
+            action
+              ? {
+                  color: "white",
+                }
+              : {}
+          }
+        >
+          {label}
+        </Text>
+      ))}
+    </VStack>
   );
 }
