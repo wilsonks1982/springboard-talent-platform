@@ -68,6 +68,9 @@ public class SecurityConfig {
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/status",
                                 "/api/v1/consents/current",
+                                "/api/v1/employers/register",
+                                "/api/v1/employers/login",
+                                "/api/v1/employers/status",
                                 "/actuator/health"
                         ).permitAll()
 

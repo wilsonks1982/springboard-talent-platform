@@ -92,11 +92,13 @@ public class EmployerRegistrationService {
 
         company.setWebsite(request.website() == null || request.website().isBlank() ? null : request.website().trim());
 
-        company.setPrimaryContactName(request.primaryContactName().trim());
+        company.setPrimaryContactName(request.fullName());
+        company.setPrimaryContactEmail(request.email());
+        company.setPrimaryContactPhone(request.phone());
 
-        company.setPrimaryContactEmail(request.primaryContactEmail() == null || request.primaryContactEmail().isBlank() ? savedUser.getEmail() : request.primaryContactEmail().trim().toLowerCase(Locale.ROOT));
-
-        company.setPrimaryContactPhone(request.primaryContactPhone() == null || request.primaryContactPhone().isBlank() ? savedUser.getPhone() : normalize(request.primaryContactPhone()));
+        company.setInviteCode(request.inviteCode() == null || request.inviteCode().isBlank() ? null : request.inviteCode().trim());
+        company.setInvitedBy(null); // This can be set later if needed
+        company.setAccountActive(true); // New employer accounts are active by default
 
         EmployerCompany savedCompany = employerCompanyRepository.save(company);
 

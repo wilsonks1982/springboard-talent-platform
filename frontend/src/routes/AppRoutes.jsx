@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
+import EmployerRoute from "./EmployerRoute";
 import RegistrationGuard from "./RegistrationGuard";
 import CandidateProfileGate from "./CandidateProfileGate";
 
@@ -20,48 +21,103 @@ import NdaPage from "../pages/registration/NdaPage";
 import PrivacyPage from "../pages/registration/PrivacyPage";
 import ConfirmationPage from "../pages/registration/ConfirmationPage";
 
+import EmployerLoginPage from "../pages/employer/EmployerLoginPage";
+import EmployerRegistrationPage from "../pages/employer/EmployerRegistrationPage";
+import EmployerEngagementSetupPage from "../pages/employer/EmployerEngagementSetupPage";
+
+import { ROUTES } from "./routePaths";
+
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ==================== PUBLIC ROUTES ==================== */}
+      {/* =====================================================
+          PUBLIC
+      ===================================================== */}
+
       <Route element={<PublicRoute />}>
-        <Route path="/" element={<PublicLandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Route>
+        <Route path={ROUTES.HOME} element={<PublicLandingPage />} />
 
-      {/* ==================== REGISTRATION ROUTES ==================== */}
-      <Route element={<RegistrationGuard />}>
-        <Route path="/register/welcome" element={<WelcomePage />} />
+        <Route path={ROUTES.LOGIN} element={<LoginPage />} />
 
-        <Route path="/register/onboarding" element={<OnboardingPage />} />
+        <Route path={ROUTES.EMPLOYER_LOGIN} element={<EmployerLoginPage />} />
 
-        <Route path="/register/nda" element={<NdaPage />} />
-
-        <Route path="/register/privacy" element={<PrivacyPage />} />
-
-        <Route path="/register/confirmation" element={<ConfirmationPage />} />
-      </Route>
-
-      {/* ==================== PROTECTED CANDIDATE ROUTES ==================== */}
-      <Route element={<ProtectedRoute />}>
-        {/* Profile setup must remain accessible before completion */}
         <Route
-          path="/candidate/profile-setup"
+          path={ROUTES.EMPLOYER_REGISTER}
+          element={<EmployerRegistrationPage />}
+        />
+      </Route>
+
+      {/* =====================================================
+          CANDIDATE REGISTRATION
+      ===================================================== */}
+
+      <Route element={<RegistrationGuard />}>
+        <Route path={ROUTES.REGISTER_WELCOME} element={<WelcomePage />} />
+
+        <Route path={ROUTES.REGISTER_ONBOARDING} element={<OnboardingPage />} />
+
+        <Route path={ROUTES.REGISTER_NDA} element={<NdaPage />} />
+
+        <Route path={ROUTES.REGISTER_PRIVACY} element={<PrivacyPage />} />
+
+        <Route
+          path={ROUTES.REGISTER_CONFIRMATION}
+          element={<ConfirmationPage />}
+        />
+      </Route>
+
+      {/* =====================================================
+          CANDIDATE PROTECTED
+      ===================================================== */}
+
+      <Route element={<ProtectedRoute />}>
+        {/* Profile setup must remain accessible before
+            profile completion. */}
+        <Route
+          path={ROUTES.CANDIDATE_PROFILE_SETUP}
           element={<CandidateProfileSetupPage />}
         />
 
-        {/* Candidate workspace requires completed profile */}
+        {/* Candidate workspace requires completed profile. */}
         <Route element={<CandidateProfileGate />}>
-          <Route path="/candidate" element={<CandidateLandingPage />} />
+          <Route path={ROUTES.CANDIDATE} element={<CandidateLandingPage />} />
 
-          <Route path="/candidate/profile" element={<CandidateProfilePage />} />
+          <Route
+            path={ROUTES.CANDIDATE_PROFILE}
+            element={<CandidateProfilePage />}
+          />
 
-          <Route path="/candidate/assessments" element={<AssessmentsPage />} />
+          <Route
+            path={ROUTES.CANDIDATE_ASSESSMENTS}
+            element={<AssessmentsPage />}
+          />
         </Route>
       </Route>
 
-      {/* ==================== FALLBACK ==================== */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* =====================================================
+          EMPLOYER PROTECTED
+      ===================================================== */}
+
+      <Route element={<EmployerRoute />}>
+        <Route
+          path={ROUTES.EMPLOYER_SETUP_ENGAGEMENT}
+          element={<EmployerEngagementSetupPage />}
+        />
+
+        {/* Employer workspace — coming next */}
+        {/* 
+        <Route
+          path={ROUTES.EMPLOYER}
+          element={<EmployerLandingPage />}
+        />
+        */}
+      </Route>
+
+      {/* =====================================================
+          FALLBACK
+      ===================================================== */}
+
+      <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
     </Routes>
   );
 }

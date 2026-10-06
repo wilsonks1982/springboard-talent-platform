@@ -1,22 +1,25 @@
 import React from "react";
+
 import {
   Box,
   Button,
   Container,
+  Divider,
+  Flex,
   Heading,
-  Text,
-  VStack,
   HStack,
   SimpleGrid,
-  Divider,
+  Text,
+  VStack,
 } from "@chakra-ui/react";
+
 import { useNavigate } from "react-router-dom";
+
 import {
   ArrowRight,
   ArrowUpRight,
   BriefcaseBusiness,
   Check,
-  ChevronRight,
   Sparkles,
   UserRound,
 } from "lucide-react";
@@ -36,10 +39,10 @@ export default function PublicLandingPage() {
         position="sticky"
         top={0}
         zIndex={30}
-        bg="rgba(255,255,255,0.96)"
+        bg="rgba(254,253,252,0.96)"
         backdropFilter="blur(14px)"
         borderBottom="1px solid"
-        borderColor="gray.200"
+        borderColor="cream.300"
       >
         <Container maxW="1280px" py={4} px={{ base: 5, md: 8 }}>
           <HStack justify="space-between">
@@ -59,9 +62,9 @@ export default function PublicLandingPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                color="charcoal.600"
+                color="charcoal.700"
                 fontWeight="600"
-                borderRadius="0"
+                borderRadius="4px"
                 onClick={() => navigate("/login")}
                 _hover={{
                   bg: "brand.50",
@@ -75,7 +78,7 @@ export default function PublicLandingPage() {
                 variant="ghostBrand"
                 size="sm"
                 fontWeight="700"
-                borderRadius="0"
+                borderRadius="4px"
                 onClick={() => navigate("/employer/login")}
               >
                 Employer Login
@@ -93,17 +96,16 @@ export default function PublicLandingPage() {
         overflow="hidden"
         bg="cream.100"
         borderBottom="1px solid"
-        borderColor="gray.200"
+        borderColor="cream.300"
       >
-        {/* Decorative vertical line */}
+        {/* Editorial vertical rule */}
         <Box
           position="absolute"
           left={{ base: "20px", lg: "7%" }}
           top={0}
           bottom={0}
           w="1px"
-          bg="gray.200"
-          opacity={0.7}
+          bg="cream.300"
         />
 
         <Container
@@ -120,7 +122,7 @@ export default function PublicLandingPage() {
             {/* Hero copy */}
             <Box gridColumn={{ lg: "span 7" }}>
               <Text textStyle="overline" mb={6}>
-                Positioning
+                Springboard Talent Partners
               </Text>
 
               <Heading
@@ -145,7 +147,7 @@ export default function PublicLandingPage() {
                 </Box>
               </Heading>
 
-              <Box mt={7} w="70px" h="3px" bg="accent.500" />
+              <Box mt={7} w="72px" h="3px" bg="accent.500" />
 
               <Text
                 mt={7}
@@ -163,7 +165,7 @@ export default function PublicLandingPage() {
                 <Button
                   h="50px"
                   px={7}
-                  borderRadius="0"
+                  borderRadius="4px"
                   rightIcon={<ArrowRight size={17} />}
                   onClick={() => navigate("/register/welcome")}
                 >
@@ -174,7 +176,7 @@ export default function PublicLandingPage() {
                   h="50px"
                   px={7}
                   variant="outlineGold"
-                  borderRadius="0"
+                  borderRadius="4px"
                   rightIcon={<ArrowUpRight size={17} />}
                   onClick={() => navigate("/employer/register")}
                 >
@@ -187,7 +189,7 @@ export default function PublicLandingPage() {
             <Box
               gridColumn={{ lg: "span 5" }}
               borderLeft={{ base: "none", lg: "1px solid" }}
-              borderColor="gray.300"
+              borderColor="cream.400"
               pl={{ base: 0, lg: 12 }}
             >
               <VStack align="stretch" spacing={10}>
@@ -237,7 +239,7 @@ export default function PublicLandingPage() {
             {/* Candidate */}
             <RoleCard
               eyebrow="For Candidates"
-              icon={<UserRound size={22} />}
+              icon={<UserRound size={21} />}
               title="Build your potential."
               description="Create a powerful professional profile, understand your strengths, develop your capabilities, and connect with opportunities aligned to your goals."
               items={[
@@ -256,7 +258,7 @@ export default function PublicLandingPage() {
             <RoleCard
               employer
               eyebrow="For Employers"
-              icon={<BriefcaseBusiness size={22} />}
+              icon={<BriefcaseBusiness size={21} />}
               title="Find your gold standard."
               description="Discover qualified talent, define your hiring needs, manage your recruitment workflow, and build teams around the people who fit."
               items={[
@@ -300,6 +302,7 @@ export default function PublicLandingPage() {
                 fontStyle="italic"
                 lineHeight="1.1"
                 color="white"
+                letterSpacing="-0.035em"
               >
                 Find Your
                 <Box as="span" display="block">
@@ -336,6 +339,7 @@ export default function PublicLandingPage() {
               fontSize={{ base: "3xl", md: "5xl" }}
               fontWeight="500"
               color="brand.500"
+              letterSpacing="-0.035em"
             >
               Progress with purpose.
             </Heading>
@@ -345,7 +349,7 @@ export default function PublicLandingPage() {
             columns={{ base: 1, md: 2, lg: 4 }}
             spacing={0}
             borderTop="1px solid"
-            borderColor="gray.300"
+            borderColor="cream.400"
           >
             <DeliveryItem
               number="01"
@@ -381,16 +385,17 @@ export default function PublicLandingPage() {
         <Container maxW="850px">
           <VStack textAlign="center" spacing={7}>
             <Box
-              w="54px"
-              h="54px"
+              w="48px"
+              h="48px"
               border="1px solid"
               borderColor="accent.500"
               display="flex"
               alignItems="center"
               justifyContent="center"
               color="accent.500"
+              borderRadius="4px"
             >
-              <Sparkles size={21} />
+              <Sparkles size={20} />
             </Box>
 
             <Text textStyle="overline">Philosophy</Text>
@@ -445,11 +450,22 @@ export default function PublicLandingPage() {
         <Container maxW="1200px">
           <SimpleGrid columns={{ base: 1, md: 4 }} spacing={10} mb={10}>
             {/* Brand */}
-            <HStack spacing={3} mb={4}>
-              <BrandMark dark />
+            <Box>
+              <HStack spacing={3} mb={4} align="flex-start">
+                <BrandMark dark />
+                <BrandWordmark dark />
+              </HStack>
 
-              <BrandWordmark dark />
-            </HStack>
+              <Text
+                fontSize="sm"
+                lineHeight="1.7"
+                color="whiteAlpha.600"
+                maxW="240px"
+              >
+                Your potential. Your platform. A talent partnership built around
+                meaningful progress.
+              </Text>
+            </Box>
 
             {/* Candidates */}
             <FooterColumn
@@ -556,26 +572,38 @@ function RoleCard({
   return (
     <Box
       border="1px solid"
-      borderColor={employer ? "accent.300" : "gray.300"}
+      borderColor={employer ? "accent.300" : "cream.400"}
       bg={employer ? "cream.100" : "white"}
       p={{ base: 7, md: 9 }}
       position="relative"
-      transition="all 0.25s ease"
+      transition="all 0.2s ease"
       _hover={{
-        transform: "translateY(-4px)",
-        boxShadow: "0 18px 45px rgba(46, 42, 40, 0.10)",
+        borderColor: employer ? "accent.500" : "brand.300",
+        boxShadow: "0 18px 45px rgba(46, 42, 40, 0.08)",
+        transform: "translateY(-2px)",
       }}
     >
-      <HStack justify="space-between" align="start" mb={7}>
+      {/* Top accent */}
+      <Box
+        position="absolute"
+        top={0}
+        left={0}
+        w="48px"
+        h="3px"
+        bg={employer ? "accent.500" : "brand.500"}
+      />
+
+      <HStack justify="space-between" align="flex-start" mb={7}>
         <Box
-          w="52px"
-          h="52px"
+          w="46px"
+          h="46px"
           display="flex"
           alignItems="center"
           justifyContent="center"
           border="1px solid"
           borderColor={employer ? "accent.500" : "brand.500"}
           color={employer ? "accent.600" : "brand.500"}
+          borderRadius="4px"
         >
           {icon}
         </Box>
@@ -629,13 +657,13 @@ function RoleCard({
         ))}
       </VStack>
 
-      <Divider borderColor="gray.300" mb={6} />
+      <Divider borderColor="cream.300" mb={6} />
 
       <HStack spacing={3}>
         <Button
           flex={1}
           h="46px"
-          borderRadius="0"
+          borderRadius="4px"
           rightIcon={<ArrowRight size={16} />}
           onClick={onPrimary}
         >
@@ -644,8 +672,8 @@ function RoleCard({
 
         <Button
           h="46px"
-          variant="outline"
-          borderRadius="0"
+          variant="outlineGold"
+          borderRadius="4px"
           onClick={onSecondary}
         >
           {secondaryLabel}
@@ -668,7 +696,7 @@ function DeliveryItem({ number, title, description }) {
         base: "none",
         md: "1px solid",
       }}
-      borderColor="gray.300"
+      borderColor="cream.400"
       _last={{
         borderRight: "none",
       }}

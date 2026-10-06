@@ -1,11 +1,29 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-export default function PublicRoute() {
-  const { accessToken } = useSelector((s) => s.auth);
+import { ROUTES } from "./routePaths";
 
-  // Allow access to public pages (/login, /) for unauthenticated users
-  // Redirect authenticated users to /candidate
-  return accessToken ? <Navigate to="/candidate" replace /> : <Outlet />;
+export default function PublicRoute() {
+  const location = useLocation();
+  const { accessToken, user } = useSelector((state) => state.auth);
+
+  if (!accessToken) {
+    return <Outlet />;
+  }
+
+  /*
+   * Employer authentication
+   *
+   * After employer registration/login, do not send the user
+   * into the candidate application.
+   */
+  if (user?.role === "COMPANY") {
+    return <Navigate to={ROUTES.EMPLOYER_SETUP_ENGAGEMENT} replace />;
+  }
+
+  /*
+   * Candidate authentication
+   */
+  return <Navigate to={ROUTES.CANDIDATE} replace />;
 }

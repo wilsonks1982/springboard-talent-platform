@@ -1,6 +1,6 @@
 import { api } from "./http";
 
-const BASE_URL = "/api/employers";
+const BASE_URL = "/employers";
 
 export const employerRegistrationApi = {
   async register(data) {
